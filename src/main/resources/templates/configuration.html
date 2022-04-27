@@ -397,9 +397,9 @@ var maximumPeople = document.getElementById("maximum-People").value;
 var minimumPeople = document.getElementById("minimum-People").value;
 
 function userName(){
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
  	var apiUrl = urlSlashCheck + "api/v1/user/usersList"; 
 
   $.ajax({

@@ -139,9 +139,9 @@
   var totalCount = 0;
     function attendancePaging(){
       itemsPerPage=10;
-      var dataApi = "[[${session.DATA_API}]]";
+      var reportApi = "[[${session.REPORT_API}]]";
       var sessionToken = "[[${session.USER.sessionToken}]]";
-      var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+      var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
       var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/count"; 
       $.ajax({
         contentType: "application/json;charset=UTF-8",
@@ -209,9 +209,9 @@ $("#clearIcon").on("click",function(){
 })
 
   function userFilter(){
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   var apiUrl = urlSlashCheck + "api/v1/user/usersList";
   var userList = [];
   $.ajax({
@@ -242,9 +242,9 @@ $("#clearIcon").on("click",function(){
                             location:"",
                             name:""
                           }
-    var dataApi = "[[${session.DATA_API}]]";
+    var reportApi = "[[${session.REPORT_API}]]";
   	var sessionToken = "[[${session.USER.sessionToken}]]";
-  	var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  	var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
  		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/filter";
      $.ajax({
 		  contentType: "application/json;charset=UTF-8",
@@ -304,9 +304,9 @@ $("#clearIcon").on("click",function(){
   }
 
 	function attendanceList(entryExitFilter, pageNumber){
-    var dataApi = "[[${session.DATA_API}]]";
+    var reportApi = "[[${session.REPORT_API}]]";
   	var sessionToken = "[[${session.USER.sessionToken}]]";
-  	var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  	var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
  		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/"+pageNumber; 
 
 		$.ajax({

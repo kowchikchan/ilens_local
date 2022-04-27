@@ -109,9 +109,9 @@ $(window).on('load', function() {
 });
 
 function userProfile(){
-      var dataApi = "[[${session.DATA_API}]]";
+      var reportApi = "[[${session.REPORT_API}]]";
   		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/user/"+"[[${session.USER.id}]]"; 
   $.ajax({
       contentType: "application/json;charset=UTF-8",
@@ -213,9 +213,9 @@ function userProfile(){
           userId: $("#UserID").val(),
           userSecrect: $("#UserID").val()
       };
-      var dataApi = "[[${session.DATA_API}]]";
+      var reportApi = "[[${session.REPORT_API}]]";
   		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/user"; 
 
       $.ajax({
@@ -294,9 +294,9 @@ function updatePassword(){
         userId: $("#UserID").val(),
         userSecrect: confirmPassword
       };
-      var dataApi = "[[${session.DATA_API}]]";
+      var reportApi = "[[${session.REPORT_API}]]";
       var sessionToken = "[[${session.USER.sessionToken}]]";
-      var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+      var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
       var apiUrl = urlSlashCheck + "api/v1/user/changePassword"; 
       $.ajax({
         contentType: "application/json;charset=UTF-8",

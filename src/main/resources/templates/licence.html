@@ -48,12 +48,9 @@
     
   })
   function importlicence(){  
-      var dataApi = "[[${session.DATA_API}]]";  		
-  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
-  		var apiUrl = urlSlashCheck + "import_licence";  
      $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url:apiUrl ,
+      url:"/import_licence" ,
       type: "GET",
       async: false,
       success: function (data){             

@@ -17,7 +17,11 @@
 			    <div class="col-md-12 p-0">
 			      <label class="dinput-labels">Data Api <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Remote API Server Address" ></i></label>
 	              <input type="text"  class="dlens_input"  id="apiValue" />
-	        </div>
+				</div>
+				<div class="col-md-12 p-0">
+					<label class="dinput-labels">Report Api <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Remote API Server Address" ></i></label>
+					<input type="text"  class="Report_input"  id="reportValue" />
+				</div>
 	            <div class="col-md-12 p-0">
 	              <label class="dinput-labels">Api Token <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The token to authentication remote api server" ></i></label>
 	              <input type="text"   class="alens_input" id="tokenValue"  />
@@ -48,9 +52,9 @@
       getDataApi();
     })
 
- function apiHealthCheck(dataApi, apiToken) {
+ function apiHealthCheck(reportApi, apiToken) {
   var returnVal = "false";
-  var url = dataApi.toString().endsWith("/")?dataApi:dataApi+"/"; 
+  var url = reportApi.toString().endsWith("/")?reportApi:reportApi+"/"; 
   var finalUrl = url + "api/v1/dataApi/details"; 
   $.ajax({
       contentType: "application/json;charset=UTF-8",
@@ -71,16 +75,15 @@
 }
 
 $("#update").click(function(){ 
-  var rtnVl = apiHealthCheck($("#apiValue").val(), $("#tokenValue").val());
+  var rtnVl = apiHealthCheck($("#reportValue").val(), $("#tokenValue").val());
   var update = {
     apiToken: $("#tokenValue").val(),
+    reportApi:$("#reportValue").val(),
     dataApi: $("#apiValue").val(),
     id: ("0")
     };
-  var dataApi = "[[${session.DATA_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
-  var apiUrl = urlSlashCheck + "api/v1/dataApi/update";
+  var apiUrl ="api/v1/dataApi/update";
     if(rtnVl == "true"){
       $.ajax({
           contentType: "application/json;charset=UTF-8",
@@ -102,10 +105,8 @@ $("#update").click(function(){
 })
 
 function getDataApi() {
-  var dataApi = "[[${session.DATA_API}]]";
   var sessionToken = "[[${session.API_TOKEN}]]";
-  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
-  var apiUrl = urlSlashCheck + "api/v1/dataApi/details";  
+  var apiUrl = "api/v1/dataApi/details";  
   $.ajax({
       contentType: "application/json;charset=UTF-8",
       url: apiUrl,
@@ -116,6 +117,7 @@ function getDataApi() {
       success: function(data){ 
         $("#tokenValue").val(data.apiToken);
         $("#apiValue").val(data.dataApi);
+        $("#reportValue").val(data.reportApi);
       },
       error: function(err){
         setTimeout(function(){ toastr.error("Error found.."); }, 1000);

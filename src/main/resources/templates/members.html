@@ -140,9 +140,9 @@ function usersEdit(id){
         $("#userForm").html(data);
       }
   });
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   var apiUrl = urlSlashCheck + "api/v1/user/"+id;
    $.ajax({
     contentType: "application/json;charset=UTF-8",
@@ -192,9 +192,9 @@ function saveUser(){
         userId: $("#UserID").val(),
         userSecret: $("#UserID").val()
       };
-      var dataApi = "[[${session.DATA_API}]]";
+      var reportApi = "[[${session.REPORT_API}]]";
       var sessionToken = "[[${session.USER.sessionToken}]]";
-      var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+      var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
       var apiUrl = urlSlashCheck + "api/v1/user";
       $.ajax({
         contentType: "application/json;charset=UTF-8",
@@ -216,9 +216,9 @@ function saveUser(){
 var currentPage = 1;
 function deleteUser(id){
   currentPage = parseInt($("#pageNo").val())+1;
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   var apiUrl = urlSlashCheck + "api/v1/user/"+id;
   $.ajax({
     contentType: "application/json;charset=UTF-8",
@@ -242,9 +242,9 @@ var totalCount = 0;
 
 function usersPaging(){
   itemsPerPage=10;
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   var apiUrl = urlSlashCheck + "api/v1/user/count";
   $.ajax({
     contentType: "application/json;charset=UTF-8",
@@ -290,9 +290,9 @@ function usersPaging(){
 
 var pageNumber = 0;
 function usersPageList(pageNumber){
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   var apiUrl = urlSlashCheck + "api/v1/user/list/"+pageNumber;
     $.ajax({
       contentType: "application/json;charset=UTF-8",
@@ -358,9 +358,9 @@ function updateUser(){
         userId: $("#UserID").val(),
         userSecret: $("#UserID").val()
     };
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   var apiUrl = urlSlashCheck + "api/v1/user";
     $.ajax({
       contentType: "application/json;charset=UTF-8",

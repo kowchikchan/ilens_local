@@ -3738,9 +3738,9 @@ input#text-date {
     height: 191px;
     width: 33vw;
 }
-.main-table {
-  margin-top: 10px;
-}
+  .main-table {
+    margin-top: 10px;
+  }
   
 }
 button#trace {
@@ -3750,4 +3750,16 @@ button#trace {
 }
 tbody#nprList:hover {
   background: #084174;
+}
+.Report_input {
+  width: 35%;
+  margin-bottom:22px;
+  height: 35px;
+  margin-left: 8.7%;
+  background-color: #3a5362;
+  border: 1px solid #f9c631 !important;
+  border: none;
+  color: white;
+  padding: 0 12px;
+  box-shadow: 0px 0px 4px 0px rgb(0 0 0 / 75%);
 }

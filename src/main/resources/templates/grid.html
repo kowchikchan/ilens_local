@@ -449,9 +449,9 @@ function save(){
               updatedBy: "string",
               updatedDt: "2021-07-02T06:44:14.985Z"
             }; 
-            var dataApi = "[[${session.DATA_API}]]";
+            var reportApi = "[[${session.REPORT_API}]]";
             var sessionToken = "[[${session.USER.sessionToken}]]";
-            var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+            var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
             var apiUrl = urlSlashCheck + "api/v1/channels"; 
      
    $.ajax({

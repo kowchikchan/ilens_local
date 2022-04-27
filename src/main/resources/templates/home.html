@@ -124,7 +124,7 @@ $(document).ready(function(){
     sixMonth_average();
     entryViolation_byLocation();
     totalViolation_count();
-    npr();
+    // npr();
     $("#home").addClass('active');
     $('[data-toggle="tooltip"]').tooltip({
         placement : 'left'
@@ -142,9 +142,9 @@ $(window).on('load', function() {
 
 
 function lastHourEntry(){
-      var dataApi = "[[${session.DATA_API}]]";
+      var reportApi = "[[${session.REPORT_API}]]";
   		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/lasthourentry"; 
     $.ajax({
       contentType: "application/json;charset=UTF-8",
@@ -160,9 +160,9 @@ function lastHourEntry(){
 }
 
 function onTimeEntry(){
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/ontimeentry"; 
     $.ajax({
       contentType: "application/json;charset=UTF-8",
@@ -178,9 +178,9 @@ function onTimeEntry(){
 }
 
 function lateTimeEntry(){
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/lateEntry"; 
     $.ajax({
       contentType: "application/json;charset=UTF-8",
@@ -196,9 +196,9 @@ function lateTimeEntry(){
 }
 
 function graceTimeEntry(){
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/gracetimeentry"; 
     $.ajax({
       contentType: "application/json;charset=UTF-8",
@@ -214,9 +214,9 @@ function graceTimeEntry(){
 }
 
 function lastMonthAverage(){
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/average"; 
     $.ajax({
       contentType: "application/json;charset=UTF-8",
@@ -232,9 +232,9 @@ function lastMonthAverage(){
 }
 
 function totalViolation_count(){
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/entryviolationtotalcount"; 
     $.ajax({
       contentType: "application/json;charset=UTF-8",
@@ -255,9 +255,9 @@ function totalViolation_count(){
 
 var count = [];
 function everyTenMins_refreshData(){
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/everytenminutes"; 
    count = [];
    $.ajax({
@@ -362,9 +362,9 @@ function everyTenMins_refreshData(){
 var month = [];
 var average = [];
 function sixMonth_average(){
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/sixmonthaverage"; 
     $.ajax({
       contentType: "application/json;charset=UTF-8",
@@ -449,9 +449,9 @@ function sixMonth_average(){
 var locationBy_violation = [];
 var locationCount = [];
 function entryViolation_byLocation(){
-  var dataApi = "[[${session.DATA_API}]]";
+  var reportApi = "[[${session.REPORT_API}]]";
   		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/entryviolationbylocation"; 
     $.ajax({
       contentType: "application/json;charset=UTF-8",

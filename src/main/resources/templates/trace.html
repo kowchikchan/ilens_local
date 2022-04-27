@@ -107,9 +107,9 @@
 
 	function getSnapshotString(snapshotValue){
 		var bs64EncodedString = "";
-    var dataApi = "[[${session.DATA_API}]]";
+    var reportApi = "[[${session.REPORT_API}]]";
     var sessionToken = "[[${session.USER.sessionToken}]]";
-    var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+    var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
     var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/snapshot/"+snapshotValue; 
 		$.ajax({
 			contentType:"application/json;charset=UTF-8",
@@ -172,9 +172,9 @@
 		var snapshot = "";
 		var encodedString = "";
         var swapVariable = "";
-    var dataApi = "[[${session.DATA_API}]]";
+    var reportApi = "[[${session.REPORT_API}]]";
     var sessionToken = "[[${session.USER.sessionToken}]]";
-    var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+    var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
     var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/"+pageNumber;
 		$.ajax({
 		  contentType: "application/json;charset=UTF-8",

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+	<title>[[${APP_NAME}]] - Agents</title>
+</head>
+<body class="overflow">
+<div layout:fragment="content" class="contant">
+	<div class="pre-loading">
+    	<img class="loader" src="/web/images/loader.png" />
+  	</div>
+      <div class="heading">
+        <span class="heading-text fs-30">Licence</span>
+    </div>  	
+    <span>
+        <a onclick="importlicence()"><button  class="btn btn-outline-warning" >Import</button></a>
+    </span>
+    <div class="main-table zoom">
+    	<div class="col-md-12 pb-10 row m-0">
+    		
+    		<div class="col-md-12 row table-responsive">
+    			<table class="clr-txt">
+    				<thead>
+    					<tr>
+    						<th width="300"> Company Name </th>
+    						<th width="300"> No of Channels</th>
+    						<th width="300"> Start Date </th>
+    						<th width="300"> Type </th>
+                <th width="300">Expire Date</th>
+    					</tr>
+    				</thead>
+    				<tbody>
+              <tr>
+                <td>Logicfocus India</td>
+                <td>10</td>
+                <td>12-12-12</td>
+                <td>....</td>
+                <td>12-12-24</td>
+              </tr>
+            </tbody>
+    			</table>
+          <div id="Licence"></div>
+    		</div>
+<script>
+  $(document).ready(function(){    
+      $("#navadms").addClass('active');
+      $("#licence").addClass('active');
+      $("#Adms").addClass('show');
+    
+  })
+  function importlicence(){  
+      var dataApi = "[[${session.DATA_API}]]";  		
+  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var apiUrl = urlSlashCheck + "import_licence";  
+     $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url:apiUrl ,
+      type: "GET",
+      async: false,
+      success: function (data){             
+        $("#Licence").html(data);
+        setTimeout(function(){ toastr.warning("licence will be override"); }, 1000);
+
+      }
+   })
+}
+
+</script>

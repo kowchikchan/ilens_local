@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/vendor/fontawesome/css/font-awesome.css"/>
+    <link rel="stylesheet" href="/vendor/jquery-autocomplete/css/styles.css"/>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="/web/css/theme/dark/style.css">
+    <link rel="stylesheet" href="/vendor/toastr/toastr.min.css">
+    <link rel="stylesheet" href="/vendor/typeahead/jquery.aircomplete.css">
+    <link rel="stylesheet" href="/vendor/datepicker/bootstrap-datepicker.min.css">
+
+    <script src="/vendor/jquery/js/jquery-3.3.1.min.js"></script>
+    <script src="/vendor/popper/popper.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/vendor/jquery-autocomplete/js/jquery.autocomplete.min.js"></script>
+    <script src="/vendor/typeahead/jquery.aircomplete.js"></script>
+
+    <script src="/vendor/jquery/js/jquery.twbsPagination.min.js"></script>
+
+    <script src="/vendor/chartjs/js/Chart.min.js"></script>
+    <script src="/vendor/toastr/toastr.min.js"></script>
+    <script src="/vendor/datepicker/bootstrap-datepicker.min.js"></script>
+
+    <script src="/vendor/moment/moment.min.js"></script>
+    <script src="/web/js/main.js"></script>
+</head>
+<body>
+<div id="sidebar">
+    <header class="sidebar-section">
+        <div class="navbar-vertical">
+            <div class="user row">
+                <img src="/web/images/2.png">
+                <div class="ml-10">
+                    <span class="username">[[${session.USER.userId}]]</span><br>
+                    <span id="UserRole">[[${session.ROLE}]]</span>
+                </div>
+            </div>
+            <ul class="main-menu visble-menu">
+                <li>
+                    <a href="/" id="home"><i class="fa fa-home nav-icon" data-toggle="tooltip" data-original-title="Home" aria-hidden="true"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+<!--                 <li class="drop">
+                    <a href="#">
+                        <em class="fa fa-desktop nav-icon" data-toggle="tooltip" data-original-title="Boards"></em>
+                        <span>Boards</span></a>
+                </li> -->
+                <li>
+                    <a href="/channels" id="channels"><i class="fa fa-cog nav-icon" data-toggle="tooltip" data-original-title="Channel configuration" aria-hidden="true"></i><span class="icon-tooltip">Configuration</span>
+                    </a>
+                </li>
+                 <li>
+                    <a href="/members" id="users"><i class="fa fa-users nav-icon" data-toggle="tooltip" data-original-title="Members" aria-hidden="true"></i><span>Members</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/attendance" id="attendance"><i class="fa fa-calendar nav-icon ex" data-toggle="tooltip" data-original-title="Attendance"aria-hidden="true"></i><span>Attendance</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#Adms" id="navadms" data-toggle="collapse" aria-expanded="false"> <i class="fa fa-user-plus nav-icon ex" data-toggle="tooltip" data-original-title="Administration"></i><span>Administration  </span>
+                    </a>
+                    <ul id="Adms" class="nav nav-second collapse mk">
+                        <li class="sec_li"><a href="/data_api"  id="dataapi"><i class="fa fa-cloud" data-toggle="tooltip" data-original-title="Data Api"></i> <span>Data Api</span>
+                        </a></li>
+                        <li class="sec_li"><a href="/licence"  id="licence"><i class="fa fa-newspaper-o" data-toggle="tooltip" data-original-title="licenece"></i> <span>Licenece</span>
+                        </a></li>                                     
+                                               
+                    </ul>
+                </li>
+                <li>
+                    <a href="/profile" id="profile"><em class="fa fa-user nav-icon" data-toggle="tooltip" data-original-title="Profile"></em><span>Profile</span>
+                    </a>
+                </li>
+                <img src="/web/images/Asset 1.png" class="nav-logo">
+                <li class="logout">
+                    <a href="/logout">
+                        <em class="fa fa-power-off nav-icon ex" data-toggle="tooltip" data-original-title="Logout"></em><span>Logout</span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </header>
+</div>
+<div class="top-nav">
+    <span class="navbar-icon"><i class="fa fa-bars" aria-hidden="true"></i></span>
+</div>
+
+<!--<div class="pre-loading">
+    <img class="loader" src="/web/images/loader.png"/>
+</div>-->
+<div layout:fragment="content">
+
+</div>
+<script>
+$(document).ready(function(){
+
+      $('[data-toggle="tooltip"]').tooltip({
+        placement : 'right'
+    });
+        
+
+ });
+</script>
+</body>
+</html>

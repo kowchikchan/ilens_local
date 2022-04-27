@@ -1,0 +1,141 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.2.0"
+    }
+}
+
+
+
+plugins {
+    id 'org.springframework.boot' version '2.3.9.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'java'
+}
+
+apply plugin: "org.sonarqube"
+
+group = 'com.pbs.tech'
+version = '1.0'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+}
+
+sonarqube {
+    properties {
+        property 'sonar.sources', 'src/main/java,src/main/resources'
+        //property 'sonar.tests', 'src/test/java'
+    }
+}
+
+dependencies {
+
+    //Spring core
+    compile("org.springframework.boot:spring-boot-starter-web")
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter'
+
+    // Template layout
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
+
+    compile('org.springframework.boot:spring-boot-starter-data-cassandra')
+
+    //Thanks for using https://jar-download.com
+    //spring security
+    compile('org.springframework.boot:spring-boot-starter-security')
+
+    //DATA
+    compile ("org.springframework.boot:spring-boot-starter-data-jpa")
+    //compile 'mysql:mysql-connector-java:6.0.5'
+    // https://mvnrepository.com/artifact/com.h2database/h2
+    compile group: 'com.h2database', name: 'h2', version: '1.4.200'
+
+
+
+    //Apache Utils
+    compile 'org.apache.commons:commons-dbcp2:2.1.1'
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+    //swagger API DOC.
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+def packageDistribution =copySpec {
+
+    def distroName = "$name-$version";
+    into(distroName) {
+
+        new File(buildDir, "$distroName/conf").mkdirs()
+        new File(buildDir, "$distroName/bin").mkdirs()
+        new File(buildDir, "$distroName/lib").mkdirs()
+        new File(buildDir, "$distroName/data").mkdirs()
+        new File(buildDir, "$distroName/scripts").mkdirs()
+
+        into('lib') {
+            from libsDir
+            include '*.jar' //copy the fat jar created by bootRepackage
+        }
+
+
+        into('bin') {
+            from 'src/templates'
+            include 'start*.template'
+            include 'stop*.template'
+            filter(ReplaceTokens, tokens: [
+                    name: project.name,
+                    extra_java_opts_property: project.name.replace('-','_').toUpperCase() + "_OPTS",
+                    extra_java_opts: ' -Dspring.config.location=$APP_HOME/conf/ -Dspring.profiles.active=$1 -DSCRIPT_PATH=$APP_HOME/scripts',
+                    version: project.version,
+                    generated: new Date().toString()
+            ])
+            fileMode = 0755
+        }
+        into('conf') {
+            from "src/main/resources/" //custom start script based on startScripts task output
+            include '*.yml'
+        }
+
+        into('scripts') {
+            from "build/resources/main/scripts/"
+            include '**/*.py'
+            include '**/*.xml'
+        }
+
+        rename ("^start-ilens.sh.template\$","start-ilens.sh")
+        rename ("^stop-ilens.sh.template\$","stop-ilens.sh")
+
+
+
+    }
+
+
+}
+
+
+
+task releaseTar(type: Tar, dependsOn: ['build']) { with packageDistribution }
+

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.css" />
+    <link
+      rel="stylesheet"
+      href="/vendor/fontawesome/css/font-awesome.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/vendor/jquery-autocomplete/css/styles.css"
+    />
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="/web/css/theme/dark/style.css" />
+
+    <script src="/vendor/jquery/js/jquery-3.3.1.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/vendor/jquery-autocomplete/js/jquery.autocomplete.min.js"></script>
+    <script src="/vendor/jquery/js/jquery.twbsPagination.min.js"></script>
+    <script src="/vendor/chartjs/js/Chart.min.js"></script>
+  </head>
+  <body class="login-body">
+    <div class="pre-loading">
+      <img class="loader" src="/web/images/loader.png" />
+    </div>
+    <div class="Login-content">
+      <div class="col-md-12 row">
+        <div class="Login_panal">
+           <label class="ybg-lable">Login</label>
+           <div id="user-credentials">
+            <i id="warn-icon" class="fa fa-exclamation-triangle warning-icon sty" aria-hidden="true"><div id="validInput"></div></i>
+          </div> 
+          <div id="user-credentials1">
+            <i id="warn-icon1" class="fa fa-times-circle warning-icon sty" aria-hidden="true"><div id="validInput1"></div></i>
+          </div>   
+          <div class="input_part col-md-10 p-0">
+            <div class="col-md-12 p-0">
+              <label class="input-labels">User Name/Email ID</label>
+              <input type="text" id="userId" name="Username" class="lens_input" placeholder="User Name/Email ID"/>
+              <span class="validate-login">Invalid User Credentials</span>
+            </div>
+            <div class="col-md-12 p-0">
+              <label class="input-labels">Password</label>
+              <input type="password" id="userSecret" name="Username" class="lens_input login-pass pr-40" placeholder="Password"/>
+              <i id="login_password" class="fa fa-eye show-password"></i>
+              <span class="validate-login">Invalid Password</span>
+            </div>
+          </div>
+          <div class="">
+            <button id="login" class="submit-btn" onclick="checkLogin();">Login</button>
+            <div class="pf-div"><a href="#">Forgot Password?</a></div>
+          </div>
+          <div class="img-bg-line">
+            <img src="/web/images/lines.png" id="live_c2" />
+          </div>
+        </div>
+      </div>
+      <div class="login-logo">
+        <img src="/web/images/Asset 2.png" class="w-100" />
+      </div>
+      <div class="bg-out">
+        <img src="/web/images/bubbles.png" class="w-100" />
+      </div>
+    </div>
+<script>
+$(document).ready(function(){
+    const password = $('#userSecrect')
+    $('#login_password').click(function(){
+      if(password.prop('type') == 'password'){
+        $(this).addClass('fa-eye-slash');
+        password.attr('type','text');
+      }
+      else{
+        $(this).removeClass('fa-eye-slash');
+        password.attr('type','password');
+      }
+    })
+     $(".submit-btn").on("click",function(){
+        $(".pre-loading").show();
+        window.setInterval(function(){
+          $(".pre-loading").hide();
+        }, 1500);
+      });
+     $(".validate-login").hide();
+});
+$(window).on('load', function() {
+  $(".pre-loading").hide();
+});
+
+$(document).keypress(function (e) {
+ var key = e.which;
+ if(key == 13)
+  {
+    checkLogin();
+  }
+});
+
+
+function checkLogin(){
+  if($.trim($('#userId').val()) == ""){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Please Enter User Id/Email");
+    return false;
+  }else if($.trim($('#userSecret').val()) == ""){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Please Enter Password");
+    return false;
+  }
+  loginUser();
+}
+function loginUser(){
+
+    var userVO = {
+          userId: $("#userId").val(),
+          userSecret: $("#userSecret").val()
+    };
+
+    $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: "/auth",
+        type: "POST",
+        async: false,
+        data: JSON.stringify(userVO),
+        complete: function(xhr, response, textStatus){
+            // console.log(xhr.status);
+            if(xhr.status == 200){
+               window.location.href = "/";
+            }else{
+                console.log("error" + xhr.status);
+                
+                  $("#user-credentials1").show();
+                  $("#warn-icon1").show();
+                  $('#validInput1').html("User Name or Password is Not Valid");
+                  $('#validInput1').show();
+            }
+        }
+    })
+
+}
+
+
+function validate() {
+        clearAlert();
+        var formData = $('#login').serialize();
+        $.post("/login", formData, function(data) {
+            window.location.href = "/";
+        }).fail(function(data) {
+            $('#password').val("");
+            showAlert("danger",data.responseText);
+            stopProcess();
+        });
+        return false;
+    }
+
+
+
+    
+
+
+
+
+
+
+
+</script>
+  </body>
+</html>
+

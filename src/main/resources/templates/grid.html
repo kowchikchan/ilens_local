@@ -1,0 +1,746 @@
+<div id="grid_table" class="main-table">
+    <div class="col-md-12 pb-12 row m-0">
+        <div class="col-md-12">
+             <input class="input-search" type="text" name="hostname" id="hostname" onkeydown="inputStop()" value="192.168.0.x" />
+             <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Please enter the ip range to start staring , Can keep last one can keep empty or .x”" ></i>
+            <button onclick="filterIp()" class="button-scan">
+                <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                <span class="btn-txt">Scan for devices</span>
+            </button>
+            <span id="processing_devices">Please wait it will take some time</span>
+            <nav aria-label="Page navigation example" class="pagination-nav" id="pagination">
+                <ul class="pagination" id="tablePagination">
+                </ul>
+            </nav>
+            <a onclick="addChannel()"><button id="addUser" class="new-button button-position">New<i class="fa fa-plus-circle" aria-hidden="true"></i></button></a>
+            <div class="container-switch ya">
+              <div class="inner-container" id="toggle-7" enable="false">
+                  <div id="tg-9"  class="toggle toggle-btn active one" flag="one">
+                    <p><i class="fa fa-th-large"></i> Grid</p>
+                  </div>
+                  <div id="tg-" class="toggle toggle-btn  one" flag="one">
+                    <p><i class="fa fa-bars"></i> List</p>
+                  </div>
+              </div>
+            </div>
+            <div class="dropdown">
+              <button class="dropBtn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select filter
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#" id="fil"  onclick="allList()">All</a>
+                <a class="dropdown-item" href="#" id="fil" onclick="activeList()">Active</a>
+                <a class="dropdown-item" href="#" id="fil" onclick="inActiveList()" >In Active</a>
+              </div>
+            </div>
+        </div>
+    </div>  
+    <br>
+      <div class="container grid-container" id="channelList">
+      </div>
+  </div>        
+  </div>
+  <div class="modal fade modal-blur" id="exampleModalCenter-1" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div id="popup-bg" class="modal-content popup-wh">
+      <div id="remove-modal" class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Invalid config credentials</h5>
+      </div>
+    <div class="modal-body">
+       <div id="config-credentials">
+          <i id="warn-Invalid" class="fa fa-exclamation-triangle warning-config" aria-hidden="true"><div id="validConfigInput"></div></i>
+       </div>
+    </div>
+    <div id="footer-remove" class="modal-footer">
+      <button type="button" id="cancel" class="ok-btn" data-dismiss="modal" onclick="popupCancel()">Ok</button>
+    </div>
+  </div>
+  </div>
+  </div>
+  <input type="hidden" name="" id="channelId" value="0">
+  <div id="channelForm"></div>
+  <input type="hidden" name="" id="configPageNo"> 
+  <div class="records"></div>  
+  <div id="popup_default" class="popup">
+          <div class="popup-overlay"></div>
+          <div class="popup-content">
+            <a href="#" class="close-popup" data-id="popup_default">&times;</a>
+           <table id="liveId">
+            <div class="camera_live">
+              <div class="fp-Video" id="ch" >
+                <div id="play" class="display"></div>
+               </div>
+            </div>
+               
+           </table>
+        </div>  
+    <script>
+     var accessConfig = [];
+      var access = [];
+      var addedPersons = [];
+      var removedPersons = [];
+      $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip({
+        placement : 'right'
+        });
+        $('[data-toggle1="tooltip"]').tooltip({trigger:'click'}); 
+        $(document).on("click",function()
+          {
+          setTimeout(function()
+          {
+              $('[data-toggle1="tooltip"]').tooltip('hide');
+              },1000);   
+    });         
+        $("#channels").addClass('active');
+        $("#channels").on("click",function(){
+          $(".pre-loading").show();
+            window.setInterval(function(){
+              $(".pre-loading").hide();
+            }, 2000);
+        });
+        allList();
+        $("#channelForm").show();
+        toastr.options = {
+          debug: false,
+          newestOnTop: false,
+          positionClass: "toast-bottom-right",
+          closeButton: true,
+          progressBar: false,
+        }
+        $('[data-toggle="tooltip"]').tooltip();
+        $(".button-scan").on("click", function () {
+          $(".loading-icon").removeClass("hide");
+          $(".button-scan").attr("disabled", true);
+          $(".btn-txt").text("Scanning...");
+        });
+  });
+  $(window).on('load', function() {
+      $(".pre-loading").hide();
+  });  
+
+
+
+  var lst = [];
+  function getRuntimes(){
+    lst = [];
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url:"api/v1/ilens/runtime",
+      dataType:"json",
+      headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+      type: "GET",
+      async: false,
+      success: function (data){
+          for(i = 0; i < data.length; i++){
+            lst.push(data[i].name);
+          }
+         }
+      });
+    return lst;
+  }
+
+$('#tg-').click(function() {
+    $('#toggle-7').find('.toggle').toggleClass('active');
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: "/channels",
+      type: "GET",
+      async: false,
+      success: function (data){      
+        location.reload();
+      }
+    });
+});
+
+function filterIp(){
+    var rL = getRuntimes();
+    $("#processing_devices").fadeIn(1500);
+    $("#grid_table").show();
+    $("#channelForm").hide();
+    var filter = $("#hostname").val();
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: "api/v1/channels/"+filter,
+        dataType: "json",
+        headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+        type: "GET",
+        async: true,
+        success: function (data) {
+          var channelList="";
+          for(i=0;i<data.length;i++){
+            var id = data[i].id;
+            channelList=channelList+'<div class="algrow">';
+            channelList=channelList+'<div class="col-12 col-md-6 col-lg-4">';
+            channelList=channelList+'<div class="card al">';
+            channelList=channelList+'<div class="fp-Video sm"><div><img id="liveVideoGridId" src="http://127.0.0.1:5000/' + data[i].ip+'/1"></div></div>';
+            if(data[i].status==false){
+            channelList=channelList+'<div class="disableIc"> <i class="fa fa-ban" aria-hidden="true"></i></div>'
+            }else{          
+             }
+            if(data[i].id==null){
+                channelList=channelList+'<span>------</span>';
+              }else{
+                channelList=channelList+'<span class="ctext">Id: '+data[i].id+'</span>';
+              }
+            if(data[i].name==null){
+                channelList=channelList+'<span>------</span>';
+              }else{
+                channelList=channelList+'<span class="ctext">Name: '+data[i].name+'</span>';
+              } 
+            
+            channelList=channelList+'<div id="server_'+data[i].id+'" class="database-icon">';
+
+            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+
+              if(rL.includes(data[i].id.toString())){
+
+            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+
+            channelList=channelList+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+
+            channelList=channelList+'<div class="tooltipMenu rightSide">';
+
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+
+            }else{
+              if(data[i].status==false){
+              channelList=channelList+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li inactive1"><i class="fa fa-play fa-sm" aria-hidden="true"></i>';
+              }else{
+              channelList=channelList+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm" aria-hidden="true"></i>';
+              }
+            }
+
+            channelList=channelList+'<div class="tooltipMenu rightSide">';
+
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a></div>';
+
+            channelList=channelList+'<p class="dm"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></p>';
+            channelList=channelList+'</div>';
+            channelList=channelList+'</div>';
+            channelList=channelList+'</div>';
+          }
+          $("#channelList").html(channelList);
+          setTimeout(function(){ toastr.success("New devices found.."); }, 1000);
+          $("#processing_devices").fadeOut(1000);
+          $(".loading-icon").addClass("hide");
+          $(".button-scan").attr("disabled", false);
+          $(".btn-txt").text("Scan for devices...");
+        },
+        error:function(err){
+            setTimeout(function(){ toastr.error("Error found.."); }, 1000);          }
+      });
+  }
+
+
+  function getForm(id){
+      $("#channelId").val(id);
+      $("#grid_table").hide();
+      $("#channelForm").show();
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: "/configuration",
+        type: "GET",
+        async: false,
+        success: function (data){
+          $("#channelForm").html(data);
+          addedPersons = [];
+          removedPersons = [];
+        }
+      });
+        $.ajax({
+          contentType: "application/json;charset=UTF-8",
+          url:"api/v1/channels/id/"+id,
+          dataType: "json",
+          headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+          type: "GET",
+          async: false,
+          success: function (data){
+            access.length = 0;
+            for(i=0;i<data.configsVo.membersAdd.length;i++){
+                accessConfig = data.configsVo.membersAdd[i];
+                configName(data.configsVo.membersAdd[i]);
+                access.push(data.configsVo.membersAdd[i]);
+            }
+            if(data.accessEnabled == ""){
+                $("#toggle-4").attr('enable', false);
+                $('#tg-7').removeClass("active");
+                $("#tg-8").addClass('active');
+                }else{
+                $("#toggle-1").attr('enable', true);
+                $('#tg-8').removeClass("active");
+                $("#tg-7").addClass('active');             
+               }
+               if(data.countsEnabled == ""){
+                $("#toggle-3").attr('enable', false);
+                $('#tg-5').removeClass("active");
+                $("#tg-6").addClass('active');
+                }else{
+                $("#toggle-3").attr('enable', true);
+                $('#tg-6').removeClass("active");
+                $("#tg-5").addClass('active');             
+               }
+                $("#deviceId").val(data.id);
+                $("#name").val(data.name);
+                $("#ip").val(data.ip);
+                $("#camType").val(data.camType);
+                if(data.entry == "") {
+                  $("#entryGate").prop('checked', false);
+                }else{
+                  $("#entryGate").prop('checked', true);
+                  }
+                if(data.exit == "") {
+                    $("#exitGate").prop('checked', false);
+                }else{
+                  $("#exitGate").prop('checked', true);
+                }
+                if(data.frEnabled == ""){
+                  $("#toggle-2").attr('enable', false);
+                  $('#tg-3').removeClass("active");
+                  $("#tg-4").addClass('active');
+                  }else{
+                  $("#toggle-2").attr('enable', true)
+                  $('#tg-4').removeClass("active");
+                  $("#tg-3").addClass('active');             
+               }
+               var value = 0.85*data.frConfigsVo.maxRatio;
+               $("#rs-bullet2").css({"left": value});
+               $("#rs-bullet2").html(data.frConfigsVo.maxRatio);
+               $("#rs-range-line2").attr("value", data.frConfigsVo.maxRatio);
+
+               var value = 0.85*data.frConfigsVo.minRatio;
+               $("#rs-bullet3").css({"left": value});
+               $("#rs-bullet3").html(data.frConfigsVo.minRatio);
+               $("#rs-range-line3").attr("value", data.frConfigsVo.minRatio);
+
+               var value = 0.85*data.frConfigsVo.maximumPeople;
+               $("#maximum-People").attr("value", data.frConfigsVo.maximumPeople);
+
+               var value =0.85*data.frConfigsVo.minimumPeople;
+               $("#minimum-People").attr("value", data.frConfigsVo.minimumPeople);
+
+
+               if(data.nprEnabled == ""){
+                $("#toggle-1").attr('enable', false);
+                $('#tg-1').removeClass("active");
+                $("#tg-2").addClass('active');
+                }else{
+                $("#toggle-1").attr('enable', true)
+                $('#tg-2').removeClass("active");
+                $("#tg-1").addClass('active');             
+              }
+               var value = 0.85*data.nprConfigsVo.maxKernel;
+               $("#rs-bullet5").css({"left": value});
+               $("#rs-bullet5").html(data.nprConfigsVo.maxKernel);
+               $("#rs-range-line5").attr("value", data.nprConfigsVo.maxKernel);
+
+               var value = 0.85*data.nprConfigsVo.maxRatio;
+               $("#rs-bullet1").css({"left": value});
+               $("#rs-bullet1").html(data.nprConfigsVo.maxRatio);
+               $("#rs-range-line1").attr("value", data.nprConfigsVo.maxRatio);
+
+               var value = 0.85*data.nprConfigsVo.minKernel;
+               $("#rs-bullet4").css({"left": value});
+               $("#rs-bullet4").html(data.nprConfigsVo.minKernel);
+               $("#rs-range-line4").attr("value", data.nprConfigsVo.minKernel);
+
+               var value = 0.85*data.nprConfigsVo.minRatio;
+               $("#rs-bullet").css({"left": value});
+               $("#rs-bullet").html(data.nprConfigsVo.minRatio);
+               $("#rs-range-line").attr("value", data.nprConfigsVo.minRatio);
+           }
+      });
+    }
+
+function configName(accessConfig){
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/user/usersList",
+    dataType: "json",
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+    type: "GET",
+    async: false,
+    success: function(data){
+      var userName= "";
+      for(j=0;j<data.length;j++){
+        if(data[j].id==accessConfig){
+         userName=userName='<option value='+data[j].id+'>'+data[j].firstName+'</option>'; 
+        }  
+      }
+      $("#select2").append(userName);
+    }
+  });
+}
+
+function goBack(){
+    $("#grid_table").show();
+    $("#channelForm").hide();
+}
+
+function save(){
+  var filterKey="All";
+  var channelFilterVO={status: "All"};
+    if($.trim($('#name').val()) == ""){
+      $("#exampleModalCenter-1").show();
+      $("#warn-Invalid").show();
+      $('#validConfigInput').html("Name should not be empty");
+      return false;
+    }else if($.trim($('#name').val()) == 0){
+      $("#exampleModalCenter-1").show();
+      $("#warn-Invalid").show();
+      $('#validConfigInput').html("Name should not be 0");
+      return false;
+    }else if($.trim($('#name').val()).length < 3){
+      $("#exampleModalCenter-1").show();
+      $("#warn-Invalid").show();
+      $('#validConfigInput').html("Name should be atleast 3 characters");
+      return false;
+    }else if($.trim($('#camType').val()) == ""){
+      $("#exampleModalCenter-1").show();
+      $("#warn-Invalid").show();
+      $('#validConfigInput').html("Camera Type should not be empty");
+      return false;
+    }else if($.trim($('#camType').val()) == 0){
+      $("#exampleModalCenter-1").show();
+      $("#warn-Invalid").show();
+      $('#validConfigInput').html("Camera Type should not be 0");
+      return false;
+    }else if($.trim($('#camType').val()).length < 4){
+      $("#exampleModalCenter-1").show();
+      $("#warn-Invalid").show();
+      $('#validConfigInput').html("Camera Type should be atleast 4 characters");
+      return false;
+    }  
+    var vo = {
+              accessEnabled: $("#toggle-4").attr("enable"),
+              camType: $("#camType").val(),
+              configsVo: {
+                membersAdd: addedPersons,
+                membersRemove: removedPersons
+             },
+              countsEnabled: $("#toggle-3").attr("enable"),
+              createBy: "string",
+              createdDt: "2021-07-02T06:44:14.984Z",
+              entry: $("#entryGate").is(':checked') ? true : false,
+              exit: $("#exitGate").is(':checked') ? true : false,
+              frConfigsVo: {
+                id: 0,
+                maxRatio: $("#rs-bullet2").text(),
+                maximumPeople:$("#maximum-People").val(),
+                minRatio: $("#rs-bullet3").text(),
+                minimumPeople:$("#minimum-People").val(),
+              },
+              frEnabled: $("#toggle-2").attr("enable"),
+              id: $("#channelId").val(),
+              ip: $("#ip").val(),
+              mappings: true,
+              name: $("#name").val(),
+              nprConfigsVo: {
+                id: 0,
+                maxKernel: $("#rs-bullet5").text(),
+                maxRatio: $("#rs-bullet1").text(),
+                minKernel: $("#rs-bullet4").text(),
+                minRatio: $("#rs-bullet").text()
+              },
+              nprEnabled: $("#toggle-1").attr("enable"),
+              running: true,
+              status: $("#Select").val(),
+              updatedBy: "string",
+              updatedDt: "2021-07-02T06:44:14.985Z"
+            }; 
+            var dataApi = "[[${session.DATA_API}]]";
+            var sessionToken = "[[${session.USER.sessionToken}]]";
+            var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+            var apiUrl = urlSlashCheck + "api/v1/channels"; 
+     
+   $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url:apiUrl,
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "POST",
+        async: false,
+        data: JSON.stringify(vo),
+        success:function(data){
+           paging(filterKey,channelFilterVO);
+          setTimeout(function(){ toastr.success("Configuration updated.."); }, 1000);
+        },
+        error:function(err){
+          setTimeout(function(){ toastr.error("Error found.."); }, 1000);          }
+  });
+}
+
+function popupCancel(){
+   $("#exampleModalCenter-1").hide();
+}
+
+function inputStop(){
+    $("#processing_devices").hide();
+    $(".loading-icon").addClass("hide");
+    $(".button-scan").attr("disabled", false);
+    $(".btn-txt").text("Scan for devices...");
+}
+
+
+var totalPages = 0;
+var totalCount = 0;
+function paging(filterKey,channelFilterVO){
+  itemsPerPage=10;
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/channels/pageCount/"+filterKey,
+    dataType: "json",
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+    type: "GET",
+    async: false,
+    success:function(data){
+       totalCount=data;
+       totalPages=Math.ceil(totalCount/itemsPerPage);
+       $('#tablePagination').empty();
+        $('#tablePagination').removeData("twbs-pagination");
+        $('#tablePagination').unbind("page");
+        window.pagObj = $('#tablePagination').twbsPagination({
+            totalPages: totalPages,
+            visiblePages: 5,
+            next: '&raquo;',
+            last: '',
+            prev: '&laquo;',
+            first:'',
+            onPageClick: function (event, page) {
+                pageNumber = (page - 1);
+                pageTable(pageNumber,channelFilterVO);
+            }
+        }).on("page",function(event,num){});
+      }
+  });
+}
+
+function allList(){  
+  $("#channelList").empty();
+  var channelFilterVO={
+  status: "All"
+    }
+  pageTable(pageNumber,channelFilterVO);
+  $("#dropdownMenuButton").html("All");
+  var filterKey="All"
+  paging(filterKey,channelFilterVO);
+}
+function activeList(){
+  $("#channelList").empty();
+  var channelFilterVO={
+  status: "true"
+    }
+    pageTable(pageNumber,channelFilterVO);
+    $("#dropdownMenuButton").html("Acitve");
+    var filterKey="true"
+  paging(filterKey,channelFilterVO);
+}
+function inActiveList(id){
+  $("#channelList").empty();
+  var channelFilterVO={
+  status: "false"
+    }
+    pageTable(pageNumber,channelFilterVO);
+    $("#dropdownMenuButton").html("In Acitve");
+    var filterKey="false"
+   paging(filterKey,channelFilterVO);
+}
+
+var pageNumber=0;
+function pageTable(pageNumber,channelFilterVO){
+var rL = getRuntimes();
+$("#grid_table").show();
+$("#channelForm").hide();
+  $.ajax({
+     contentType: "application/json;charset=UTF-8",
+     url: "api/v1/channels/page/"+pageNumber,
+     dataType: "json",
+     headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+     data: JSON.stringify(channelFilterVO),
+     type: "POST",
+     async: false,
+     success:function(data){
+        var channelList="";
+        for(i=0;i<data.length;i++){
+          var id = data[i].id;
+          channelList=channelList+'<div class="algrow">';
+          channelList=channelList+'<div class="col-12 col-md-6 col-lg-4">';
+          channelList=channelList+'<div class="card al">';
+          channelList=channelList+'<div class="fp-Video sm"><div><img id="liveVideoGridId" src="http://127.0.0.1:5000/' + data[i].ip+'/1"></div></div>';
+          if(data[i].status==false){
+            channelList=channelList+'<div class="disableIc"> <i class="fa fa-ban" aria-hidden="true"></i></div>'
+          }else{          
+           }
+          if(data[i].id==null){
+              channelList=channelList+'<span>------</span>';
+            }else{
+              channelList=channelList+'<span class="ctext">Id: '+data[i].id+'</span>';
+            }
+          if(data[i].name==null){
+              channelList=channelList+'<span>------</span>';
+            }else{
+              channelList=channelList+'<span class="ctext">Name: '+data[i].name+'</span>';
+            } 
+          
+          channelList=channelList+'<div id="server_'+data[i].id+'" class="database-icon">';
+
+          channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+
+
+          if(rL.includes(data[i].id.toString())){
+
+            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+
+            channelList=channelList+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+
+            channelList=channelList+'<div class="tooltipMenu rightSide">';
+
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+
+          }else{
+            if(data[i].status==false){
+              channelList=channelList+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li inactive1"><i class="fa fa-play fa-sm" aria-hidden="true"></i>';
+            }else{
+            channelList=channelList+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm" aria-hidden="true"></i>';
+            }
+          }
+
+          channelList=channelList+'<div class="tooltipMenu rightSide">';
+
+          channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a></div>';
+
+          channelList=channelList+'<p class="dm"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></p>';
+          channelList=channelList+'</div>';
+          channelList=channelList+'</div>';
+          channelList=channelList+'</div>';
+        }
+        if(data == 0){
+          $(".records").show();
+           $('#pagination').hide();              
+        }else{
+          $("#channelList").html(channelList);
+          $(".records").hide();
+          $('#pagination').show(); 
+        }
+      },
+      error:function(err){
+         console.log(error);
+       }
+    });
+}
+
+function addChannel(){   
+     $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: "/new_device",
+      type: "GET",
+      async: false,
+      success: function (data){        
+          $("#channelList").html(data);
+      }
+   })
+}
+
+function startChannel(id){
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url:"api/v1/channels/runtime/start/"+id,
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+    type: "POST",
+    async: true,
+    success: function(data){
+    var startserver="";
+    startserver=startserver+'<a href="#" class="tooltipMenu-color">';
+
+    startserver=startserver+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+
+    startserver=startserver+'<div class="tooltipMenu rightSide">';
+
+    startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+
+    startserver=startserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+    //$("#hide_"+id).addClass('hide');
+    $("#server_"+id).html(startserver);
+    setTimeout(function(){ toastr.info("Server started successfully.."); }, 1000); 
+    },
+    error:function(err){
+      setTimeout(function(){ toastr.error("Error found.."); }, 1000); 
+    }
+  });
+}
+
+function restartchannel(id){
+
+  // channel stop ajax call.
+   $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/channels/runtime/stop/"+id,
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+    type: "POST",
+    async: false,
+    success: function(data){
+
+      // channel start ajax call.
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url:"api/v1/channels/runtime/start/"+id,
+        headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+        type: "POST",
+        async: true,
+        success: function(data){
+          var restartserver="";
+          restartserver=restartserver+'<a href="#" class="tooltipMenu-color">';
+          restartserver=restartserver+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+          restartserver=restartserver+'<div class="tooltipMenu rightSide">';
+          restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+          restartserver=restartserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+          $("#server_"+id).html(restartserver);
+          setTimeout(function(){ toastr.info("Channel Restarted successfully."); }, 1000);
+        },
+        error: function(err){
+          setTimeout(function(){ toastr.error("Error: Channel Not Restarted."); }, 1000);
+        }
+      });
+    },
+    error: function(err){
+      setTimeout(function(){ toastr.error("Error: Channel Not Stopped."); }, 1000);
+    }
+  });
+}
+
+
+
+
+
+function stopChannel(id){
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/channels/runtime/stop/"+id,
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+    type: "POST",
+    async: true,
+    success: function(data){
+      var stopserver="";
+      stopserver=stopserver+'<a href="#" class="tooltipMenu-color">';
+
+      stopserver=stopserver+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm" aria-hidden="true"></i></i>';
+
+      stopserver=stopserver+'<div class="tooltipMenu rightSide">';
+
+      stopserver=stopserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a>';
+
+       $("#server_"+id).html(stopserver);
+       setTimeout(function(){ toastr.info("Server stopped successfully.."); }, 1000); 
+    },
+    error:function(){
+      setTimeout(function(){ toastr.error("Error found.."); }, 1000); 
+    }
+  });
+}
+
+</script>
+</div>
+</body>
+</html>

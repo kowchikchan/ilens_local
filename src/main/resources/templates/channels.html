@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+    <title>[[${APP_NAME}]] - Agents</title>
+</head>
+<body class="overflow">
+<div layout:fragment="content" class="contant">
+    <div class="pre-loading">
+      <img class="loader" src="/web/images/loader.png" />
+    </div>
+    <div class="heading">
+        <span class="heading-text fs-30">Channel Configuration</span>
+    </div>
+    <div id="server_table" class="main-table zoom">
+        <div class="col-md-12 pb-12 row m-0">
+            <div class="col-md-12">
+                 <input class="input-search" type="text" name="hostname" id="hostname" onkeydown="inputStop()" value="192.168.0.x" />
+                 <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Please enter the ip range to start staring , Can keep last one can keep empty or .x”" ></i>
+                <button onclick="filterIp()" class="button-scan">
+                    <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                    <span class="btn-txt">Scan for devices</span>
+                </button>
+                <span id="processing_devices">Please wait it will take some time</span>
+                <nav aria-label="Page navigation example" class="pagination-nav" id="pagination">
+                    <ul class="pagination" id="tablePagination">
+                    </ul>
+                </nav>
+                <a onclick="addChannel()"><button id="addUser" class="new-button button-position">New<i class="fa fa-plus-circle" aria-hidden="true"></i></button></a>                
+                <div class="dropdown">
+                  <button class="dropBtn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                     <span id="text">Select filter</span>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a class="dropdown-item" href="#" id="fil"  onclick="allList()">All</a>
+                      <a class="dropdown-item" href="#" id="fil" onclick="activeList()">Active</a>
+                      <a class="dropdown-item" href="#" id="fil" onclick="inActiveList()" >In Active</a>
+                  </div>
+              </div>
+            </div>
+        </div>
+        <br>
+        <div class="col-md-12 row">
+            <table class="clr-txt">
+                <thead>
+                <tr>
+                    <!--
+                        <th class="img-th"></th> -->
+                    <th>Channel ID</th>
+                    <th>Name</th>
+                    <th>URL/IP</th>
+                    <th>Camera Type</th>
+                    <th>Status </th>
+                    <th>Is Entry</th>
+                    <th>Is Exit</th>
+                    <th width="160">Action</th>
+                    <th width="100">Settings</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody class="" id="channelList">
+
+                </tbody>
+            </table>
+        </div>
+  </div>
+  <div class="modal fade modal-blur" id="exampleModalCenter-1" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div id="popup-bg" class="modal-content popup-wh">
+      <div id="remove-modal" class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Invalid config credentials</h5>
+      </div>
+    <div class="modal-body">
+       <div id="config-credentials">
+          <i id="warn-Invalid" class="fa fa-exclamation-triangle warning-config" aria-hidden="true"><div id="validConfigInput"></div></i>
+       </div>
+    </div>
+    <div id="footer-remove" class="modal-footer">
+      <button type="button" id="cancel" class="ok-btn" data-dismiss="modal" onclick="popupCancel()">Ok</button>
+    </div>
+  </div>
+</div>
+</div>
+<input type="hidden" name="" id="channelId" value="0">
+<div id="channelForm"></div>
+<input type="hidden" name="" id="configPageNo">
+<div class="records"></div>
+<div id="popup_default" class="popup">
+          <div class="popup-overlay"></div>
+          <div class="popup-content">
+            <a href="#" class="close-popup" data-id="popup_default">&times;</a>
+           <table id="liveId">
+            <div class="pre-loading1">
+              <img class="loader1" src="/web/images/loader.png" />
+            </div>
+            <div class="camera_live">
+              <div class="fp-Video-1" id="liveVideoIdAtChannel" >
+            </div>
+           </table>
+        </div>
+<script>
+      var accessConfig = [];
+      var access = [];
+      var addedPersons = [];
+      var removedPersons = [];
+      $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip({
+        placement : 'right'
+        });
+        $('[data-toggle1="tooltip"]').tooltip({trigger:'click'});
+        $(".fa-question-circle").mouseleave(function(){
+           $('[data-toggle1="tooltip"]').tooltip('hide');
+               })
+        $("#channels").addClass('active');
+        $("#channels").on("click",function(){
+          $(".pre-loading").show();
+            window.setInterval(function(){
+              $(".pre-loading").hide();
+            }, 3000);
+        });
+        allList();
+        $("#channelForm").show();
+        toastr.options = {
+          debug: false,
+          newestOnTop: false,
+          positionClass: "toast-bottom-right",
+          closeButton: true,
+          progressBar: false,
+        }
+        $('[data-toggle="tooltip"]').tooltip();
+        $(".button-scan").on("click", function () {
+          $(".loading-icon").removeClass("hide");
+          $(".button-scan").attr("disabled", true);
+          $(".btn-txt").text("Scanning...");
+        });
+  });
+  $(window).on('load', function() {
+      $(".pre-loading").hide();
+  });  
+
+var lst = [];
+function getRuntimes(){
+  lst = [];
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url:"api/v1/ilens/runtime",
+    dataType:"json",
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+    type: "GET",
+    async: false,
+    success: function (data){
+        for(i = 0; i < data.length; i++){
+          lst.push(data[i].name);
+        }
+       }
+    });
+  return lst;
+}
+
+function filterIp(){
+    var rL = getRuntimes();
+    $("#processing_devices").fadeIn(1500);
+    $("#server_table").show();
+    $("#channelForm").hide();
+    var filter = $("#hostname").val();
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: "api/v1/channels/"+filter,
+        dataType: "json",
+        headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+        type: "GET",
+        async: true,
+        success: function (data) {
+          var channelList="";
+          for(i=0;i<data.length;i++){
+            var id = data[i].id;
+            channelList=channelList+'<tr>';
+            if(data[i].id==null){
+              channelList=channelList+'<td>------</td>';
+            }else{
+              channelList=channelList+'<td>'+data[i].id+'</td>';
+            }
+            if(data[i].name==null){
+              channelList=channelList+'<td>------</td>';
+            }else{
+              channelList=channelList+'<td>'+data[i].name+'</td>';
+            }
+              channelList=channelList+'<td>'+data[i].ip+'</td>';
+            if(data[i].camType==null){
+              channelList=channelList+'<td>------</td>';
+            }else{
+              channelList=channelList+'<td>'+data[i].camType+'</td>';
+            }
+            if(data[i].status==false){
+              channelList=channelList+'<td class="personEnteries"><i class="fa fa-times inactive" aria-hidden="true" ></i></td>';         
+            }else{
+              channelList=channelList+'<td class="personEnteries"><i class="fa fa-check active" aria-hidden="true"></i></td>';         
+            }
+            if(data[i].entry == false){
+              channelList=channelList+'<td class="personEnteries"><i class="fa fa-times inactive" aria-hidden="true"></i></td>';
+            }else{
+              channelList=channelList+'<td class="personEnteries"><i class="fa fa-check active" aria-hidden="true"></i></td>';
+            }
+            if(data[i].exit == false){
+              channelList=channelList+'<td class="personEnteries"><i class="fa fa-times inactive" aria-hidden="true"></i></td>';
+            }else{
+              channelList=channelList+'<td class="personEnteries"><i class="fa fa-check active" aria-hidden="true"></i></td>';
+            }
+            channelList=channelList+'<td id="server_'+data[i].id+'" class="database-icon">';
+
+            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+
+          if(rL.includes(data[i].id.toString())){
+            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+
+            channelList=channelList+'<div class="tooltipMenu rightSide">';
+
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+
+          }else{
+            if(data[i].status==false){
+              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li inactive1"><i class="fa fa-play fa-sm"></i>';
+            }else{
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm"></i>';
+            }
+          }
+            channelList=channelList+'<div class="tooltipMenu rightSide">';
+
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a></td>';
+
+            channelList=channelList+'<td class="personEnteries"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></td>';
+            channelList=channelList+'<td><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  href=\'#\'></i></div></td>';
+            channelList=channelList+'</tr>';
+          }
+          if(data == 0){
+             $(".records").html("No Records Found");
+             $('#pagination').hide();
+             $(".records").show();
+          }else{
+            var channelFilterVO = {
+              status: "All"
+            }
+            paging("All",channelFilterVO);
+            $("#channelList").html(channelList);
+            $(".records").hide();
+            $('#pagination').show();
+            }
+          setTimeout(function(){toastr.success("New devices found.."); }, 1000);
+          $("#processing_devices").fadeOut(1000);
+          $(".loading-icon").addClass("hide");
+          $(".button-scan").attr("disabled", false);
+          $(".btn-txt").text("Scan for devices...");
+        },
+        error:function(err){
+            setTimeout(function(){ toastr.error("Error found.."); }, 1000);          }
+      });
+  }
+
+
+  function getForm(id){
+      $("#channelId").val(id);
+      $("#server_table").hide();
+      $("#channelForm").show();
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: "/configuration",
+        type: "GET",
+        async: false,
+        success: function (data){
+          $("#channelForm").html(data);
+          addedPersons = [];
+          removedPersons = [];
+        }
+      });
+        $.ajax({
+          contentType: "application/json;charset=UTF-8",
+          url: "api/v1/channels/id/"+id,
+          dataType: "json",
+          headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+          type: "GET",
+          async: false,
+          success: function (data){
+            access.length = 0;
+            for(i=0;i<data.configsVo.membersAdd.length;i++){
+                accessConfig = data.configsVo.membersAdd[i];
+                configName(data.configsVo.membersAdd[i]);
+                access.push(data.configsVo.membersAdd[i]);
+            }
+            if(data.accessEnabled == ""){
+                $("#toggle-4").attr('enable', false);
+                $('#tg-7').removeClass("active");
+                $("#tg-8").addClass('active');
+                $("#tick5") .empty();
+                $("#tick6").append("d"); 
+                $("#icon4").removeClass("fa fa-check-circle");
+                $("#icon5").addClass("fa fa-check-circle");
+                }else{
+                $("#toggle-1").attr('enable', true);
+                $('#tg-8').removeClass("active");
+                $("#tg-7").addClass('active'); 
+                $("#tick6") .empty();
+                $("#tick5").append("d"); 
+                $("#icon5").removeClass("fa fa-check-circle");
+                $("#icon4").addClass("fa fa-check-circle");    
+               }
+               if(data.countsEnabled == ""){
+                $("#toggle-3").attr('enable', false);
+                $('#tg-5').removeClass("active");
+                $("#tg-6").addClass('active');
+                }else{
+                $("#toggle-3").attr('enable', true);
+                $('#tg-6').removeClass("active");
+                $("#tg-5").addClass('active');             
+               }
+                $("#deviceId").val(data.id);
+                $("#name").val(data.name);
+                $("#ip").val(data.ip);
+                $("#camType").val(data.camType);
+                if(data.entry == "") {
+                  $("#entryGate").prop('checked', false);
+                }else{
+                  $("#entryGate").prop('checked', true);
+                  }
+                if(data.exit == "") {
+                    $("#exitGate").prop('checked', false);
+                }else{
+                  $("#exitGate").prop('checked', true);
+                }
+                if(data.frEnabled == ""){
+                  $("#toggle-2").attr('enable', false);
+                  $('#tg-3').removeClass("active");
+                  $("#tg-4").addClass('active');
+                  $("#tick") .empty();
+                  $("#tick2").append("d");
+                  $("#icon").removeClass("fa fa-check-circle");
+                  $("#icon1").addClass("fa fa-check-circle");
+                  }else{
+                  $("#toggle-2").attr('enable', true)
+                  $('#tg-4').removeClass("active");
+                  $("#tg-3").addClass('active');  
+                  $("#tick2") .empty();
+                  $("#tick").append("d");
+                  $("#icon1").removeClass("fa fa-check-circle");
+                  $("#icon").addClass("fa fa-check-circle");            
+               }
+               if(data.frConfigsVo==null){
+                data.frConfigsVo=0;
+               }
+               var value = 0.85*data.frConfigsVo.maxRatio;
+               $("#rs-bullet2").css({"left": value});
+               $("#rs-bullet2").html(data.frConfigsVo.maxRatio);
+               $("#rs-range-line2").attr("value", data.frConfigsVo.maxRatio);
+
+               var value = 0.85*data.frConfigsVo.minRatio;
+               $("#rs-bullet3").css({"left": value});
+               $("#rs-bullet3").html(data.frConfigsVo.minRatio);
+               $("#rs-range-line3").attr("value", data.frConfigsVo.minRatio);
+
+               var value = 0.85*data.frConfigsVo.maximumPeople;
+               $("#maximum-People").attr("value", data.frConfigsVo.maximumPeople);
+
+               var value =0.85*data.frConfigsVo.minimumPeople;
+               $("#minimum-People").attr("value", data.frConfigsVo.minimumPeople);
+
+
+               if(data.nprEnabled == ""){
+                $("#toggle-1").attr('enable', false);
+                $('#tg-1').removeClass("active");
+                $("#tg-2").addClass('active');
+                $("#tick3").empty();
+                $("#tick4").append("d");
+                $("#icon2").removeClass("fa fa-check-circle");
+                $("#icon3").addClass("fa fa-check-circle");
+                }else{
+                $("#toggle-1").attr('enable', true)
+                $('#tg-2').removeClass("active");
+                $("#tg-1").addClass('active'); 
+                $("#tick4").empty();
+                $("#tick3").append("d");  
+                $("#icon3").removeClass("fa fa-check-circle");
+                $("#icon2").addClass("fa fa-check-circle");          
+              }
+              var maxKernel = 23;
+              var maxRatio = 5000;
+              var minKernel=3;
+              var minRatio=2000;
+              if(data.nprConfigsVo){
+                maxKernel = data.nprConfigsVo.maxKernel;
+                maxRatio = data.nprConfigsVo.maxRatio;
+                minRatio = data.nprConfigsVo.minRatio;
+                minKernel = data.nprConfigsVo.minKernel;
+               }
+               var value = 4*maxKernel;
+               $("#rs-bullet5").css({"left": maxKernel});
+               $("#rs-bullet5").html(maxKernel);
+               $("#rs-range-line5").attr("value", maxKernel);
+
+               var value =maxRatio/25;
+               $("#rs-bullet1").css({"left": value});
+               $("#rs-bullet1").html(maxRatio);
+               $("#rs-range-line1").attr("value", maxRatio);
+
+               var value = 4*minKernel;
+               $("#rs-bullet4").css({"left": value});
+               $("#rs-bullet4").html(minKernel);
+               $("#rs-range-line4").attr("value", minKernel);
+
+               var value = minRatio/25;
+               $("#rs-bullet").css({"left": value});
+               $("#rs-bullet").html(minRatio);
+               $("#rs-range-line").attr("value", minRatio);
+           }
+      });
+    }
+
+function configName(accessConfig){
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/user/usersList",
+    dataType: "json",
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+    type: "GET",
+    async: false,
+    success: function(data){
+      var userName= "";
+      for(j=0;j<data.length;j++){
+        if(data[j].id==accessConfig){
+         userName=userName='<option value='+data[j].id+'>'+data[j].firstName+'</option>'; 
+        }  
+      }
+      $("#select2").append(userName);
+    }
+  });
+}
+
+function goBack(){
+    $("#server_table").show();
+    $("#channelForm").hide();
+}
+
+function save(){
+  var filterKey="All";
+  var channelFilterVO={status: "All"};
+
+    if($.trim($('#name').val()) == ""){
+      $("#exampleModalCenter-1").show();
+      $("#warn-Invalid").show();
+      $('#validConfigInput').html("Name should not be empty");
+      return false;
+    }else if($.trim($('#name').val()) == 0){
+      $("#exampleModalCenter-1").show();
+      $("#warn-Invalid").show();
+      $('#validConfigInput').html("Name should not be 0");
+      return false;
+    }else if($.trim($('#name').val()).length < 3){
+      $("#exampleModalCenter-1").show();
+      $("#warn-Invalid").show();
+      $('#validConfigInput').html("Name should be atleast 3 characters");
+      return false;
+    }else if($.trim($('#camType').val()) == ""){
+      $("#exampleModalCenter-1").show();
+      $("#warn-Invalid").show();
+      $('#validConfigInput').html("Camera Type should not be empty");
+      return false;
+    }else if($.trim($('#camType').val()) == 0){
+      $("#exampleModalCenter-1").show();
+      $("#warn-Invalid").show();
+      $('#validConfigInput').html("Camera Type should not be 0");
+      return false;
+    }else if($.trim($('#camType').val()).length < 4){
+      $("#exampleModalCenter-1").show();
+      $("#warn-Invalid").show();
+      $('#validConfigInput').html("Camera Type should be atleast 4 characters");
+      return false;
+    }  
+    var vo = {
+              accessEnabled: $("#toggle-4").attr("enable"),
+              camType: $("#camType").val(),
+              configsVo: {
+                membersAdd: addedPersons,
+                membersRemove: removedPersons
+             },
+              countsEnabled: $("#toggle-3").attr("enable"),
+              createBy: "string",
+              createdDt: "2021-07-02T06:44:14.984Z",
+              entry: $("#entryGate").is(':checked') ? true : false,
+              exit: $("#exitGate").is(':checked') ? true : false,
+              frConfigsVo: {
+                id: 0,
+                maxRatio: $("#rs-bullet2").text(),
+                maximumPeople:$("#maximum-People").val(),
+                minRatio: $("#rs-bullet3").text(),
+                minimumPeople:$("#minimum-People").val(),
+              },
+              frEnabled: $("#toggle-2").attr("enable"),
+              id: $("#channelId").val(),
+              ip: $("#ip").val(),
+              mappings: true,
+              name: $("#name").val(),
+              nprConfigsVo: {
+                id: 0,
+                maxKernel: $("#rs-bullet5").text(),
+                maxRatio: $("#rs-bullet1").text(),
+                minKernel: $("#rs-bullet4").text(),
+                minRatio: $("#rs-bullet").text()
+              },
+              nprEnabled: $("#toggle-1").attr("enable"),
+              running: true,
+              status: $("#Select").val(),
+              updatedBy: "string",
+              updatedDt: "2021-07-02T06:44:14.985Z"
+            };   
+   $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url:"api/v1/channels" ,
+        headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+        type: "POST",
+        async: false,
+        data: JSON.stringify(vo),
+        success:function(data){
+          paging(filterKey,channelFilterVO);
+          setTimeout(function(){ toastr.success("Configuration updated.."); }, 1000);
+        },
+        error:function(err){
+          setTimeout(function(){ toastr.error("Error found.."); }, 1000);          }
+  });
+}
+
+function popupCancel(){
+   $("#exampleModalCenter-1").hide();
+}
+
+function inputStop(){
+    $("#processing_devices").hide();
+    $(".loading-icon").addClass("hide");
+    $(".button-scan").attr("disabled", false);
+    $(".btn-txt").text("Scan for devices...");
+}
+
+
+var totalPages = 0;
+var totalCount = 0;
+function paging(filterKey,channelFilterVO){
+  itemsPerPage=10;
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/channels/pageCount/"+filterKey,
+    dataType: "json",
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},    
+    type: "GET",
+    async: false,
+    success:function(data){
+      if(data!=0){
+       totalCount=data;
+      totalPages=Math.ceil(totalCount/itemsPerPage);
+       $('#tablePagination').empty();
+        $('#tablePagination').removeData("twbs-pagination");
+        $('#tablePagination').unbind("page");
+        window.pagObj = $('#tablePagination').twbsPagination({
+            totalPages: totalPages,
+            visiblePages: 5,
+            next: '&raquo;',
+            last: '',
+            prev: '&laquo;',
+            first:'',
+            onPageClick: function (event, page) {
+                pageNumber = (page - 1);
+                pageTable(pageNumber,channelFilterVO);
+            }
+        }).on("page",function(event,num){});
+      }
+      }
+  });
+}
+function allList(){  
+  $("#channelList").empty();
+  var channelFilterVO={
+  status: "All"
+    }
+  pageTable(pageNumber,channelFilterVO);
+  $("#text").html("  All");
+  var filterKey="All"
+  paging(filterKey,channelFilterVO);
+}
+function activeList(){
+  $("#channelList").empty();
+  var channelFilterVO={
+  status: "true"
+    }
+    pageTable(pageNumber,channelFilterVO);
+    $("#text").html("  Acitve");
+    var filterKey="true"
+  paging(filterKey,channelFilterVO);
+}
+function inActiveList(id){
+  $("#channelList").empty();
+  var channelFilterVO={
+  status: "false"
+    }
+    pageTable(pageNumber,channelFilterVO);
+    $("#text").html("  In Acitve");
+    var filterKey="false"
+   paging(filterKey,channelFilterVO);
+}
+
+var pageNumber=0;
+function pageTable(pageNumber,channelFilterVO){
+var rL = getRuntimes();
+$("#server_table").show();
+$("#channelForm").hide();
+  $.ajax({
+     contentType: "application/json;charset=UTF-8",
+     url:"api/v1/channels/page/"+pageNumber,
+     dataType: "json",
+     headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+     data: JSON.stringify(channelFilterVO),
+     type: "POST",
+     async: false,
+     success:function(data,channelFilterVO){
+        var channelList="";
+        for(i=0;i<data.length;i++){
+          var id = data[i].id;
+          channelList=channelList+'<tr>';         
+          if(data[i].id==null){
+            channelList=channelList+'<td>------</td>';
+          }else{
+            channelList=channelList+'<td>'+data[i].id+'</td>';
+          }
+          if(data[i].name==null){
+            channelList=channelList+'<td>------</td>';
+          }else{
+            channelList=channelList+'<td>'+data[i].name+'</td>';
+          }
+          channelList=channelList+'<td>'+data[i].ip+'</td>';
+          if(data[i].camType==null){
+            channelList=channelList+'<td>------</td>';
+          }else{
+            channelList=channelList+'<td>'+data[i].camType+'</td>';
+          }
+          if(data[i].status==false){
+          channelList=channelList+'<td class="personEnteries"><i class="fa fa-times inactive" aria-hidden="true" ></i></td>';         
+          }else{
+          channelList=channelList+'<td class="personEnteries"><i class="fa fa-check active" aria-hidden="true"></i></td>';         
+          }
+          if(data[i].entry == false){
+            channelList=channelList+'<td class="personEnteries"><i class="fa fa-times inactive" aria-hidden="true"></i></td>';
+          }else{
+            channelList=channelList+'<td class="personEnteries"><i class="fa fa-check active" aria-hidden="true"></i></td>';
+          }
+          if(data[i].exit == false){
+            channelList=channelList+'<td class="personEnteries"><i class="fa fa-times inactive" aria-hidden="true"></i></td>';
+          }else{
+            channelList=channelList+'<td class="personEnteries"><i class="fa fa-check active" aria-hidden="true"></i></td>';
+          }
+          
+          channelList=channelList+'<td id="server_'+data[i].id+'" class="database-icon">';
+
+          channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+
+          if(rL.includes(data[i].id.toString())){
+            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+
+            channelList=channelList+'<div class="tooltipMenu rightSide">';
+
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+
+          }else{
+            if(data[i].status==false){
+              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li inactive1"><i class="fa fa-play fa-sm"></i>';
+            }else{
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm"></i>';
+            }
+          }
+
+          channelList=channelList+'<div class="tooltipMenu rightSide">';
+
+          channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a></td>';
+
+          channelList=channelList+'<td class="personEnteries"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></td>';
+          channelList=channelList+'<td><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  href=\'#\'></i></div></td>';
+          channelList=channelList+'</tr>';
+        }
+        if(data == 0){
+           $(".records").html("No Records Found");
+           $('#pagination').hide();
+           $(".records").show();
+        }else{
+          $("#channelList").html(channelList);
+          $(".records").hide();
+          $('#pagination').show();
+        }
+      },
+      error:function(err){
+         console.log(error);
+       }
+    });
+}
+
+function addChannel(){   
+     $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: "/new_device",
+      type: "GET",
+      async: false,
+      success: function (data){        
+          $("#channelList").html(data);
+      }
+   })
+}
+
+(function($) {
+      $.fn.openPopup = function( settings ) {
+        var elem = $(this);
+        var settings = $.extend({
+          anim: 'fade'
+        }, settings);
+        elem.show();
+        elem.find('.popup-content').addClass(settings.anim+'In');
+      }
+      
+      $.fn.closePopup = function( settings ) {
+        var elem = $(this);
+        var settings = $.extend({
+          anim: 'fade'
+        }, settings);
+        elem.find('.popup-content').removeClass(settings.anim+'In').addClass(settings.anim+'Out');
+        
+        setTimeout(function(){
+            elem.hide();
+            elem.find('.popup-content').removeClass(settings.anim+'Out')
+          }, 400);
+      }
+
+    }(jQuery));
+
+    var liveVideoIdAtChannel="";
+    function snapshotShow(camIp){
+      $(".pre-loading1").show()
+        liveVideoIdAtChannel = liveVideoIdAtChannel + '<img id="liveVideo-channel-live" src="http://127.0.0.1:5000/' + camIp + '">';
+        $("#liveVideoIdAtChannel").html(liveVideoIdAtChannel);
+        $('#popup_default').openPopup({ anim: 'fade' });
+        setTimeout(function(){
+          $(".pre-loading1").hide();
+        },2000)
+    }
+
+     $('.close-popup').click(function(){
+      liveVideoIdAtChannel= "";
+      $('#popup_default').closePopup({ anim: 'fade' });
+    });
+
+
+function startChannel(id){
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url:"api/v1/channels/runtime/start/"+id,
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+    type: "POST",
+    async: true,
+    success: function(data){
+    var startserver="";
+    startserver=startserver+'<a href="#" class="tooltipMenu-color">';
+
+    startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+
+    startserver=startserver+'<div class="tooltipMenu rightSide">';
+
+    startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+
+    startserver=startserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+
+    $("#server_"+id).html(startserver);
+    setTimeout(function(){ toastr.info("Channel started successfully.."); }, 1000);
+    },
+    error:function(err){
+      setTimeout(function(){ toastr.error("Error found.."); }, 1000); 
+    }
+  });
+}
+
+function restartchannel(id){
+
+  // channel stop ajax call.
+   $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/channels/runtime/stop/"+id,
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+    type: "POST",
+    async: false,
+    success: function(data){
+
+      // channel start ajax call.
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url:"api/v1/channels/runtime/start/"+id,
+        headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+        type: "POST",
+        async: true,
+        success: function(data){
+          var restartserver="";
+          restartserver=restartserver+'<a href="#" class="tooltipMenu-color">';
+          restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+          restartserver=restartserver+'<div class="tooltipMenu rightSide">';
+          restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+          restartserver=restartserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+          $("#server_"+id).html(restartserver);
+          setTimeout(function(){ toastr.info("Channel Restarted successfully."); }, 1000);
+        },
+        error: function(err){
+          setTimeout(function(){ toastr.error("Error: Channel Not Restarted."); }, 1000);
+        }
+      });
+    },
+    error: function(err){
+      setTimeout(function(){ toastr.error("Error: Channel Not Stopped."); }, 1000);
+    }
+  });
+}
+
+function stopChannel(id){
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/channels/runtime/stop/"+id,
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+    type: "POST",
+    async: false,
+    success: function(data){
+    var stopserver="";
+    stopserver=stopserver+'<a href="#" class="tooltipMenu-color">';
+
+    stopserver=stopserver+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm" aria-hidden="true"></i></i>';
+
+    stopserver=stopserver+'<div class="tooltipMenu rightSide">';
+
+    stopserver=stopserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a>';
+
+     $("#server_"+id).html(stopserver);
+     setTimeout(function(){ toastr.info("Channel stopped successfully.."); }, 1000);
+    },
+    error:function(){
+      setTimeout(function(){ toastr.error("Error found.."); }, 1000); 
+    }
+  });
+}
+
+
+
+</script>
+</div>
+</body>
+</html>

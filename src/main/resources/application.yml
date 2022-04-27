@@ -1,0 +1,42 @@
+server:
+  port: 8088
+spring:
+  data:
+    cassandra:
+      local-datacenter: datacenter1
+      keyspace-name: ilens
+      contact-points: localhost
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 3MB
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: mysql
+    database-platform: org.hibernate.dialect.H2Dialect
+  datasource:
+    url: jdbc:h2:file:~/.ilendbmdi
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+logging:
+  level:
+    root: info
+
+ilens:
+  api:
+    protocal: http
+    host: 127.0.0.1
+    port: 8088
+    path: api/v1/ilens/dataset
+  python:
+    path: python3
+  user:
+    train-data:
+      path: /home/baas/applications/ilens-1.0/scripts/faceDetection/face_training/training_imgs
+locations:
+  data-location: /home/baas/applications/ilens-1.0/scripts/faceDetection/extracted_imgs
+  license-location: /home/baas/applications/ilens-1.0/scripts/license
+  json-location: /home/baas/applications/ilens-1.0/scripts
+  tessearct-location: /home/baas/applications/ilens-1.0/scripts

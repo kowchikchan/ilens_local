@@ -1,0 +1,54 @@
+#!groovy
+
+def gitInfo = {}
+
+
+pipeline {
+    agent any
+
+    tools{
+        jdk 'OpenJDK11'
+    }
+
+    options{
+        skipDefaultCheckout()
+    }
+
+    stages {
+        stage('checkout') {
+            steps {
+                script {
+
+                    gitInfo = checkout scm
+                    echo "$gitInfo.GIT_COMMIT"
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh "${tool name: 'gradle5.0', type: 'hudson.plugins.gradle.GradleInstallation'}/bin/gradle --no-daemon clean releaseTar"
+            }
+        }
+
+        stage('Static analyze') {
+            steps {
+                sh "${tool name: 'gradle5.0', type: 'hudson.plugins.gradle.GradleInstallation'}/bin/gradle --no-daemon sonarqube -Dsonar.host.url=http://192.168.0.111:9000/sonarqube   -Dsonar.login=4333eb43cd6a58169d18bedd7e92bc8f90955673 -Dsonar.exclusions=src/main/resources/**/*.py,src/main/resources/**/*.css,src/main/resources/**/*.js"
+            }
+
+        }
+
+        stage('Upload Package'){
+            steps {
+                script {
+                    appVersion = sh (script: "${tool name: 'gradle5.0', type: 'hudson.plugins.gradle.GradleInstallation'}/bin/gradle --no-daemon properties | grep -v grep | grep version | cut -d ':' -f 2",returnStdout: true).trim()
+
+                    nexusArtifactUploader artifacts: [[artifactId: 'ilens', classifier: '', file: "build/distributions/ilens-${appVersion}.tar", type: 'tar']], credentialsId: 'CICD', groupId: 'com.pbs.tech', nexusUrl: '192.168.0.111:8081/nexus', nexusVersion: 'nexus3', protocol: 'http', repository: 'PBSTech', version: "${appVersion}"
+
+                    echo "App version : ${appVersion}"
+                }
+            }
+        }
+
+    }
+}

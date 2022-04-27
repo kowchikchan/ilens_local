@@ -1,0 +1,567 @@
+<!DOCTYPE HTML>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+    <title>[[${APP_NAME}]] - Agents</title>
+</head>
+<body>
+<div layout:fragment="content" class="contant">
+    <div class="pre-loading">
+      <img class="loader" src="/web/images/loader.png" />
+    </div>
+    <div class="Date-time-div">
+        <span class="Date-time fs-30"></span><span class="am_pm fs-30"></span>
+        <!-- <div><i class="fa fa-chevron-up date-move" aria-hidden="true"></i></div> -->
+    </div>
+    <div class="main-table zoom4">
+        <div class="">
+            <div class="home-heading">Attendance</div>
+            <div class="home-panals">
+                <div class="col-md-12 next-zoom">
+                    <a href="/attendance"><img src="/web/images/zoomnext.png" width="20" class="pull-right mt-5" data-toggle="tooltip" data-original-title="Attendance"></a>
+                </div>
+                <div class="col-md-12 p-0 row h-100">
+                    <div class="col-md-2 h-100">
+                        <div class="display-panal h-100 ">
+                            <span class="dp-head">Last 1 Hour Entry</span>
+                            <div class="big-data notcenter m-left"><span id="lastHour_Entry" class="single"></span></div>
+                            <canvas id="mine-bar" class="move-chart" width="120" height="50"></canvas>
+                            <span class="dp-head gp-text">Group by every 10 mins</span>
+
+                        </div>
+                    </div>
+                    <div class="col-md-2 h-100 ">
+                        <div class="display-panal h-100 ">
+                            <span class="dp-head">Ontime Entry</span>
+                            <div class="big-data"><span id="onTime_Entry" class="single"></span></div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 h-100 ">
+                      <div class="display-panal h-100 ">
+                          <span class="dp-head">Latetime Entry</span>
+                          <div class="big-data"><span id="latetime" class="single"></span></div>
+                      </div>
+                  </div>
+                    <div class="col-md-2 h-100 ">
+                        <div class="display-panal h-100 ">
+                            <span class="dp-head">Entry in Grace Period</span>
+                            <div class="big-data"><span id="graceTime_Entry" class="single"></span></div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 h-100 ">
+                        <div class="display-panal h-100 ">
+<!--                            <div class="pre-loading2">-->
+<!--                                <i class="fa fa-spinner fa-spin spinsty"></i>-->
+<!--                            </div>-->
+                            <span class="dp-head">Monthly Average Ontime</span>
+                            <div class="big-data"><span id="lastMonth_average"></span>%</div>
+                            <canvas id="fullChart" width="550" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="traffic-brd">
+          <div class="col-md-12 traffic-board">
+           <!-- <div class="col-md-6 board-style">
+                <div class="home-heading">Traffic Board</div>
+                <div class="home-panals">
+                    <div class="col-md-12 next-zoom">
+                        <img src="/web/images/zoomnext.png" width="20" class="pull-right mt-5">
+                    </div>
+                    <div class="col-md-12 p-0 row h-100">
+                         <div class="col-md-6 h-100">
+                            <div class="display-panal h-100">
+                                <span class="dp-head">Vehicles</span><span class="seprate-txt">In</span>
+                                <div class="big-data notcenter"><span class="single">150</span></div>
+                                <canvas id="mine-bar-in" class="move-chart" width="120" height="50"></canvas>
+                                <span class="dp-head gp-text">Group by location</span>
+                            </div>
+                        </div>
+                       <div class="col-md-6 h-100">
+                            <div class="display-panal h-100">
+                                <span class="dp-head">Vehicles</span><span class="seprate-txt">Out</span>
+                                <div class="big-data notcenter"><span class="single">117</span></div>
+                                <canvas id="mine-bar-out" class="move-chart" width="120" height="50"></canvas>
+                                <span class="dp-head gp-text">Group by location</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+            <div class="col-md-6 violation">
+                <div class="home-heading home-style">Access Violation Report</div>
+                <div class="home-panals" id="home-height">
+                    <div class="col-md-12 next-zoom">
+                        <img src="/web/images/zoomnext.png" width="20" class="pull-right mt-5">
+                    </div>
+                    <div class="col-md-12 p-0 row h-100">
+                         <div class="col-md-12 h-100">
+                            <div class="display-panal h-100">
+                                <span class="dp-head">Access Violations by location</span>
+                                <div class="big-data notcenter"><span id="totalViolation_count" class="single digits"></span></div>
+                                <canvas id="violation-in" class="move-chart-1" width="150" height="28"></canvas>
+                                <span class="dp-head gp-text fs-15">Group by location</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+    </div>
+   <!--<div class="">
+       <div class="home-heading">Social Distance</div>
+       <div class="home-panals"></div>
+     </div>
+</div>--> 
+<script>
+$(document).ready(function(){
+    lastHourEntry();
+    onTimeEntry();
+    graceTimeEntry();
+    lateTimeEntry();
+    lastMonthAverage();
+    everyTenMins_refreshData();
+    sixMonth_average();
+    entryViolation_byLocation();
+    totalViolation_count();
+    npr();
+    $("#home").addClass('active');
+    $('[data-toggle="tooltip"]').tooltip({
+        placement : 'left'
+    });
+    $("#home").on("click",function(){
+    $(".pre-loading").show();
+      window.setInterval(function(){
+        $(".pre-loading").hide();
+      }, 2000);
+    });  
+});
+$(window).on('load', function() {
+    $(".pre-loading").hide();
+});
+
+
+function lastHourEntry(){
+      var dataApi = "[[${session.DATA_API}]]";
+  		var sessionToken = "[[${session.USER.sessionToken}]]";
+  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var apiUrl = urlSlashCheck + "api/v1/ilens/lasthourentry"; 
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url:apiUrl ,
+      dataType:'json',
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "GET",
+      async: false,
+      success: function (data){
+        $("#lastHour_Entry").html(data);
+       }
+    });
+}
+
+function onTimeEntry(){
+  var dataApi = "[[${session.DATA_API}]]";
+  		var sessionToken = "[[${session.USER.sessionToken}]]";
+  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var apiUrl = urlSlashCheck + "api/v1/ilens/ontimeentry"; 
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: apiUrl,
+      dataType:'json',
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "GET",
+      async: false,
+      success: function (data){
+        $("#onTime_Entry").html(data);
+       }
+    });
+}
+
+function lateTimeEntry(){
+  var dataApi = "[[${session.DATA_API}]]";
+  		var sessionToken = "[[${session.USER.sessionToken}]]";
+  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/lateEntry"; 
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: apiUrl,
+      dataType:'json',
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "GET",
+      async: false,
+      success: function (data){
+        $("#latetime").html(data);
+       }
+    });
+}
+
+function graceTimeEntry(){
+  var dataApi = "[[${session.DATA_API}]]";
+  		var sessionToken = "[[${session.USER.sessionToken}]]";
+  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var apiUrl = urlSlashCheck + "api/v1/ilens/gracetimeentry"; 
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url:apiUrl,
+      dataType:'json',
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "GET",
+      async: false,
+      success: function (data){
+        $("#graceTime_Entry").html(data);
+       }
+    });
+}
+
+function lastMonthAverage(){
+  var dataApi = "[[${session.DATA_API}]]";
+  		var sessionToken = "[[${session.USER.sessionToken}]]";
+  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var apiUrl = urlSlashCheck + "api/v1/ilens/average"; 
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: apiUrl,
+      dataType:'json',
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "GET",
+      async: false,
+      success: function (data){
+        $("#lastMonth_average").html(data);
+       }
+    });
+}
+
+function totalViolation_count(){
+  var dataApi = "[[${session.DATA_API}]]";
+  		var sessionToken = "[[${session.USER.sessionToken}]]";
+  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var apiUrl = urlSlashCheck + "api/v1/ilens/entryviolationtotalcount"; 
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: apiUrl,
+      dataType:'json',
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "GET",
+      async: false,
+      success: function (data){
+        $("#totalViolation_count").html(data);
+       }
+    });
+}
+
+
+// var time = setInterval(everyTenMins_refreshData, 1000*120);
+// var time1 = setInterval(lastHourEntry, 1000*120);
+
+var count = [];
+function everyTenMins_refreshData(){
+  var dataApi = "[[${session.DATA_API}]]";
+  		var sessionToken = "[[${session.USER.sessionToken}]]";
+  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var apiUrl = urlSlashCheck + "api/v1/ilens/everytenminutes"; 
+   count = [];
+   $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url:apiUrl,
+      dataType:'json',
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "GET",
+      async: false,
+      success: function (data){
+        for(i = 0; i < data.length; i++){
+          count.push(data[i].count);
+        }
+       }
+    });
+
+        
+    var dataPack1 = count.reverse();
+    var dates = ["Last 10 mins", "Last 20 mins", "Last 30 mins", "Last 40 mins", "Last 50 mins","Last 60 mins"];
+    var bar_ctx = document.getElementById('mine-bar').getContext("2d");
+    var gradient = bar_ctx.createLinearGradient(0, 10, 0, 80);
+        gradient.addColorStop(0, 'rgba(6,46,81,1)');
+        gradient.addColorStop(1, 'rgba(43,108,165,1)');
+    var bar_chart = new Chart(bar_ctx, {
+        type: 'bar',
+        data: {
+            labels: dates,
+            datasets: [
+            {
+                label: 'Count',
+                data: dataPack1,
+                backgroundColor: gradient,
+                hoverBackgroundColor: "rgba(43,108,165,1)",
+            }
+            ]
+        },
+        options: {
+            animation: {
+              duration: 1500,
+            },
+            tooltips: {
+              // mode: 'label',
+              // callbacks: {
+              // label: function(tooltipItem, data) {
+              //   return data.datasets[tooltipItem.datasetIndex].label + ": " + numberWithCommas(tooltipItem.yLabel);
+              // }
+              // }
+             },
+            scales: {
+              xAxes: [{
+                categoryPercentage: 0.9,
+                barPercentage: 0.9,
+                gridLines: { 
+                    display: false,
+                    drawBorder: false,
+                    beginAtZero: false,
+                    color: 'rgb(55,57,65 / 0%)',
+                    lineWidth: 1
+                 },
+                 ticks: {
+                  display: false,
+                  fontColor: '#ffff',
+                  fontSize:10
+                  } 
+                }],
+              
+              yAxes: [{
+                gridLines: { 
+                drawBorder: false,
+                  display: false,
+                    color: 'rgb(55,57,65 / 0%)',
+                    lineWidth: 1
+                 },
+                ticks: {
+                  display: false,
+                  fontColor: '#ffff',
+                  suggestedMin: 0,
+                  suggestedMax: 10
+                  // callback: function(value) { return numberWithCommas(value); },
+                },
+                }],
+            }, // scales
+            legend: {
+              display:false,
+                  labels: {
+                  fontColor:'#ffff'
+              }
+            },
+            layout: {
+                padding: {
+                    left: 120,
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                }
+            }
+        } // options
+    });
+}
+
+
+var month = [];
+var average = [];
+function sixMonth_average(){
+  var dataApi = "[[${session.DATA_API}]]";
+  		var sessionToken = "[[${session.USER.sessionToken}]]";
+  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var apiUrl = urlSlashCheck + "api/v1/ilens/sixmonthaverage"; 
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: apiUrl,
+      dataType:'json',
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "GET",
+      async: false,
+      success: function (data){
+        for(i = 0; i < data.length; i++){
+          month.push(data[i].month);
+          average.push(data[i].average)
+        }
+       }
+    });
+
+    var bar_ctx = document.getElementById('fullChart').getContext("2d");
+    var gradient = bar_ctx.createLinearGradient(0, 10, 0, 80);
+            gradient.addColorStop(0, 'rgba(6,46,81,1)');
+            gradient.addColorStop(1, 'rgba(43,108,165,1)');
+    var bar_chart = new Chart(bar_ctx, {
+      type: 'line',
+      data: {
+        labels: month,
+        datasets: [{ 
+            data: average,
+            label: "Average",
+            borderColor:"rgba(255,153,0,1)",
+            backgroundColor: gradient,
+            fill: true
+          }
+        ]
+      },
+      options: {
+        elements: {
+                    point:{
+                        radius: 3
+                    }
+                },
+        layout: {
+          padding: {
+               top: 27,
+               bottom:0,
+                }
+            },
+        scales: {
+        xAxes: [{
+          gridLines: {
+            display:false,
+          },
+          ticks: {
+            display:false,
+          } 
+        }],
+        yAxes: [{
+          gridLines: {
+            display:false,
+          },
+          ticks: {  
+            display:false,
+          }
+        }]
+      },
+      legend: {
+              display:false,
+              
+      },
+      tooltips: {
+        titleFontSize: 7,
+        bodyFontSize: 7,
+        callbacks: {
+        label: function(tooltipItem, data) {
+          return data['datasets'][0]['label'] + ': ' + data['datasets'][0]['data'][tooltipItem['index']] + '%';
+          }
+        }
+       }
+      }
+    });
+    $(".pre-loading2").hide();
+};
+
+var locationBy_violation = [];
+var locationCount = [];
+function entryViolation_byLocation(){
+  var dataApi = "[[${session.DATA_API}]]";
+  		var sessionToken = "[[${session.USER.sessionToken}]]";
+  		var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  		var apiUrl = urlSlashCheck + "api/v1/ilens/entryviolationbylocation"; 
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: apiUrl,
+      dataType:'json',
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "GET",
+      async: false,
+      success: function (data){
+        for(j = 0; j < data.length; j++){
+          locationBy_violation.push(data[j].location);
+          locationCount.push(data[j].count);
+        }
+       }
+    });
+
+    let dataPack2 = locationCount;
+    let location_name = locationBy_violation;
+    var bar_ctx = document.getElementById('violation-in').getContext("2d");
+    var gradient = bar_ctx.createLinearGradient(0, 10, 0, 80);
+        gradient.addColorStop(0, 'rgba(6,46,81,1)');
+        gradient.addColorStop(1, 'rgba(43,108,165,1)');
+    var bar_chart = new Chart(bar_ctx, {
+        type: 'bar',
+        data: {
+            labels: location_name,
+            datasets: [
+            {
+                label: 'Count',
+                data: dataPack2,
+                backgroundColor: gradient,
+                hoverBackgroundColor: "rgba(43,108,165,1)",
+            }
+            ]
+        },
+        options: {
+            animation: {
+                duration: 1500,
+            },
+            tooltips: {
+              // mode: 'label',
+              // callbacks: {
+              // label: function(tooltipItem, data) {
+              //   return data.datasets[tooltipItem.datasetIndex].label + ": " + numberWithCommas(tooltipItem.yLabel);
+              // }
+              // }
+             },
+            scales: {
+              xAxes: [{
+                categoryPercentage: 0.9,
+                barPercentage: 0.9,
+                gridLines: { 
+                    display: false,
+                    drawBorder: false,
+                    beginAtZero: false,
+                    color: 'rgb(55,57,65 / 0%)',
+                    lineWidth: 1
+                 },
+                 ticks: {
+                  display: false,
+                  fontColor: '#ffff',
+                  fontSize:10
+                  } 
+                }],
+              
+              yAxes: [{
+                gridLines: { 
+                drawBorder: false,
+                  display: false,
+                    color: 'rgb(55,57,65 / 0%)',
+                    lineWidth: 1
+                 },
+                ticks: {
+                  display: false,
+                  fontColor: '#ffff',
+                  suggestedMin: 0,
+                  suggestedMax: 10,
+                  // callback: function(value) { return numberWithCommas(value); },
+                },
+                }],
+            }, //scales
+            legend: {
+              display:false,
+                  labels: {
+                  fontColor:'#ffff'
+              }
+            },
+            layout: {
+                padding: {
+                    left: 120,
+                    right: 0,
+                    top: 0,
+                    bottom: 0
+                }
+            }
+        }  //options
+       }
+    );
+}
+</script>
+</div>
+</body>
+</html>
+
+
+<!-- ,
+            {
+                type: 'line',
+                data: [0,0,0,0,0,0],
+                backgroundColor: gradient,
+                hoverBackgroundColor: "rgba(43,108,165,1)",
+            }
+ -->

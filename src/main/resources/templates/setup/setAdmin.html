@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login</title>
+	<link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/vendor/fontawesome/css/font-awesome.css"/>
+    <link rel="stylesheet" href="/vendor/jquery-autocomplete/css/styles.css"/>
+
+    <!-- Custom styles -->
+
+    <script src="/vendor/jquery/js/jquery-3.3.1.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/vendor/jquery-autocomplete/js/jquery.autocomplete.min.js"></script>
+    <script src="/vendor/jquery/js/jquery.twbsPagination.min.js"></script>
+	<script src="/vendor/chartjs/js/Chart.min.js"></script>
+
+ <style type="">
+ 	@font-face {
+	  font-family: "Montserrat";
+	  src: url('../ilens_setup/static/web/css/theme/fonts/monstserrat/Montserrat-Regular.ttf');
+	}
+ 	html{
+ 		height: 100%;
+ 	}
+ 	body{
+ 		font-family: Montserrat !important;
+ 	}
+ 	.setup-body{
+	  background: linear-gradient(246.5deg, rgba(6,46,81,1) 0%, rgba(0,90,168,0.769) 100%) !important;
+	}
+	.setup-logo-part{
+		padding: 40px 20px 0px;
+		overflow: hidden;
+		flex-basis: 40%;
+	    background:linear-gradient(0deg, rgba(249,198,49,1) 16%, rgba(227,231,232,1) 55%);;
+	}
+	.setup-input-part{
+		padding: 70px 130px 80px 70px;
+		flex-basis: 59%;
+    	background-color: antiquewhite;
+    	overflow: hidden;
+    	background-color: rgba(249,198,49,1);
+	}
+	.setup-space{
+		flex-basis: 1%;
+	}
+	.setup-content {
+	    padding: 5% 8% 2% 12%;
+	}
+	.logo-img{
+		width: 100%;
+	}
+	.setup-img-bg-line {
+	    position: relative;
+	    width: 114%;
+	    right: 26px;
+	    margin-top: 10%;
+	}
+	.admin-txt{
+		white-space: nowrap;
+	    text-align: left;
+	    font-family: Montserrat;
+	    font-style: normal;
+	    font-weight: bold;
+	    font-size: 30px;
+	    color: rgba(6,46,81,1);
+	}
+	.setup-input {
+	    margin-top: 15%;
+	    position: relative;
+	}
+	.setup-show-password {
+	    position: absolute;
+	    right: 10px;
+	    top: 70px;
+	    font-size: 25px;
+	    color: rgba(69,164,232,1);
+	    cursor: pointer;
+	}
+	.lens_input {
+	    width: 100%;
+	    margin-bottom: 30px;
+	    height: 35px;
+	    background-color: #3a5362;
+	    border: none;
+	    color: white;
+	    padding: 0 35px 0 20px;
+	    box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.75);
+	}
+	.lens_input:focus{
+		outline: none;
+	}
+	.lens_input::placeholder {
+	  color: #b5b5b5;
+	}
+	.submit-btn {
+	    border: none;
+	    background-color: #3a5362;
+	    color: #fff;
+	    font-size: 17px;
+	    width: 100px;
+	    height: 35px;
+	    padding-bottom: 5px;
+	    box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.75);
+	    cursor: pointer;
+	}
+	.submit-btn:focus{
+		outline: none;
+	}
+	.submit-btn:active{
+		box-shadow:none;
+	}
+ </style>
+</head>
+<body class="setup-body">
+	<div class="setup-content">
+		<div class="row">
+			<div class="setup-logo-part">
+				<img src="/web/images/Image_12.png" id="" class="logo-img">
+				<div class="setup-img-bg-line">
+					<img src="/web/images/lines.png" class="w-100">
+				</div>
+			</div>
+			<div class="setup-space"></div>
+			<div class="setup-input-part">
+				<div class="admin-txt">Admin User Setup</div>
+				<div class="setup-input">
+					<input type="Password" name="Password" class="lens_input" placeholder="Admin User Password" />
+
+					<input type="Password" name="confirm Password" class="lens_input pr-40" placeholder="Confirm Admin User Password" /><i class="fa fa-eye setup-show-password" aria-hidden="true"></i>
+					<button class="submit-btn pull-right">Finish</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+<script>
+</script>

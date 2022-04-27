@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+    <title>[[${APP_NAME}]] - Agents</title>
+</head>
+<body class="overflow">
+<div layout:fragment="content" class="contant">
+  <div class="pre-loading">
+    <img class="loader" src="/web/images/loader.png"/>
+  </div>
+  <div class="heading">
+    <span class="heading-text fs-30">Members</span>
+  </div>
+  <div class="main-table zoom1">
+    <div class="col-md-12 pb-10 row m-0">
+      <div class="col-md-12">
+        <nav aria-label="Page navigation example" class="pagination-nav">
+          <ul class="pagination" id="usersPagination">
+          </ul>
+        </nav>
+        <a onclick="userEdit(0);"><button id="addUser" class="new-button button-position">New<i class="fa fa-plus-circle" aria-hidden="true"></i></button></a>
+      </div>
+    </div>
+    <div class="col-md-12 row table-responsive">
+      <table class="clr-txt">
+        <thead>
+          <tr>
+            <th>Member ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Department</th>
+            <th>Location</th>
+            <th class="dataTraining">Data Training  <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="This action helps system to predict user with facial recognition, adding content in different combinations of angles " ></i></th>
+            <th width="140">Role</th>
+            <th width="60">Action</th>
+          </tr>
+        </thead>
+        <tbody class="" id="userList">
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div id="adminForm">
+    
+  </div>
+  <div id="userForm">
+    
+  </div>
+  <div class="records"></div>
+  <input id="editForm" type="hidden" name="" >
+  <input id="trainId" type="hidden" name="" >
+  <input id="trainName" type="hidden" name="" >
+  <input id="upadtedUsers" type="hidden" name="">
+  <input id="pageNo" type="hidden" name=""> 
+<script>
+$(document).ready(function(){
+  $("#users").addClass('active');
+  $("#users").on("click",function(){
+    $(".pre-loading").show();
+      window.setInterval(function(){
+        $(".pre-loading").hide();
+      }, 2000);
+  });
+  usersPaging();
+  $('[data-toggle="tooltip"]').tooltip({
+      placement : 'right'
+  });
+  $('[data-toggle1="tooltip"]').tooltip({trigger:'click'}); 
+  $(".fa-question-circle").mouseleave(function(){
+           $('[data-toggle1="tooltip"]').tooltip('hide');
+   })  
+  toastr.options = {
+          debug: false,
+          newestOnTop: false,
+          positionClass: "toast-bottom-right",
+          closeButton: true,
+          progressBar: false,
+  }
+  if($("#UserRole").text()=="Admin"){
+     $(".dataTraining").show();
+     $("#addUser").show();
+     $(".editUser").show();
+  }else{
+    $(".dataTraining").hide();
+    $("#addUser").hide();
+    $(".editUser").hide();
+  }
+});
+$(window).on('load', function() {
+  $(".pre-loading").hide();
+});  
+
+function adminEdit(id,name){
+   $("#trainId").val(id);
+   $("#trainName").val(name);
+   $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "/data_training",
+    type: "GET",
+    async: false,
+    success: function (data){
+        $("#adminForm").html(data);
+
+    }
+  });
+}
+
+function cancelModal(){
+  $("#TrainingModalCenter").hide();
+  stop();
+}
+
+function userEdit(id){
+   $("#editForm").val(id);
+     $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: "/new_user",
+      type: "GET",
+      async: false,
+      success: function (data){
+          $("#userForm").html(data);
+
+      }
+  });
+}
+
+function cancelForm2(){
+  $(".exampleModalCenter1").hide();
+}
+
+function usersEdit(id){
+  $("#editForm").val(id);
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: "/new_user",
+      type: "GET",
+      async: false,
+      success: function (data){
+        $("#userForm").html(data);
+      }
+  });
+  var dataApi = "[[${session.DATA_API}]]";
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var apiUrl = urlSlashCheck + "api/v1/user/"+id;
+   $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: apiUrl,
+    dataType: "json",
+    headers:{'CLIENT_KEY':sessionToken},
+    type: "GET",
+    async: false,
+    success: function (data){
+        $("#UserID").val(data.userId);
+        $("#firstName").val(data.firstName);
+        $("#lastName").val(data.lastName);
+        $("#department").val(data.department);
+        $("#location").val(data.location);
+        $("#role").val(data.role);
+    }
+   });
+}
+
+function cancelForm2(){
+  $(".exampleModalCenter1").hide();
+}
+
+
+function saveUser(){ 
+    toastr.options = {
+      debug: false,
+      newestOnTop: false,
+      positionClass: "toast-bottom-right",
+      closeButton: true,
+      progressBar: false,
+    }
+    var user = {
+        active: true,
+        createBy: "string",
+        createdDt: "2021-04-16T06:08:27.803Z",
+        dateOfBirth: "2021-04-16T06:08:27.803Z",
+        department:$("#department").val(),
+        firstName:$("#firstName").val(),
+        id:0,
+        lastName:$("#lastName").val(),
+        location:$("#location").val(),
+        role:$("#role").val(),
+        sessionToken: "string",
+        updatedBy: "string",
+        updatedDt: "2021-04-16T06:08:27.803Z",
+        userId: $("#UserID").val(),
+        userSecret: $("#UserID").val()
+      };
+      var dataApi = "[[${session.DATA_API}]]";
+      var sessionToken = "[[${session.USER.sessionToken}]]";
+      var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+      var apiUrl = urlSlashCheck + "api/v1/user";
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: apiUrl,
+        //dataType: "json",
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "POST",
+        async: false,
+        data: JSON.stringify(user),
+        success:function(data){
+          usersPaging();
+          cancelForm2();
+          setTimeout(function(){ toastr.success("User saved successfully"); }, 1000);
+         },
+         error:function(err){
+            setTimeout(function(){ toastr.error("Error found.."); }, 1000); }
+      });
+};
+var currentPage = 1;
+function deleteUser(id){
+  currentPage = parseInt($("#pageNo").val())+1;
+  var dataApi = "[[${session.DATA_API}]]";
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var apiUrl = urlSlashCheck + "api/v1/user/"+id;
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url:apiUrl,
+    //dataType: "json",
+    headers:{'CLIENT_KEY':sessionToken},
+    type: "DELETE",
+    async: true,
+    success: function(data){
+      usersPaging();
+      setTimeout(function(){ toastr.info("User successfully deleted"); }, 1000);
+    },
+     error:function(err){
+       setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+     }
+  });
+};
+
+var totalPages = 0;
+var totalCount = 0;
+
+function usersPaging(){
+  itemsPerPage=10;
+  var dataApi = "[[${session.DATA_API}]]";
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var apiUrl = urlSlashCheck + "api/v1/user/count";
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: apiUrl,
+    dataType: "json",
+    headers:{'CLIENT_KEY':sessionToken},
+    type: "GET",
+    async: false,
+    success:function(data){
+      if(data==1){
+        totalCount=data;
+      }else{
+        var data1=data-1;
+        totalCount=data1;
+      }
+    
+       totalPages=Math.ceil(totalCount/itemsPerPage);
+       $('#usersPagination').empty();
+       $(userList).empty();
+        $('#usersPagination').removeData("twbs-pagination");
+        $('#usersPagination').unbind("page");
+        window.pagObj = $('#usersPagination').twbsPagination({
+            totalPages: totalPages,
+            visiblePages: 5,
+            next: '&raquo;',
+            last: '',
+            prev: '&laquo;',
+            first:'',
+            onPageClick: function (event, page) {
+                pageNumber = (page - 1);
+                $("#pageNo").val(pageNumber);
+                usersPageList(pageNumber);
+            }
+        }).on("page",function(event,num){});
+        if(totalPages <= currentPage){
+          $('#usersPagination').twbsPagination('show', totalPages);
+        }else{
+          $('#usersPagination').twbsPagination('show', currentPage);
+        }
+      }
+  });
+}
+
+var pageNumber = 0;
+function usersPageList(pageNumber){
+  var dataApi = "[[${session.DATA_API}]]";
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var apiUrl = urlSlashCheck + "api/v1/user/list/"+pageNumber;
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url:apiUrl ,
+      dataType: "json",
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "GET",
+      async: false,
+      success: function(data) {
+      var userList = "";
+      for(i=0;i<data.length;i++){
+        if(data[i].id!=1){
+        userList=userList+'<tr value='+data[i].id+'>';
+        userList=userList+'<td>'+data[i].userId+'</td>';
+        userList=userList+'<td>'+data[i].firstName+'</td>';
+        userList=userList+'<td>'+data[i].lastName+'</td>';
+        userList=userList+'<td>'+data[i].department+'</td>';
+        userList=userList+'<td>'+data[i].location+'</td>';
+        userList=userList+'<td class="dataTraining"><a onclick="adminEdit(\''+data[i].id+'\',\''+data[i].firstName+'\');" id="id_'+data[i].id+'" class="hide_icon"><i onclick="" class="fa fa-desktop data-icon icon-size" data-toggle="tooltip" data-original-title="Train user profile" aria-hidden="true"></i></a></td>';
+        userList=userList+'<td>'+data[i].role+'</td>';
+        userList=userList+'<td class="align"><a onclick="usersEdit(\''+data[i].id+'\');"><i id="edit" class="fa fa-pencil-square-o edit-config icon-size editUser" aria-hidden="true"></i></a><a onclick="deleteUser(\''+data[i].id+'\');"><i class="fa fa-trash icon-size" aria-hidden="true"></i></a></td>';
+        userList=userList+'</tr>';
+      }
+    }
+      if(userList.length== 0){
+         $(".records").html("No Records Found");
+         $('.pagination-nav').hide();
+         $(".records").show();
+      }else{
+         $("#userList").html(userList);
+         $(".records").hide();
+         $('.pagination-nav').show();
+      }
+    },
+    error:function(err){
+         console.log(err);
+    }
+  });
+};
+
+
+function updateUser(){ 
+  toastr.options = {
+    debug: false,
+    newestOnTop: false,
+    positionClass: "toast-bottom-right",
+    closeButton: true,
+    progressBar: false,
+  }
+  var user = {
+        active: true,
+        createBy: "string",
+        createdDt: "2021-04-16T06:08:27.803Z",
+        dateOfBirth: "2021-04-16T06:08:27.803Z",
+        department:$("#department").val(),
+        firstName:$("#firstName").val(),
+        id:$("#editForm").val(),
+        lastName:$("#lastName").val(),
+        location:$("#location").val(),
+        role:$("#role").val(),
+        updatedBy: "string",
+        updatedDt: new Date(),
+        userId: $("#UserID").val(),
+        userSecret: $("#UserID").val()
+    };
+  var dataApi = "[[${session.DATA_API}]]";
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var apiUrl = urlSlashCheck + "api/v1/user";
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: apiUrl,
+      //dataType: "json",
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "PUT",
+      async: false,
+      data: JSON.stringify(user),
+      success:function(data){
+        usersPaging();
+        cancelForm2();
+        setTimeout(function(){ toastr.info("User successfully upadted"); }, 1000);
+       },
+       error:function(err){
+          setTimeout(function(){ toastr.error("Error found.."); }, 1000);          }
+    });
+};
+</script>
+ </div>
+</body>
+</html>

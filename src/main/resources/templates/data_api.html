@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+    <title>[[${APP_NAME}]] - Agents</title>
+</head>
+<body class="overflow">
+<div layout:fragment="content" class="contant">	
+<div class="pre-loading">
+  <img class="loader" src="/web/images/loader.png" />
+</div>
+<div class="heading">
+    <span class="heading-text fs-30">Data Api</span>
+</div>
+<div class="main-table zoom2">  
+	<div class="data_api">
+		<div class="apisty">			
+			    <div class="col-md-12 p-0">
+			      <label class="dinput-labels">Data Api <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Remote API Server Address" ></i></label>
+	              <input type="text"  class="dlens_input"  id="apiValue" />
+	        </div>
+	            <div class="col-md-12 p-0">
+	              <label class="dinput-labels">Api Token <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The token to authentication remote api server" ></i></label>
+	              <input type="text"   class="alens_input" id="tokenValue"  />
+	            </div>           
+			    
+	    </div>
+    </div>
+    <div>
+      <button type="button"  class="api-button" id="update" >Update</button>
+     </div>
+  </div>
+  <script>
+  	$(document).ready(function(){
+      $("#navadms").addClass('active');
+      $("#Adms").addClass('show');
+      $("#dataapi").addClass('active');
+      toastr.options = {
+          debug: false,
+          newestOnTop: false,
+          positionClass: "toast-bottom-right",
+          closeButton: true,
+          progressBar: false,
+        }
+      $('[data-toggle1="tooltip"]').tooltip({trigger:'click'}); 
+      $(".fa-question-circle").mouseleave(function(){
+           $('[data-toggle1="tooltip"]').tooltip('hide');
+         })  
+      getDataApi();
+    })
+
+ function apiHealthCheck(dataApi, apiToken) {
+  var returnVal = "false";
+  var url = dataApi.toString().endsWith("/")?dataApi:dataApi+"/"; 
+  var finalUrl = url + "api/v1/dataApi/details"; 
+  $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: finalUrl,
+      dataType:'json',      
+      headers:{'CLIENT_KEY':"apiToken.toString()"},
+      type: 'GET',
+      crossDomain: true,       
+      async: false,
+      complete: function(xhr, data){      
+        if(xhr.status == 200){
+          returnVal = "true";
+        }     
+      }
+   });
+
+  return returnVal;
+}
+
+$("#update").click(function(){ 
+  var rtnVl = apiHealthCheck($("#apiValue").val(), $("#tokenValue").val());
+  var update = {
+    apiToken: $("#tokenValue").val(),
+    dataApi: $("#apiValue").val(),
+    id: ("0")
+    };
+  var dataApi = "[[${session.DATA_API}]]";
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var apiUrl = urlSlashCheck + "api/v1/dataApi/update";
+    if(rtnVl == "true"){
+      $.ajax({
+          contentType: "application/json;charset=UTF-8",
+          url:apiUrl,
+          headers:{'CLIENT_KEY':sessionToken},
+          type: 'POST',
+          data: JSON.stringify(update),
+          async: false,
+          success: function(data){
+            setTimeout(function(){ toastr.success("Success.."); }, 1000);
+          },
+          error: function(err){
+            setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+          }
+        });
+    }else{
+     setTimeout(function(){ toastr.error("Invalid Data API or API Token "); }, 1000);
+    }
+})
+
+function getDataApi() {
+  var dataApi = "[[${session.DATA_API}]]";
+  var sessionToken = "[[${session.API_TOKEN}]]";
+  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var apiUrl = urlSlashCheck + "api/v1/dataApi/details";  
+  $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: apiUrl,
+      dataType:'json',      
+      headers:{'CLIENT_KEY': sessionToken},
+      type: 'GET',
+      async: false,
+      success: function(data){ 
+        $("#tokenValue").val(data.apiToken);
+        $("#apiValue").val(data.dataApi);
+      },
+      error: function(err){
+        setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+      }
+   });
+}
+ 
+</script>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+    <title>[[${APP_NAME}]] - Agents</title>
+</head>
+<body>
+<div layout:fragment="content" class="contant">
+  <div class="pre-loading">
+    <img class="loader" src="/web/images/loader.png" />
+  </div>
+  <div class="heading">
+      <span class="heading-text fs-30">Attendance</span>
+  </div>
+	<div class="main-table zoom3">
+        <div class="col-md-12 pb-10 row m-0">
+          <div class="col-md-12">
+            <div class="search-box">
+              <input  class="search-input" placeholder="Search By Name/Id" id="usersFilter">
+                <button class="search-button" id="search">
+                <i class="fa fa-search"></i>
+              </button>
+              <span class="clearicon"><i class="fa fa-times" aria-hidden="true" id="clearIcon"></i></span>
+           </div>
+            <nav aria-label="Page navigation example" class="pagination-nav" id="attendancePage">
+              <ul class="pagination" id="attendancePagination">
+              </ul>
+            </nav>
+            <div class="lens_select select_position">
+                <div class="input-group date" id="datepicker">
+                    <input type="text" id="text-date" class="form-control">
+                      <span class="input-group-append"> </span>
+                 </div>
+             </div>
+          </div>
+        </div>
+        <div class="col-md-12 row table-responsive">
+          <table class="clr-txt">
+            <thead>
+              <tr>
+                <!-- 
+                    <th class="img-th"></th> -->
+                <th width="300">ID</th>
+                <th width="300">Name</th>
+                <th width="300">Entry Time</th>
+                <th width="300">Entry Location</th>
+                <th width="300">Exit Time</th>
+                <th width="300">Exit Location</th>
+              </tr>
+            </thead>
+            <tbody class="" id="attendanceList">
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="records"></div>
+<script>
+	$(document).ready(function(){
+    $("#attendance").addClass('active');
+    $("#attendance").on("click",function(){
+        $(".pre-loading").show();
+          window.setInterval(function(){
+            $(".pre-loading").hide();
+          }, 2000);
+      });
+      attendancePaging();
+      userFilter();
+	});
+  $(window).on('load', function() {
+    $(".pre-loading").hide();
+  });  
+
+
+
+  var res = "";
+  $(function() {
+    $('#datepicker').datepicker({
+        defaultDate: new Date(),
+        format: "yyyy-mm-dd",
+        timePicker: true,
+        autoclose: true
+
+    });
+    var selected = (new Date()).toISOString().split('T')[0];
+    $('#datepicker').datepicker('setDate', new Date());
+    $( "#datepicker" ).datepicker({
+        buttonImageOnly: true,
+        buttonText: "Select date"
+    });
+
+    var entryExitFilter = "";
+    var humanRF=null;
+    const url=window.location.href.toString();
+    if(url.includes("?")){
+      var dateString=url.split("?");
+      const idString=dateString[1];
+      var epoch=idString.split("=")[1];
+      epoch=epoch*1000;
+      epoch=epoch+(new Date().getTimezoneOffset() *-1);
+      $('#datepicker').datepicker("setDate", new Date(epoch) );
+      var date1=$("#text-date").val();
+      entryExitFilter={
+        date:date1,
+        id:0,
+        location:"",
+        name:""
+      }
+    }else{
+    entryExitFilter={
+        date:selected,
+        id: 0,
+        location:"",
+        name:""
+    }
+  }
+    var pageNumber = 0;
+    attendanceList(entryExitFilter, pageNumber);
+    $('#datepicker').datepicker().on("input change", function (e) { 
+
+      //2021-12-23T04:25:25.754Z//
+      var st1=(e.target.value);
+      var st2="T00:01:01.001Z";
+      selected1 = st1.concat(st2);
+
+      var pageNumber = 0;
+      entryExitFilter={
+        date:selected1, 
+        id:0,
+        location:"",
+        name:""
+      }
+      attendanceList(entryExitFilter, pageNumber);
+    });
+  });
+
+
+
+  var totalPages = 0;
+  var totalCount = 0;
+    function attendancePaging(){
+      itemsPerPage=10;
+      var dataApi = "[[${session.DATA_API}]]";
+      var sessionToken = "[[${session.USER.sessionToken}]]";
+      var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+      var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/count"; 
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: apiUrl,
+        dataType:'json',
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "GET",
+        async: false,
+        success:function(data){
+          if(data!=0){
+           totalCount=data;
+           totalPages=Math.ceil(totalCount/itemsPerPage);
+           $('#attendancePagination').empty();
+            $('#attendancePagination').removeData("twbs-pagination");
+            $('#attendancePagination').unbind("page");
+            window.pagObj = $('#attendancePagination').twbsPagination({
+                totalPages: totalPages,
+                visiblePages: 5,
+                next: '&raquo;',
+                last: '',
+                prev: '&laquo;',
+                first:'',
+                onPageClick: function (event, page) {
+                    pageNumber = (page - 1);
+                    attendanceList(pageNumber);
+                }
+            }).on("page",function(event,num){});
+          }
+        }
+      });
+    }
+$("#usersFilter").keyup(function(data){
+        var date1=$("#text-date").val();
+        var date2="T00:01:01.001Z";        
+        var date=date1.concat(date2);
+        var pageNumber=0;
+        var entryExitFilter= {date:date,
+                             id:0,
+                            location:"",
+                            name:""
+                          }
+  data=$("#usersFilter").val();
+  if(data==""){
+    attendanceList(entryExitFilter, pageNumber);
+    $(".clearicon").css('opacity', '0');
+  }else{
+    $(".clearicon").css('opacity', '1');
+  }
+})
+$("#clearIcon").on("click",function(){
+  $("#usersFilter").val("");
+  $(".clearicon").css('opacity', '0');
+  $("#usersFilter").focus();
+  var date1=$("#text-date").val();
+        var date2="T00:01:01.001Z";
+        var date=date1.concat(date2);
+        var pageNumber=0;
+        var entryExitFilter= {date:date,
+                             id:0,
+                            location:"",
+                            name:""
+                          }
+  data=$("#usersFilter").val();
+  attendanceList(entryExitFilter, pageNumber);
+})
+
+  function userFilter(){
+  var dataApi = "[[${session.DATA_API}]]";
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+  var apiUrl = urlSlashCheck + "api/v1/user/usersList";
+  var userList = [];
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: apiUrl,
+    dataType: "json",
+    headers:{'CLIENT_KEY':sessionToken},
+    type: "GET",
+    async: false,
+    success: function (data){     
+      for(i = 0; i < data.length; i++){    
+        if(i==0) continue;            
+        userList.push(data[i].id+" ["+data[i].firstName+" "+data[i].lastName+"]");
+      }      
+    }    
+   });
+   $("#usersFilter").aircomplete({
+      data: userList,
+      minSearchStringLength : 1, // show results after a single character is entered
+      onSelect: function(data){
+        var split=data.split("[");
+        var id=split[0];
+        var date1=$("#text-date").val();
+        var date2="T00:01:01.001Z";        
+        var date=date1.concat(date2);
+        var entryExitFilter= {date:date,
+                             id:id,
+                            location:"",
+                            name:""
+                          }
+    var dataApi = "[[${session.DATA_API}]]";
+  	var sessionToken = "[[${session.USER.sessionToken}]]";
+  	var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+ 		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/filter";
+     $.ajax({
+		  contentType: "application/json;charset=UTF-8",
+          url: apiUrl,
+          dataType: "json",
+          headers:{'CLIENT_KEY':sessionToken},
+          type: "POST",
+          async: false,
+          data: JSON.stringify(entryExitFilter),
+          success: function(data){
+            var attendanceList="";
+          	for(i=0;i<data.length;i++){
+              var entryTime = moment(data[i].entry_view.time).format("DD-MM-YYYY hh:mm:ss A");
+          	  attendanceList=attendanceList+'<tr>';
+          	  attendanceList=attendanceList+"<td> <button id='idTraceButton' type='button' class='btn btn-primary' onclick='getTraceMethod(this.value)' value= "+ data[i].id +'_'+ entryExitFilter.date +" >"+data[i].id+"</button></td>";
+              attendanceList=attendanceList+'<td>'+data[i].name+'</td>';
+              attendanceList=attendanceList+'<td>'+ entryTime +'</td>';
+              attendanceList=attendanceList+'<td>'+data[i].entry_view.location+'</td>';
+              if(data[i].exit_view==0){
+                attendanceList=attendanceList+'<td>-----</td>';
+              }else{
+                var exitTime = moment(data[i].exit_view[0].time).format("DD-MM-YYYY hh:mm:ss A");
+                attendanceList=attendanceList+'<td>'+ exitTime +'</td>';
+              }
+              if(data[i].exit_view==0){
+                attendanceList=attendanceList+'<td>-----</td>';
+              }else{
+                attendanceList=attendanceList+'<td>'+data[i].exit_view[0].location+'</td>';
+              }
+          		attendanceList=attendanceList+'</tr>';
+          	}
+            if(data == 0){
+               $("#attendanceList").hide();
+               $(".records").html("No Records Found").show();
+               $('.pagination-nav').hide();
+            }else{
+               $(".records").hide();
+               $("#attendanceList").empty();
+               $("#attendanceList").html(attendanceList).show(); 
+               $('.pagination-nav').show();
+            }
+
+          }
+    });
+    return data;
+      },
+     
+  });
+}
+
+  function getTraceMethod(clickedValue){
+      const myArray = clickedValue.toString().split("_");
+
+      // convert human readable date into epoch.
+      var dateInEpoch = Math.round(new Date(myArray[1])/1000.0);
+      location.href = '/attendanceById?id='+myArray[0] +'&date='+dateInEpoch;
+  }
+
+	function attendanceList(entryExitFilter, pageNumber){
+    var dataApi = "[[${session.DATA_API}]]";
+  	var sessionToken = "[[${session.USER.sessionToken}]]";
+  	var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+ 		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/"+pageNumber; 
+
+		$.ajax({
+		  contentType: "application/json;charset=UTF-8",
+          url: apiUrl,
+          dataType: "json",
+          headers:{'CLIENT_KEY':sessionToken},
+          type: "POST",
+          async: false,
+          data: JSON.stringify(entryExitFilter),
+          success: function(data){
+          	var attendanceList="";
+          	for(i=0;i<data.length;i++){
+              var entryTime = moment(data[i].entry_view.time).format("DD-MM-YYYY hh:mm:ss A");
+          	  attendanceList=attendanceList+'<tr>';
+          	  attendanceList=attendanceList+"<td> <button id='idTraceButton' type='button' class='btn btn-primary' onclick='getTraceMethod(this.value)' value= "+ data[i].id +'_'+ entryExitFilter.date +" >"+data[i].id+"</button></td>";
+              attendanceList=attendanceList+'<td>'+data[i].name+'</td>';
+              attendanceList=attendanceList+'<td>'+ entryTime +'</td>';
+              attendanceList=attendanceList+'<td>'+data[i].entry_view.location+'</td>';
+              if(data[i].exit_view==0){
+                attendanceList=attendanceList+'<td>-----</td>';
+              }else{
+                var exitTime = moment(data[i].exit_view[0].time).format("DD-MM-YYYY hh:mm:ss A");
+                attendanceList=attendanceList+'<td>'+ exitTime +'</td>';
+              }
+              if(data[i].exit_view==0){
+                attendanceList=attendanceList+'<td>-----</td>';
+              }else{
+                attendanceList=attendanceList+'<td>'+data[i].exit_view[0].location+'</td>';
+              }
+          		attendanceList=attendanceList+'</tr>';
+          	}
+            if(data == 0){
+               $("#attendanceList").hide();
+               $(".records").html("No Records Found").show();
+               $('.pagination-nav').hide();
+            }else{
+              $("#attendanceList").empty();
+               $(".records").hide();
+               $("#attendanceList").html(attendanceList).show(); 
+               $('.pagination-nav').show();
+            }
+          },
+          error:function(err){
+               console.log(err);
+          }
+		});
+	}
+</script>
+</div>
+</body>
+</html>

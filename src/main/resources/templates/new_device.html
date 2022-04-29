@@ -75,13 +75,10 @@ if($.trim($('#newName').val()) == ""){
               ip: $("#newIp").val(),
               name: $("#newName").val(),             
             };  
-          var reportApi = "[[${session.REPORT_API}]]";
-          var sessionToken = "[[${session.USER.sessionToken}]]";
-          var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
-          var apiUrl = urlSlashCheck + "api/v1/channels";     
+    var sessionToken = "[[${session.USER.sessionToken}]]";  
    $.ajax({
         contentType: "application/json;charset=UTF-8",
-        url:apiUrl ,
+        url:"api/v1/channels" ,
         headers:{'CLIENT_KEY':sessionToken},
         type: "POST",
         async: false,

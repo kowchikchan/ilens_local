@@ -144,12 +144,19 @@ function usersEdit(id){
   var sessionToken = "[[${session.USER.sessionToken}]]";
   var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   var apiUrl = urlSlashCheck + "api/v1/user/"+id;
+  var ilensApiClientVO  = {
+    api: apiUrl,
+    clientKey: sessionToken,
+    inputVo: {},
+    method: "GET"
+  }
    $.ajax({
     contentType: "application/json;charset=UTF-8",
-    url: apiUrl,
+    url: "/api/v1/iLensApiClient",
     dataType: "json",
     headers:{'CLIENT_KEY':sessionToken},
-    type: "GET",
+    type: "POST",
+    data: JSON.stringify(ilensApiClientVO),
     async: false,
     success: function (data){
         $("#UserID").val(data.userId);
@@ -196,14 +203,20 @@ function saveUser(){
       var sessionToken = "[[${session.USER.sessionToken}]]";
       var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
       var apiUrl = urlSlashCheck + "api/v1/user";
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: user,
+        method: "POST"
+      }
       $.ajax({
         contentType: "application/json;charset=UTF-8",
-        url: apiUrl,
+        url: "/api/v1/iLensApiClient",
         //dataType: "json",
         headers:{'CLIENT_KEY':sessionToken},
         type: "POST",
         async: false,
-        data: JSON.stringify(user),
+        data: JSON.stringify(ilensApiClientVO),
         success:function(data){
           usersPaging();
           cancelForm2();
@@ -220,12 +233,19 @@ function deleteUser(id){
   var sessionToken = "[[${session.USER.sessionToken}]]";
   var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   var apiUrl = urlSlashCheck + "api/v1/user/"+id;
+  var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "DELETE"
+      }
   $.ajax({
     contentType: "application/json;charset=UTF-8",
-    url:apiUrl,
+    url:"/api/v1/iLensApiClient",
     //dataType: "json",
     headers:{'CLIENT_KEY':sessionToken},
-    type: "DELETE",
+    type: "POST",
+    data: JSON.stringify(ilensApiClientVO),
     async: true,
     success: function(data){
       usersPaging();
@@ -246,12 +266,19 @@ function usersPaging(){
   var sessionToken = "[[${session.USER.sessionToken}]]";
   var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   var apiUrl = urlSlashCheck + "api/v1/user/count";
+  var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
   $.ajax({
     contentType: "application/json;charset=UTF-8",
-    url: apiUrl,
+    url: "api/v1/iLensApiClient",
     dataType: "json",
     headers:{'CLIENT_KEY':sessionToken},
-    type: "GET",
+    type: "POST",
+    data: JSON.stringify(ilensApiClientVO),
     async: false,
     success:function(data){
       if(data==1){
@@ -294,12 +321,19 @@ function usersPageList(pageNumber){
   var sessionToken = "[[${session.USER.sessionToken}]]";
   var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   var apiUrl = urlSlashCheck + "api/v1/user/list/"+pageNumber;
+  var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
     $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url:apiUrl ,
+      url:"api/v1/iLensApiClient" ,
       dataType: "json",
       headers:{'CLIENT_KEY':sessionToken},
-      type: "GET",
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
       async: false,
       success: function(data) {
       var userList = "";
@@ -362,14 +396,21 @@ function updateUser(){
   var sessionToken = "[[${session.USER.sessionToken}]]";
   var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   var apiUrl = urlSlashCheck + "api/v1/user";
+  var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: user,
+        method: "PUT"
+      }
     $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url: apiUrl,
+      url: "api/v1/iLensApiClient",
       //dataType: "json",
       headers:{'CLIENT_KEY':sessionToken},
-      type: "PUT",
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
       async: false,
-      data: JSON.stringify(user),
+      //data: JSON.stringify(user),
       success:function(data){
         usersPaging();
         cancelForm2();

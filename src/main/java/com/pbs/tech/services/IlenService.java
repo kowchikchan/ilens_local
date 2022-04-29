@@ -143,13 +143,6 @@ public class IlenService {
         }
 
         JSONObject configJson = new JSONObject();
-       // configJson.put("api", protocal + "://" + host + ":" + port + "/" + apiPath.toString());
-        if(StringUtils.isBlank(dataApi.getDataApi())){
-            dataApi.setDataApi("http://127.0.0.1:61616");
-        }
-        if(StringUtils.isBlank(dataApi.getReportApi())){
-            dataApi.setReportApi("http://127.0.0.1:8088");
-        }
         configJson.put("dataApi", dataApi.getDataApi());
         configJson.put("reportApi", dataApi.getReportApi());
         configJson.put("apiToken", dataApi.getApiToken());
@@ -910,15 +903,17 @@ public class IlenService {
         return encodedFile;
     }
 
-    public String attendanceSnapshot(String snapshot) throws IOException {
+    public List<String> attendanceSnapshot(String snapshot) throws IOException {
             String encodedString = null;
+            List<String> val = new ArrayList<>();
             try {
                 File file = new File(dataLocation + "/" + snapshot + ".jpg");
                 encodedString = bs64Conversion(file);
             }catch (FileNotFoundException e){
                 throw new FileNotFoundException("File Not Found Exception " + e.getMessage());
             }
-            return encodedString;
+            val.add(encodedString);
+            return val;
     }
 
     public long getLateEntry() throws Exception {

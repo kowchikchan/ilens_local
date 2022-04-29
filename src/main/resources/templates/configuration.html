@@ -397,14 +397,10 @@ var maximumPeople = document.getElementById("maximum-People").value;
 var minimumPeople = document.getElementById("minimum-People").value;
 
 function userName(){
-  var reportApi = "[[${session.REPORT_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
- 	var apiUrl = urlSlashCheck + "api/v1/user/usersList"; 
-
   $.ajax({
     contentType: "application/json;charset=UTF-8",
-    url: apiUrl,
+    url: "api/v1/user/usersList",
     dataType: "json",
     headers:{'CLIENT_KEY':sessionToken},
     type: "GET",

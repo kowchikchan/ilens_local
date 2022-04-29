@@ -186,12 +186,9 @@ function startTraining(image){
   var blob = base64ToBlob(base64ImageContent, 'image/png');                
   var formData = new FormData();
   formData.append('file', blob, ".png");
-  var reportApi = "[[${session.REPORT_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
- 	var apiUrl = urlSlashCheck + "api/v1/user/loadTraining/"+$("#trainId").val(); 
    $.ajax({
-        url: apiUrl,
+        url: "api/v1/user/loadTraining/"+$("#trainId").val(),
         headers:{'CLIENT_KEY':sessionToken},
         type: "PUT",
         enctype: 'multipart/form-data',
@@ -211,14 +208,10 @@ function startTraining(image){
 
 
 function trainingId(id){
-  var reportApi = "[[${session.REPORT_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
- 	var apiUrl = urlSlashCheck + "api/v1/user/starTraining/"+id; 
-
     $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url: apiUrl,
+      url: "api/v1/user/starTraining/"+id,
       headers:{'CLIENT_KEY':sessionToken},
       type: "PUT",
       async: true,

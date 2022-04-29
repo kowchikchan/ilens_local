@@ -56,12 +56,19 @@
   var returnVal = "false";
   var url = reportApi.toString().endsWith("/")?reportApi:reportApi+"/"; 
   var finalUrl = url + "api/v1/dataApi/details"; 
+  var ilensApiClientVO  = {
+                            api: finalUrl,
+                            clientKey: apiToken.toString(),
+                            inputVo: {},
+                            method: "GET"
+                          }
   $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url: finalUrl,
+      url: "/api/v1/iLensApiClient",
       dataType:'json',      
-      headers:{'CLIENT_KEY':"apiToken.toString()"},
-      type: 'GET',
+      headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+      type: 'POST',
+      data: JSON.stringify(ilensApiClientVO),
       crossDomain: true,       
       async: false,
       complete: function(xhr, data){      

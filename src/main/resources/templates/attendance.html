@@ -143,13 +143,20 @@
       var sessionToken = "[[${session.USER.sessionToken}]]";
       var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
       var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/count"; 
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
       $.ajax({
         contentType: "application/json;charset=UTF-8",
-        url: apiUrl,
+        url: "api/v1/iLensApiClient",
         dataType:'json',
         headers:{'CLIENT_KEY':sessionToken},
-        type: "GET",
+        type: "POST",
         async: false,
+        data: JSON.stringify(ilensApiClientVO),
         success:function(data){
           if(data!=0){
            totalCount=data;
@@ -213,13 +220,20 @@ $("#clearIcon").on("click",function(){
   var sessionToken = "[[${session.USER.sessionToken}]]";
   var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   var apiUrl = urlSlashCheck + "api/v1/user/usersList";
+  var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
   var userList = [];
   $.ajax({
     contentType: "application/json;charset=UTF-8",
-    url: apiUrl,
+    url: "api/v1/iLensApiClient",
     dataType: "json",
     headers:{'CLIENT_KEY':sessionToken},
-    type: "GET",
+    type: "POST",
+    data: JSON.stringify(ilensApiClientVO),
     async: false,
     success: function (data){     
       for(i = 0; i < data.length; i++){    
@@ -246,14 +260,20 @@ $("#clearIcon").on("click",function(){
   	var sessionToken = "[[${session.USER.sessionToken}]]";
   	var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
  		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/filter";
+    var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: entryExitFilter,
+        method: "POST"
+      }
      $.ajax({
 		  contentType: "application/json;charset=UTF-8",
-          url: apiUrl,
+          url: "api/v1/iLensApiClient",
           dataType: "json",
           headers:{'CLIENT_KEY':sessionToken},
           type: "POST",
           async: false,
-          data: JSON.stringify(entryExitFilter),
+          data: JSON.stringify(ilensApiClientVO),
           success: function(data){
             var attendanceList="";
           	for(i=0;i<data.length;i++){
@@ -308,15 +328,20 @@ $("#clearIcon").on("click",function(){
   	var sessionToken = "[[${session.USER.sessionToken}]]";
   	var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
  		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/"+pageNumber; 
-
+    var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: entryExitFilter,
+        method: "POST"
+      }
 		$.ajax({
 		  contentType: "application/json;charset=UTF-8",
-          url: apiUrl,
+          url: "api/v1/iLensApiClient",
           dataType: "json",
           headers:{'CLIENT_KEY':sessionToken},
           type: "POST",
           async: false,
-          data: JSON.stringify(entryExitFilter),
+          data: JSON.stringify(ilensApiClientVO),
           success: function(data){
           	var attendanceList="";
           	for(i=0;i<data.length;i++){

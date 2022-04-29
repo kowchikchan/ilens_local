@@ -146,12 +146,19 @@ function lastHourEntry(){
   		var sessionToken = "[[${session.USER.sessionToken}]]";
   		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/lasthourentry"; 
+       var ilensApiClientVO  = {
+                            api: apiUrl,
+                            clientKey: sessionToken,
+                            inputVo: {},
+                            method: "GET"
+                          }
     $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url:apiUrl ,
+      url:"/api/v1/iLensApiClient" ,
       dataType:'json',
       headers:{'CLIENT_KEY':sessionToken},
-      type: "GET",
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
       async: false,
       success: function (data){
         $("#lastHour_Entry").html(data);
@@ -161,15 +168,22 @@ function lastHourEntry(){
 
 function onTimeEntry(){
   var reportApi = "[[${session.REPORT_API}]]";
-  		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
-  		var apiUrl = urlSlashCheck + "api/v1/ilens/ontimeentry"; 
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+  var apiUrl = urlSlashCheck + "api/v1/ilens/ontimeentry";
+  var ilensApiClientVO  = {
+                            api: apiUrl,
+                            clientKey: sessionToken,
+                            inputVo: {},
+                            method: "GET"
+                          }
     $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url: apiUrl,
+      url: "/api/v1/iLensApiClient",
       dataType:'json',
       headers:{'CLIENT_KEY':sessionToken},
-      type: "GET",
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
       async: false,
       success: function (data){
         $("#onTime_Entry").html(data);
@@ -182,12 +196,19 @@ function lateTimeEntry(){
   		var sessionToken = "[[${session.USER.sessionToken}]]";
   		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/lateEntry"; 
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
     $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url: apiUrl,
+      url: "/api/v1/iLensApiClient",
       dataType:'json',
       headers:{'CLIENT_KEY':sessionToken},
-      type: "GET",
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
       async: false,
       success: function (data){
         $("#latetime").html(data);
@@ -200,12 +221,19 @@ function graceTimeEntry(){
   		var sessionToken = "[[${session.USER.sessionToken}]]";
   		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/gracetimeentry"; 
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
     $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url:apiUrl,
+      url:"/api/v1/iLensApiClient",
       dataType:'json',
       headers:{'CLIENT_KEY':sessionToken},
-      type: "GET",
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
       async: false,
       success: function (data){
         $("#graceTime_Entry").html(data);
@@ -218,12 +246,19 @@ function lastMonthAverage(){
   		var sessionToken = "[[${session.USER.sessionToken}]]";
   		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/average"; 
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
     $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url: apiUrl,
+      url: "/api/v1/iLensApiClient",
       dataType:'json',
       headers:{'CLIENT_KEY':sessionToken},
-      type: "GET",
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
       async: false,
       success: function (data){
         $("#lastMonth_average").html(data);
@@ -236,12 +271,19 @@ function totalViolation_count(){
   		var sessionToken = "[[${session.USER.sessionToken}]]";
   		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/entryviolationtotalcount"; 
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
     $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url: apiUrl,
+      url: "/api/v1/iLensApiClient",
       dataType:'json',
       headers:{'CLIENT_KEY':sessionToken},
-      type: "GET",
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
       async: false,
       success: function (data){
         $("#totalViolation_count").html(data);
@@ -259,13 +301,20 @@ function everyTenMins_refreshData(){
   		var sessionToken = "[[${session.USER.sessionToken}]]";
   		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/everytenminutes"; 
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
    count = [];
    $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url:apiUrl,
+      url:"/api/v1/iLensApiClient",
       dataType:'json',
       headers:{'CLIENT_KEY':sessionToken},
-      type: "GET",
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
       async: false,
       success: function (data){
         for(i = 0; i < data.length; i++){
@@ -366,12 +415,19 @@ function sixMonth_average(){
   		var sessionToken = "[[${session.USER.sessionToken}]]";
   		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/ilens/sixmonthaverage"; 
+        var ilensApiClientVO  = {
+                            api: apiUrl,
+                            clientKey: sessionToken,
+                            inputVo: {},
+                            method: "GET"
+                          }
     $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url: apiUrl,
+      url: "/api/v1/iLensApiClient",
       dataType:'json',
       headers:{'CLIENT_KEY':sessionToken},
-      type: "GET",
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
       async: false,
       success: function (data){
         for(i = 0; i < data.length; i++){
@@ -450,15 +506,22 @@ var locationBy_violation = [];
 var locationCount = [];
 function entryViolation_byLocation(){
   var reportApi = "[[${session.REPORT_API}]]";
-  		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
-  		var apiUrl = urlSlashCheck + "api/v1/ilens/entryviolationbylocation"; 
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+  var apiUrl = urlSlashCheck + "api/v1/ilens/entryviolationbylocation"; 
+  var ilensApiClientVO  = {
+    api: apiUrl,
+    clientKey: sessionToken,
+    inputVo: {},
+    method: "GET"
+  }
     $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url: apiUrl,
+      url: "/api/v1/iLensApiClient",
       dataType:'json',
       headers:{'CLIENT_KEY':sessionToken},
-      type: "GET",
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
       async: false,
       success: function (data){
         for(j = 0; j < data.length; j++){

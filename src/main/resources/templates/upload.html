@@ -64,12 +64,9 @@ $("#clickButton").click(function(){
     form.append('File', files[0]);
   }
   $(".pre-loading").show();
-  var reportApi = "[[${session.REPORT_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
-  var apiUrl = urlSlashCheck + "api/v1/imageUpload/imageUpload/"; 
   $.ajax({
-      url: apiUrl+($("#trainId").val()),
+      url: "api/v1/imageUpload/imageUpload/"+($("#trainId").val()),
       headers:{'CLIENT_KEY':sessionToken},
       type: 'POST',
       data: form,
@@ -95,13 +92,10 @@ $("#clickButton").click(function(){
 
 
 function trainingId(id){
-  var reportApi = "[[${session.REPORT_API}]]";
   var sessionToken = "[[${session.USER.sessionToken}]]";
-  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
-  var apiUrl = urlSlashCheck + "api/v1/user/starTraining/"; 
     $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url: apiUrl+($("#trainId").val()),
+      url: "api/v1/user/starTraining/"+($("#trainId").val()),
       dataType: "json",
       headers:{'CLIENT_KEY':sessionToken},
       type: "PUT",

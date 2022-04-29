@@ -113,12 +113,19 @@ function userProfile(){
   		var sessionToken = "[[${session.USER.sessionToken}]]";
   		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/user/"+"[[${session.USER.id}]]"; 
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
   $.ajax({
       contentType: "application/json;charset=UTF-8",
-      url:apiUrl ,
+      url:"api/v1/iLensApiClient" ,
       dataType: "json",
       headers:{'CLIENT_KEY':sessionToken},
-      type: "GET",
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
       async: false,
       success: function (data){
           $("#profile-Fname").val(data.firstName);
@@ -218,14 +225,21 @@ function userProfile(){
   		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
   		var apiUrl = urlSlashCheck + "api/v1/user"; 
 
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: user,
+        method: "PUT"
+      }
+
       $.ajax({
         contentType: "application/json;charset=UTF-8",
-        url:apiUrl ,
+        url:"api/v1/iLensApiClient" ,
         //dataType: "json",
         headers:{'CLIENT_KEY':sessionToken},
-        type: "PUT",
+        type: "POST",
         async: false,
-        data: JSON.stringify(user),
+        data: JSON.stringify(ilensApiClientVO),
         success:function(data){
           //usersPageList();
           setTimeout(function(){ toastr.info("Successfully upadated the user.."); }, 1000);
@@ -298,14 +312,21 @@ function updatePassword(){
       var sessionToken = "[[${session.USER.sessionToken}]]";
       var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
       var apiUrl = urlSlashCheck + "api/v1/user/changePassword"; 
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: user,
+        method: "PUT"
+      }
+
       $.ajax({
         contentType: "application/json;charset=UTF-8",
-        url:apiUrl ,
+        url:"api/v1/iLensApiClient" ,
         dataType: "json",
         headers:{'CLIENT_KEY':sessionToken},
-        type: "PUT",
+        type: "POST",
         async: false,
-        data: JSON.stringify(user),
+        data: JSON.stringify(ilensApiClientVO),
         success:function(data){
         clearInput();
         }

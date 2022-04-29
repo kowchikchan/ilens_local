@@ -48,8 +48,8 @@ $("#clickButton").click(function(){
     form.append('File', files[0]);
   }
   $(".pre-loading").show();
-  		var sessionToken = "[[${session.USER.sessionToken}]]";
-  		var apiUrl = "api/v1/license/upload"; 
+  	var sessionToken = "[[${session.USER.sessionToken}]]";
+  	var apiUrl = "api/v1/license/upload"; 
 
   $.ajax({
       url:apiUrl ,

@@ -111,11 +111,18 @@
     var sessionToken = "[[${session.USER.sessionToken}]]";
     var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
     var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/snapshot/"+snapshotValue; 
+    var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
 		$.ajax({
 			contentType:"application/json;charset=UTF-8",
-			url:apiUrl,
+			url:"api/v1/iLensApiClient",
 			headers:{'CLIENT_KEY':sessionToken},
-            type: "GET",
+            type: "POST",
+            data: JSON.stringify(ilensApiClientVO),
             async:false,
             success:function(data){
             	bs64EncodedString = data;
@@ -176,22 +183,34 @@
     var sessionToken = "[[${session.USER.sessionToken}]]";
     var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
     var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/"+pageNumber;
+    var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: entryExitFilter,
+        method: "POST"
+      }
 		$.ajax({
 		  contentType: "application/json;charset=UTF-8",
-          url: apiUrl,
+          url: "api/v1/iLensApiClient",
           dataType: "json",
           headers:{'CLIENT_KEY':sessionToken},
           type: "POST",
           async: false,
-          data: JSON.stringify(entryExitFilter),
+          data: JSON.stringify(ilensApiClientVO),
           success: function(data){
           	//totalPagesMethod(data.trace.length);
+            console.log("entered here...1")
           	traceHeading = traceHeading + "Id : " +data.id + '<br>' + "Name : " +  data.name + '</br>';
           	for(i=0;i<data.trace.length;i++){
+                          console.log("entered here...2")
                 var traceTime = moment(data.trace[i].time).format("DD-MM-YYYY hh:mm:ss A");
+                            console.log("entered here...3")
           		encodedString = getSnapshotString(data.trace[i].snapshot);
+                          console.log("entered here...4")
                 if(encodedString.toString().length === 0){
+                              console.log("entered here...5")
                     encodedString = getSnapshotString("noImageAvailable");
+                                console.log("entered here...6")
                 }
                 if(i == 0){
               		traceList = traceList + '<tr>';

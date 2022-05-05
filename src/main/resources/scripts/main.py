@@ -20,9 +20,9 @@ def client(idOfCamera, cameraUrl, dataApi):
     clientConnection.set_ssl(for_hosts=[(host, port)])
     clientConnection.connect('admin', 'password', wait=True)
     videoCapture = cv2.VideoCapture(cameraUrl)
-    while True:
+    while videoCapture.isOpened():
         ret, frame = videoCapture.read()
-        frame = cv2.resize(frame, (0, 0), fx=0.22, fy=0.22)
+        # frame = cv2.resize(frame, (0, 0), fx=0.22, fy=0.22)
         if not ret:
             break
         _, buffer = cv2.imencode('.jpg', frame)
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     print(f'[INFO]: iLens Started.')
     print(f'[INFO]: Running Applications :  {appsList}')
 
-    # Start client and server.
+    # Start client and server
     threading.Thread(target=client, args=(cameraId, cameraURL, data['dataApi'])).start()
     threading.Thread(target=server,
                      args=(appsList, cameraId, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken,

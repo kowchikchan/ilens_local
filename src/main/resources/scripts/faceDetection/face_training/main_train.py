@@ -23,9 +23,10 @@ class MainTrain:
                     path = os.path.join(self.imagePath, filename)
                     img = cv2.imread(path)
                     shapeValues = img.shape
-                    if shapeValues[0] <= 800 and shapeValues[1] <= 370:
+                    """ if shapeValues[0] <= 800 and shapeValues[1] <= 370:
+                        print("Entered inside")
                         dimensions = (800, 470)
-                        img = cv2.resize(img, dimensions, interpolation=cv2.INTER_AREA)
+                        img = cv2.resize(img, dimensions, interpolation=cv2.INTER_AREA) """
                     # faces = face_cascade.detectMultiScale(img, 1.3, 5)
                     # for (x, y, w, h) in faces:
                     #     roi_color = img[y:y + h, x:x + w]

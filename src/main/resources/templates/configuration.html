@@ -262,7 +262,9 @@
 $(document).ready(function(){
   var camIp = $('#ip').val();
   var liveVideoDiv = "";
-  var ip = "[[${session.IP}]]";
+  const url = window.location.href.toString().split("//");
+  const colonSplit = url[1].split(":");
+  var ip = colonSplit[0];
   liveVideoDiv = liveVideoDiv + '<img id="liveVideoId" src="http://'+ip+':5000/' + camIp + '">';
   $("#liveVideoDiv").html(liveVideoDiv).show();
 

@@ -2172,6 +2172,7 @@ option:hover{
 
 .form-body{
   bottom: -32px;
+  text-align: initial !important;
 }
 .modal{
   display: inline;
@@ -2209,6 +2210,7 @@ option:hover{
 
 #remove-footer{
   border-top: none !important;
+  position: relative;
 }
 #remove-modal{
   border-bottom: none !important;
@@ -2648,7 +2650,7 @@ fa-warning:before, .fa-exclamation-triangle:before {
   }
   .violation{
     /* right: 3px; */
-    left: -10px;
+    left: 21px;
   }
   .traffic-brd{
     width: 103%;
@@ -3355,7 +3357,7 @@ span#text {
 }
 button.btn.btn-outline-warning {
   padding: 5px;
-  margin-bottom: -13px;
+  margin-bottom: -2px;
   width: 86px;
 }
 .pre-loading2 {
@@ -3391,7 +3393,7 @@ button.btn.btn-outline-warning {
   width: 50%;
   position: relative;
   display: inline-flex;
-  left: 20%;
+  left: 15%;
 }
 button.search-button {
   text-align: center;
@@ -3514,6 +3516,7 @@ li.aircomplete-list-item.aircomplete-focused {
   }
   .alens_input{
     width: 85%;
+    margin-left: 9.85%;
   }
   .apisty{
     min-height: 396px;
@@ -3539,8 +3542,8 @@ li.aircomplete-list-item.aircomplete-focused {
 input#text-date {
   height: 2%;
   width: 112px;
-  top: -2px;
-  right: -37px;
+  top: -5px;
+  right: -13px;
   }
   .datepicker-dropdown {
     top: 15% !important;
@@ -3621,7 +3624,7 @@ input#text-date {
     top: 0;
   }
   .traffic-board {
-    left: 2px;
+    left: -30px;
   }
   .overflow{
     overflow-y: scroll;
@@ -3631,7 +3634,7 @@ input#text-date {
   }
   .popup-content.fadeIn {
     zoom: 53%;
-    left: 20%;
+    left: 14%;
   }
   .im {
     width: auto;
@@ -3677,6 +3680,32 @@ input#text-date {
   .datepicker td, .datepicker th {
     font-size: 9px;
   }
+  input#reportValue{
+    width: 85%;
+    margin-left: 9.7%;
+  }
+  #attendanceList td {
+      font-size: 9px;
+  }
+  .search-box {
+    left: 12%;
+    width: 37%;
+  }
+  .move-chart {
+    top: 16px;
+  }
+  .col-md-5.userList {
+    left: 6%;
+  }
+  .fp-Video {
+    width: 100%;
+  }
+  #liveVideoId {  
+    width: 100%;
+  }
+  #traceList td {
+    font-size: 9px;
+  }
 }
 
 
@@ -3717,8 +3746,8 @@ input#text-date {
   input#text-date {
     height: 2%;
     width: 120px;
-    top: -2px;
-    right: -37px;
+    top: -5px;
+    right: -16px;
   }
   .im {
     width: auto;
@@ -3731,7 +3760,25 @@ input#text-date {
   i.fa.fa-check-circle.df {
     margin-top: 2px;
   }
-  
+  #attendanceList td {
+    font-size: 11px;
+  }
+  .search-box {
+    left: 11%;
+    width: 37%;
+  }
+  .fp-Video {
+    width: 100%;
+  }
+  #liveVideoId {
+    width: 100%;
+  }
+  #liveVideoIdAtFr {
+    width: 100%;
+    }
+  .inner-container {
+    letter-spacing: 0.em;
+  }
 }
 @media only screen and (min-width: 961px){
   img#live_c2 {

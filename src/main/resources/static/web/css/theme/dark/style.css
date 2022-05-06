@@ -3669,7 +3669,7 @@ input#text-date {
     font-size: 11px;
   }
   .toggle p {
-    letter-spacing: -1px;
+    letter-spacing: 0px;
   }
   i.fa.fa-check-circle.df {
     margin-top: 2px;
@@ -3685,14 +3685,14 @@ input#text-date {
     margin-left: 9.7%;
   }
   #attendanceList td {
-      font-size: 9px;
+      font-size: 12px;
   }
   .search-box {
     left: 12%;
     width: 37%;
   }
   .move-chart {
-    top: 16px;
+    top: -20px;
   }
   .col-md-5.userList {
     left: 6%;
@@ -3705,6 +3705,12 @@ input#text-date {
   }
   #traceList td {
     font-size: 9px;
+  }
+  .width{
+    width: 26%;
+  }
+  .move-chart-1 {
+    top: 75px;
   }
 }
 
@@ -3778,6 +3784,9 @@ input#text-date {
     }
   .inner-container {
     letter-spacing: 0.em;
+  }
+  .move-chart-1 {
+    top: 44px;
   }
 }
 @media only screen and (min-width: 961px){

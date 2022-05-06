@@ -281,7 +281,7 @@ $("#clearIcon").on("click",function(){
           	  attendanceList=attendanceList+'<tr>';
           	  attendanceList=attendanceList+"<td> <button id='idTraceButton' type='button' class='btn btn-primary' onclick='getTraceMethod(this.value)' value= "+ data[i].id +'_'+ entryExitFilter.date +" >"+data[i].id+"</button></td>";
               attendanceList=attendanceList+'<td>'+data[i].name+'</td>';
-              attendanceList=attendanceList+'<td>'+ entryTime +'</td>';
+              attendanceList=attendanceList+'<td class="width">'+ entryTime +'</td>';
               attendanceList=attendanceList+'<td>'+data[i].entry_view.location+'</td>';
               if(data[i].exit_view==0){
                 attendanceList=attendanceList+'<td>-----</td>';
@@ -349,7 +349,7 @@ $("#clearIcon").on("click",function(){
           	  attendanceList=attendanceList+'<tr>';
           	  attendanceList=attendanceList+"<td> <button id='idTraceButton' type='button' class='btn btn-primary' onclick='getTraceMethod(this.value)' value= "+ data[i].id +'_'+ entryExitFilter.date +" >"+data[i].id+"</button></td>";
               attendanceList=attendanceList+'<td>'+data[i].name+'</td>';
-              attendanceList=attendanceList+'<td>'+ entryTime +'</td>';
+              attendanceList=attendanceList+'<td class="width">'+ entryTime +'</td>';
               attendanceList=attendanceList+'<td>'+data[i].entry_view.location+'</td>';
               if(data[i].exit_view==0){
                 attendanceList=attendanceList+'<td>-----</td>';

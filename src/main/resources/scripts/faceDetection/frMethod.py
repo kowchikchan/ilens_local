@@ -69,8 +69,7 @@ class FRMethod:
         dt_string = now.strftime("%d%m%Y%H%M%S")
         json_values = {}
         img = adjustGamma(self.frame, gamma=1.7)
-        img = cv2.resize(img, (0, 0), fx=0.22, fy=0.22)
-        # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.resize(img, (0, 0), fx=0.50, fy=0.50)
         faces = face_locations(img)
         encodesCurFrame = face_encodings(img, faces, model="large")
         for encodeFace, faceLoc in zip(encodesCurFrame, faces):
@@ -80,7 +79,7 @@ class FRMethod:
             contCount = checkContiguousOccurrence(matchList)
             print(f'contCount, {contCount}')
             # (top, right, bottom, left) = faceLoc
-            if contCount >= 0:  # based on Training image quantity
+            if contCount >= 2:  # based on Training image quantity
                 matchIndex = np.argmin(faceDistance)
                 if matches[matchIndex]:
                     emp_id = modelLabels[matchIndex]

@@ -1,10 +1,4 @@
-import cv2
-import json
-import time
-import stomp
-import base64
-import argparse
-import threading
+import cv2, json, time, stomp, base64, argparse, threading
 import numpy as np
 from PIL import Image
 from io import BytesIO
@@ -23,13 +17,15 @@ def client(idOfCamera, cameraUrl, dataApi):
     while videoCapture.isOpened():
         ret, frame = videoCapture.read()
         # frame = cv2.resize(frame, (0, 0), fx=0.22, fy=0.22)
-        if not ret:
-            break
-        _, buffer = cv2.imencode('.jpg', frame)
-        encodedData = base64.b64encode(buffer)
-        clientConnection.send(body=encodedData, destination='/queue/' + idOfCamera, headers={'persistent': 'true'})
-    time.sleep(2)
-    clientConnection.disconnect()
+        if ret:
+            _, buffer = cv2.imencode('.jpg', frame)
+            try:
+                encodedData = base64.b64encode(buffer)
+                clientConnection.send(body=encodedData, destination='/queue/' + idOfCamera, headers={'persistent': 'true'})
+            except UnicodeEncodeError:
+                continue
+    # time.sleep(2)
+    # clientConnection.disconnect()
 
 
 def server(appList, idOfCamera, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken, dataApi):
@@ -45,15 +41,15 @@ def server(appList, idOfCamera, basePath, channelName, frConfigs, postUrl, dataL
             frameInBytes = bytes(frame, 'utf-8')
             decodedFrame = Image.open(BytesIO(base64.b64decode(frameInBytes)))
             finalDecodedImage = np.array(decodedFrame)
-            # cv2.imwrite("newImg.jpg", cv2.cvtColor(finalDecodedImage, cv2.COLOR_BGR2RGB))
+
             if "fr" in appList:
                 frObject = FRMethod(finalDecodedImage, basePath, idOfCamera, channelName, frConfigs, postUrl,
                                     dataLocation, apiToken)
                 threading.Thread(target=frObject.liveMethod).start()
 
             # if "npr" in appsList:
-            #     threading.Thread(target=detect(int(thresh_1), int(thresh_2), int(minRatio), int(maxRatio), frame, postUrl,
-            #                                    channelName, cameraId, fps)).start()
+            #     threading.Thread(target=detect(int(thresh_1), int(thresh_2), int(minRatio), int(maxRatio), frame,
+            #     postUrl, channelName, cameraId, fps)).start()
             # if "peopleCount" in appsList:
             #     threadPeople = threading.Thread(target=peopleCountMethod(frame, cameraId, channelName, postUrl,
             #                                                              fps)).start()

@@ -5,7 +5,6 @@ import pickle
 import requests
 import numpy as np
 from datetime import datetime
-from matplotlib import pyplot as plt
 from face_recognition import face_encodings
 from face_recognition import face_locations
 
@@ -69,7 +68,7 @@ class FRMethod:
         dt_string = now.strftime("%d%m%Y%H%M%S")
         json_values = {}
         img = adjustGamma(self.frame, gamma=1.7)
-        img = cv2.resize(img, (0, 0), fx=0.50, fy=0.50)
+        img = cv2.resize(img, (0, 0), fx=0.34, fy=0.34)
         faces = face_locations(img)
         encodesCurFrame = face_encodings(img, faces, model="large")
         for encodeFace, faceLoc in zip(encodesCurFrame, faces):
@@ -93,7 +92,7 @@ class FRMethod:
                     json_values["socialViolation"] = None
                     json_values["time"] = dt_string
                     json_values["type"] = self.entryOrExit
-                    plt.imsave(face_file_name, cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB))
+                    cv2.imwrite(face_file_name, cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB))
                     try:
                         headers = {'Content-type': 'application/json', 'Accept': 'text/plain',
                                    'CLIENT_KEY': str(self.apiToken)}
@@ -108,7 +107,7 @@ class FRMethod:
         #     # cv2.putText(img, 'unknown', (left - 10, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0),
         #     #            2, cv2.LINE_AA)
         #     face_file_name = "".join([self.dataLocation, "/", dt_string, ".jpg"])
-        #     plt.imsave(face_file_name, cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB))
+        #     cv2.imwrite(face_file_name, cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB))
         # print(f'{json_values}')
         # print(f'fps at fr, {int(self.fps)}')
         # json_values.clear()

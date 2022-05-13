@@ -3,7 +3,7 @@
 <head>
     <title>[[${APP_NAME}]] - Agents</title>
 </head>
-<body class="overflow">
+<body>
 <div layout:fragment="content" class="contant">
   <div class="pre-loading">
     <img class="loader" src="/web/images/loader.png"/>
@@ -14,16 +14,20 @@
   <div class="main-table zoom1">
     <div class="col-md-12 pb-10 row m-0">
       <div class="col-md-12">
-        <nav aria-label="Page navigation example" class="pagination-nav">
-          <ul class="pagination" id="usersPagination">
-          </ul>
-        </nav>
-        <a onclick="userEdit(0);"><button id="addUser" class="new-button button-position">New<i class="fa fa-plus-circle" aria-hidden="true"></i></button></a>
+        <div class="navStyle1">
+          <a onclick="userEdit(0);"><button id="addUser" class="new-button">New<i class="fa fa-plus-circle" aria-hidden="true"></i></button></a>
+          <div>
+            <nav aria-label="Page navigation example" class="pagination-nav1">
+              <ul class="pagination" id="usersPagination">
+              </ul>
+            </nav>
+        </div>
+      </div>
       </div>
     </div>
     <div class="col-md-12 row table-responsive">
       <table class="clr-txt">
-        <thead>
+        <thead class="tableHead">
           <tr>
             <th>Member ID</th>
             <th>First Name</th>
@@ -36,6 +40,9 @@
           </tr>
         </thead>
         <tbody class="" id="userList">
+
+        </tbody>
+        <tbody class="" id="mobileList">
 
         </tbody>
       </table>
@@ -54,7 +61,15 @@
   <input id="upadtedUsers" type="hidden" name="">
   <input id="pageNo" type="hidden" name=""> 
 <script>
+  var windowsize = $(window).width();
 $(document).ready(function(){
+  if ( windowsize < 500 ){
+          $("#userList").hide();
+          mobilePageList(pageNumber);
+        }else{
+          $("#userList").show();
+          $(".tooltip").css({"display":"none"});
+        }
   $("#users").addClass('active');
   $("#users").on("click",function(){
     $(".pre-loading").show();
@@ -63,9 +78,6 @@ $(document).ready(function(){
       }, 2000);
   });
   usersPaging();
-  $('[data-toggle="tooltip"]').tooltip({
-      placement : 'right'
-  });
   $('[data-toggle1="tooltip"]').tooltip({trigger:'click'}); 
   $(".fa-question-circle").mouseleave(function(){
            $('[data-toggle1="tooltip"]').tooltip('hide');
@@ -165,6 +177,7 @@ function usersEdit(id){
         $("#department").val(data.department);
         $("#location").val(data.location);
         $("#role").val(data.role);
+        $("#role").attr("value", data.role);
     }
    });
 }
@@ -220,7 +233,7 @@ function saveUser(){
         success:function(data){
           usersPaging();
           cancelForm2();
-          setTimeout(function(){ toastr.success("User saved successfully"); }, 1000);
+          setTimeout(function(){ toastr.success("User successfully Saved"); }, 1000);
          },
          error:function(err){
             setTimeout(function(){ toastr.error("Error found.."); }, 1000); }
@@ -291,6 +304,7 @@ function usersPaging(){
        totalPages=Math.ceil(totalCount/itemsPerPage);
        $('#usersPagination').empty();
        $(userList).empty();
+       $("#mobileList").empty();
         $('#usersPagination').removeData("twbs-pagination");
         $('#usersPagination').unbind("page");
         window.pagObj = $('#usersPagination').twbsPagination({
@@ -303,7 +317,12 @@ function usersPaging(){
             onPageClick: function (event, page) {
                 pageNumber = (page - 1);
                 $("#pageNo").val(pageNumber);
-                usersPageList(pageNumber);
+                if ( windowsize < 500 ){
+                  mobilePageList(pageNumber);
+                  }else{
+                    usersPageList(pageNumber);
+                }
+               
             }
         }).on("page",function(event,num){});
         if(totalPages <= currentPage){
@@ -353,12 +372,12 @@ function usersPageList(pageNumber){
     }
       if(userList.length== 0){
          $(".records").html("No Records Found");
-         $('.pagination-nav').hide();
+         $('.pagination-nav1').hide();
          $(".records").show();
       }else{
          $("#userList").html(userList);
          $(".records").hide();
-         $('.pagination-nav').show();
+         $('.pagination-nav1').show();
       }
     },
     error:function(err){
@@ -420,6 +439,80 @@ function updateUser(){
           setTimeout(function(){ toastr.error("Error found.."); }, 1000);          }
     });
 };
+//mobile view//
+var prevSize = $(window).width();
+$(window).resize(function() {
+    var windowsize = $(window).width();
+    if ( prevSize != windowsize && windowsize < 500 ){
+      $("#mobileList").show();
+      $("#userList").hide();
+      mobilePageList(pageNumber);
+      
+    }else if ( prevSize != windowsize){
+      $("#mobileList").hide();
+      $("#userList").show();
+    }
+  }); 
+
+  function mobilePageList(pageNumber){
+  var reportApi = "[[${session.REPORT_API}]]";
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+  var apiUrl = urlSlashCheck + "api/v1/user/list/"+pageNumber;
+  var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url:"api/v1/iLensApiClient" ,
+      dataType: "json",
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
+      async: false,
+      success: function(data) {
+      var userList = "";
+      for(i=0;i<data.length;i++){
+        if(data[i].id!=1){
+        userList=userList+'<div class="userHead1" value='+data[i].id+'>';
+        userList=userList+'<div class="col-12 colSplit">';
+        userList=userList+'<div class="col-11"><span class="ctext2">Member ID: '+'</span>'+data[i].userId+'</div>';
+        userList=userList+'<div class="dataTraining col-1"><a onclick="adminEdit(\''+data[i].id+'\',\''+data[i].firstName+'\');" id="id_'+data[i].id+'" class="hide_icon"><i onclick="" class="fa fa-desktop data-icon icon-size Align" data-toggle="tooltip" data-original-title="Train user profile" aria-hidden="true"></i></a></div>';
+        userList=userList+'</div>';
+        userList=userList+'<div class="col-12 colSplit">';
+        userList=userList+'<div class="col-6 margin"><span class="ctext2">Name: '+'</span><br>'+data[i].firstName+" "+data[i].lastName+'</div>';
+        userList=userList+'<div class="col-5"><span class="ctext2">Role: '+'</span><br>'+data[i].role+'</div>';
+        userList=userList+'<div class="col-1 iconAlign">';
+        userList=userList+'<div class="align"><a onclick="usersEdit(\''+data[i].id+'\');"><i id="edit" class="fa fa-pencil-square-o edit-config icon-size editUser" aria-hidden="true"></i></a></div>';
+        userList=userList+'</div>';
+        userList=userList+'</div>';
+        userList=userList+'<div class="col-12 colSplit">';
+        userList=userList+'<div class="col-6 margin1"><span class="ctext2">DEPT: </span><br>'+data[i].department+'</div>';
+        userList=userList+'<div class="col-5"><span class="ctext2">Location: </span><br>'+data[i].location+'</div>';
+        userList=userList+'<div class="col-1 align"><a onclick="deleteUser(\''+data[i].id+'\');"><i class="fa fa-trash icon-size" aria-hidden="true"></i></a></div>';
+        userList=userList+'</div>';
+        userList=userList+'</div>';
+      }
+    }
+      if(userList.length== 0){
+         $(".records").html("No Records Found");
+         $('.pagination-nav1').hide();
+         $(".records").show();
+      }else{
+         $("#mobileList").html(userList);
+         $(".records").hide();
+         $('.pagination-nav1').show();
+      }
+    },
+    error:function(err){
+         console.log(err);
+    }
+  });
+};
+
 </script>
  </div>
 </body>

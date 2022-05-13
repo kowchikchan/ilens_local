@@ -21,7 +21,7 @@
               </button>
               <span class="clearicon"><i class="fa fa-times" aria-hidden="true" id="clearIcon"></i></span>
            </div>
-            <nav aria-label="Page navigation example" class="pagination-nav" id="attendancePage">
+            <nav aria-label="Page navigation example" class="pagination-nav1" id="attendancePage">
               <ul class="pagination" id="attendancePagination">
               </ul>
             </nav>
@@ -35,7 +35,7 @@
         </div>
         <div class="col-md-12 row table-responsive">
           <table class="clr-txt">
-            <thead>
+            <thead class="tableHead">
               <tr>
                 <!-- 
                     <th class="img-th"></th> -->
@@ -50,11 +50,15 @@
             <tbody class="" id="attendanceList">
 
             </tbody>
+            <tbody class="" id="mobileList">
+
+            </tbody>
           </table>
         </div>
       </div>
       <div class="records"></div>
 <script>
+  var windowsize = $(window).width();
 	$(document).ready(function(){
     $("#attendance").addClass('active');
     $("#attendance").on("click",function(){
@@ -114,7 +118,11 @@
     }
   }
     var pageNumber = 0;
+    if ( windowsize < 500 ){
+      mobileAttendance(entryExitFilter, pageNumber);
+    }else{
     attendanceList(entryExitFilter, pageNumber);
+    }
     $('#datepicker').datepicker().on("input change", function (e) { 
 
       //2021-12-23T04:25:25.754Z//
@@ -129,7 +137,11 @@
         location:"",
         name:""
       }
+      if ( windowsize < 500 ){
+        mobileAttendance(entryExitFilter, pageNumber);
+      }else{
       attendanceList(entryExitFilter, pageNumber);
+      }
     });
   });
 
@@ -173,7 +185,11 @@
                 first:'',
                 onPageClick: function (event, page) {
                     pageNumber = (page - 1);
+                    if ( windowsize < 500 ){
+                      mobileAttendance(pageNumber);
+                    }else{
                     attendanceList(pageNumber);
+                    }
                 }
             }).on("page",function(event,num){});
           }
@@ -192,7 +208,11 @@ $("#usersFilter").keyup(function(data){
                           }
   data=$("#usersFilter").val();
   if(data==""){
+    if ( windowsize < 500 ){
+      mobileAttendance(entryExitFilter, pageNumber);
+    }else{
     attendanceList(entryExitFilter, pageNumber);
+    }
     $(".clearicon").css('opacity', '0');
   }else{
     $(".clearicon").css('opacity', '1');
@@ -212,7 +232,11 @@ $("#clearIcon").on("click",function(){
                             name:""
                           }
   data=$("#usersFilter").val();
+  if ( windowsize < 500 ){
+    mobileAttendance(entryExitFilter, pageNumber);
+  }else{
   attendanceList(entryExitFilter, pageNumber);
+  }
 })
 
   function userFilter(){
@@ -287,7 +311,7 @@ $("#clearIcon").on("click",function(){
                 attendanceList=attendanceList+'<td>-----</td>';
               }else{
                 var exitTime = moment(data[i].exit_view[0].time).format("DD-MM-YYYY hh:mm:ss A");
-                attendanceList=attendanceList+'<td>'+ exitTime +'</td>';
+                attendanceList=attendanceList+'<td class="width">'+ exitTime +'</td>';
               }
               if(data[i].exit_view==0){
                 attendanceList=attendanceList+'<td>-----</td>';
@@ -297,14 +321,23 @@ $("#clearIcon").on("click",function(){
           		attendanceList=attendanceList+'</tr>';
           	}
             if(data == 0){
+              if ( windowsize < 500 ){
+                 $("#mobileList").hide();
+              }else{
                $("#attendanceList").hide();
+              }
                $(".records").html("No Records Found").show();
-               $('.pagination-nav').hide();
+               $('.pagination-nav1').hide();
             }else{
-               $(".records").hide();
+              if ( windowsize < 500 ){
+                 $("#mobileList").empty();
+                 $("#mobileList").html(attendanceList).show(); 
+              }else{
                $("#attendanceList").empty();
-               $("#attendanceList").html(attendanceList).show(); 
-               $('.pagination-nav').show();
+               $("#attendanceList").html(attendanceList).show();
+              }
+               $(".records").hide();
+               $('.pagination-nav1').show();
             }
 
           }
@@ -355,7 +388,7 @@ $("#clearIcon").on("click",function(){
                 attendanceList=attendanceList+'<td>-----</td>';
               }else{
                 var exitTime = moment(data[i].exit_view[0].time).format("DD-MM-YYYY hh:mm:ss A");
-                attendanceList=attendanceList+'<td>'+ exitTime +'</td>';
+                attendanceList=attendanceList+'<td class="width">'+ exitTime +'</td>';
               }
               if(data[i].exit_view==0){
                 attendanceList=attendanceList+'<td>-----</td>';
@@ -365,14 +398,101 @@ $("#clearIcon").on("click",function(){
           		attendanceList=attendanceList+'</tr>';
           	}
             if(data == 0){
+              if ( windowsize < 500 ){
+                 $("#mobileList").hide();
+              }else{
                $("#attendanceList").hide();
+              }
                $(".records").html("No Records Found").show();
-               $('.pagination-nav').hide();
+               $('.pagination-nav1').hide();
             }else{
-              $("#attendanceList").empty();
+              if ( windowsize < 500 ){
+                 $("#mobileList").empty();
+                 $("#mobileList").html(attendanceList).show(); 
+              }else{
+               $("#attendanceList").empty();
+               $("#attendanceList").html(attendanceList).show();
+              }
+              $(".records").hide();
+              $('.pagination-nav1').show();
+            }
+          },
+          error:function(err){
+               console.log(err);
+          }
+		});
+	}
+  //mobile view//
+var prevSize = $(window).width();
+$(window).resize(function() {
+    var windowsize = $(window).width();
+    if ( prevSize != windowsize && windowsize < 500 ){
+      $("#mobileList").show();
+      $("#attendanceList").hide();
+      mobileAttendance(entryExitFilter, pageNumber);
+      
+    }else if ( prevSize != windowsize){
+      $("#mobileList").hide();
+      $("#attendanceList").show();
+    }
+  }); 
+
+  function mobileAttendance(entryExitFilter, pageNumber){
+    var reportApi = "[[${session.REPORT_API}]]";
+  	var sessionToken = "[[${session.USER.sessionToken}]]";
+  	var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+ 		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/"+pageNumber; 
+    var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: entryExitFilter,
+        method: "POST"
+      }
+		$.ajax({
+		  contentType: "application/json;charset=UTF-8",
+          url: "api/v1/iLensApiClient",
+          dataType: "json",
+          headers:{'CLIENT_KEY':sessionToken},
+          type: "POST",
+          async: false,
+          data: JSON.stringify(ilensApiClientVO),
+          success: function(data){
+          	var attendanceList="";
+          	for(i=0;i<data.length;i++){
+              var entryTime = moment(data[i].entry_view.time).format("DD-MM-YYYY hh:mm:ss A");
+          	  attendanceList=attendanceList+'<div class="userHead1">';
+                attendanceList=attendanceList+'<div class="col-12 colSplit">';
+          	  attendanceList=attendanceList+"<div class='col-4'><span class='ctext2'>ID: </span> <button id='idTraceButton' type='button' class='btn btn-primary' onclick='getTraceMethod(this.value)' value= "+ data[i].id +'_'+ entryExitFilter.date +" >"+data[i].id+"</button></div>";
+              attendanceList=attendanceList+'<div class="col-8 ctext3"><span class="ctext2">Name: '+'</span>'+data[i].name+'</div>';
+              attendanceList=attendanceList+'</div>';
+              attendanceList=attendanceList+'<div class="col-12 colSplit">';
+              attendanceList=attendanceList+'<div class="col-8"> <span class="ctext2">Entry Time: </span><br>'+ entryTime +'</div>';
+              attendanceList=attendanceList+'<div><span class="ctext2">Entry Location: </span><br>'+data[i].entry_view.location+'</div>';
+              attendanceList=attendanceList+'</div>';
+              attendanceList=attendanceList+'<div class="col-12 colSplit">';
+                if(data[i].exit_view==0){
+                attendanceList=attendanceList+'<div class="col-8"><span class="ctext2">Exit Time: </span>-----</div>';
+              }else{
+                var exitTime = moment(data[i].exit_view[0].time).format("DD-MM-YYYY hh:mm:ss A");
+                attendanceList=attendanceList+'<div class="col-8"> <span class="ctext2">Exit Time: </span><br>'+ exitTime +'</div>';
+              }
+              if(data[i].exit_view==0){
+                attendanceList=attendanceList+'<div><span class="ctext2">Exit Location: </span>-----</div>';
+              }else{
+                attendanceList=attendanceList+'<div><span class="ctext2">Exit Location: </span><br>'+data[i].exit_view[0].location+'</div>';
+              }
+              attendanceList=attendanceList+'</div>';
+          		attendanceList=attendanceList+'</div>';
+          	}
+            if(data == 0){
+               $("#mobileList").hide();
+               $(".records").html("No Records Found").show();
+               $('.pagination-nav1').hide();
+            }else{
+              $("#mobileList").empty();
                $(".records").hide();
-               $("#attendanceList").html(attendanceList).show(); 
-               $('.pagination-nav').show();
+               $("#mobileList").html(attendanceList).show(); 
+               $('.pagination-nav1').show();
             }
           },
           error:function(err){

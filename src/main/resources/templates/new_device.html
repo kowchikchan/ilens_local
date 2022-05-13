@@ -49,7 +49,7 @@ function checkDevice(){
 if($.trim($('#newName').val()) == ""){
     $("#user-credentials").show();
     $("#warn-icon").show();
-    $('#validInput').html("User Name should not be empty");
+    $('#validInput').html("Name should not be empty");
     return false;
   }else if($.trim($('#newIp').val()) == ""){
     $("#user-credentials").show();
@@ -59,7 +59,7 @@ if($.trim($('#newName').val()) == ""){
   }else if($.trim($('#addcamType').val()) == ""){
     $("#user-credentials").show();
     $("#warn-icon").show();
-    $('#validInput').html("CamType should not be empty");
+    $('#validInput').html("Camera Type should not be empty");
     return false;
   }  
   AddDevice();
@@ -93,9 +93,7 @@ if($.trim($('#newName').val()) == ""){
   }
   
   function cancelnew_device(){
-    $("#newdevice").hide();
-    $("#channelList").show();
-    location.reload();  
+    location.href="/channels";  
 }
  </script>
   

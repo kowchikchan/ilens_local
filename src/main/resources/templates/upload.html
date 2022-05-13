@@ -65,6 +65,7 @@ $("#clickButton").click(function(){
   }
   $(".pre-loading").show();
   var sessionToken = "[[${session.USER.sessionToken}]]";
+  if(files.length!=0){
   $.ajax({
       url: "api/v1/imageUpload/imageUpload/"+($("#trainId").val()),
       headers:{'CLIENT_KEY':sessionToken},
@@ -85,6 +86,9 @@ $("#clickButton").click(function(){
         setTimeout(function(){ toastr.error("Error found.."); }, 1000);
       }
    });
+  }else{
+    setTimeout(function(){ toastr.error("Image file is empty"); }, 1000);
+  }
    window.setInterval(function(){
     $(".pre-loading").hide();
     }, 2000);

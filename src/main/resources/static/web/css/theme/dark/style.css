@@ -3468,7 +3468,7 @@ button.LicenceBtn:hover {
   color: #062e51;
 }
 .camera_head.mb-10 {
-  text-align: right;
+  /* text-align: right; */
 }
 span.live1 {
   float: left;

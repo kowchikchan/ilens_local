@@ -1,10 +1,5 @@
-import cv2
-import json
-import time
-import stomp
-import base64
-import argparse
-import threading
+import asyncio
+import cv2, json, time, stomp, base64, argparse, threading
 import numpy as np
 from PIL import Image
 from io import BytesIO
@@ -13,7 +8,7 @@ from faceDetection.frMethod import FRMethod
 # from peopleCount.peopleCount import peopleCountMethod
 
 
-def client(idOfCamera, cameraUrl, dataApi):
+async def client(idOfCamera, cameraUrl, dataApi):
     host = dataApi[:-6]
     port = dataApi[int(len(dataApi)) - 5:]
     clientConnection = stomp.Connection()
@@ -21,18 +16,20 @@ def client(idOfCamera, cameraUrl, dataApi):
     clientConnection.connect('admin', 'password', wait=True)
     videoCapture = cv2.VideoCapture(cameraUrl)
     while videoCapture.isOpened():
+        await asyncio.sleep(0)
         ret, frame = videoCapture.read()
-        # frame = cv2.resize(frame, (0, 0), fx=0.22, fy=0.22)
-        if not ret:
-            break
-        _, buffer = cv2.imencode('.jpg', frame)
-        encodedData = base64.b64encode(buffer)
-        clientConnection.send(body=encodedData, destination='/queue/' + idOfCamera, headers={'persistent': 'true'})
-    time.sleep(2)
-    clientConnection.disconnect()
+        if ret:
+            _, buffer = cv2.imencode('.jpg', frame)
+            try:
+                encodedData = base64.b64encode(buffer)
+                clientConnection.send(body=encodedData, destination='/queue/' + idOfCamera, headers={'persistent': 'true'})
+            except UnicodeEncodeError:
+                continue
+    # time.sleep(2)
+    # clientConnection.disconnect()
 
 
-def server(appList, idOfCamera, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken, dataApi):
+async def server(appList, idOfCamera, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken, dataApi):
     host = dataApi[:-6]
     port = dataApi[int(len(dataApi)) - 5:]
 
@@ -45,15 +42,15 @@ def server(appList, idOfCamera, basePath, channelName, frConfigs, postUrl, dataL
             frameInBytes = bytes(frame, 'utf-8')
             decodedFrame = Image.open(BytesIO(base64.b64decode(frameInBytes)))
             finalDecodedImage = np.array(decodedFrame)
-            # cv2.imwrite("newImg.jpg", cv2.cvtColor(finalDecodedImage, cv2.COLOR_BGR2RGB))
+
             if "fr" in appList:
                 frObject = FRMethod(finalDecodedImage, basePath, idOfCamera, channelName, frConfigs, postUrl,
                                     dataLocation, apiToken)
                 threading.Thread(target=frObject.liveMethod).start()
 
             # if "npr" in appsList:
-            #     threading.Thread(target=detect(int(thresh_1), int(thresh_2), int(minRatio), int(maxRatio), frame, postUrl,
-            #                                    channelName, cameraId, fps)).start()
+            #     threading.Thread(target=detect(int(thresh_1), int(thresh_2), int(minRatio), int(maxRatio), frame,
+            #     postUrl, channelName, cameraId, fps)).start()
             # if "peopleCount" in appsList:
             #     threadPeople = threading.Thread(target=peopleCountMethod(frame, cameraId, channelName, postUrl,
             #                                                              fps)).start()
@@ -64,7 +61,7 @@ def server(appList, idOfCamera, basePath, channelName, frConfigs, postUrl, dataL
     serverConnection.connect('admin', 'password', wait=True)
     serverConnection.subscribe(destination='/queue/' + idOfCamera, id=1, ack='auto')
     while True:
-        time.sleep(1)
+        await asyncio.sleep(0)
 
 
 if __name__ == "__main__":
@@ -127,8 +124,11 @@ if __name__ == "__main__":
     print(f'[INFO]: iLens Started.')
     print(f'[INFO]: Running Applications :  {appsList}')
 
-    # Start client and server
-    threading.Thread(target=client, args=(cameraId, cameraURL, data['dataApi'])).start()
-    threading.Thread(target=server,
-                     args=(appsList, cameraId, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken,
-                           data['dataApi'])).start()
+    # Start client and server parallely.
+    async def main():
+        await asyncio.gather(
+            client(cameraId, cameraURL, data['dataApi']),
+            server(appsList, cameraId, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken,
+                   data['dataApi']))
+
+    asyncio.run(main())

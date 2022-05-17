@@ -30,7 +30,7 @@ class Train:
                         path = os.path.join(root, file)
                         label = os.path.basename(root).replace(" ", "_").lower()
                         img = cv2.imread(path)
-                        img = cv2.resize(img, (0, 0), fx=0.25, fy=0.25)
+                        # img = cv2.resize(img, (0, 0), fx=0.60, fy=0.60)
                         img = adjustGamma(img, gamma=1.7)
                         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                         try:

@@ -3609,7 +3609,7 @@ span.crop1 {
 }
   .zoom1{
     zoom: 70%;
-    margin-top: 4px;
+    margin-top: 7px;
   }
   .zoom2{
     zoom: 70%;
@@ -3761,7 +3761,7 @@ input#text-date {
   }
   .navbar-vertical.active {
     transition: 1s;
-    zoom: 120%;
+    zoom: 109%;
   }
   .navbar-vertical{
     width: 0px;
@@ -3779,6 +3779,7 @@ input#text-date {
     height: 30px;
     transition: 1s;
     position: relative;
+    margin-right: 5px;
     top: 0;
   }
   .traffic-board {

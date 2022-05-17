@@ -199,18 +199,12 @@
           data: JSON.stringify(ilensApiClientVO),
           success: function(data){
           	//totalPagesMethod(data.trace.length);
-            console.log("entered here...1")
           	traceHeading = traceHeading + "Id : " +data.id + '<br>' + "Name : " +  data.name + '</br>';
           	for(i=0;i<data.trace.length;i++){
-                          console.log("entered here...2")
                 var traceTime = moment(data.trace[i].time).format("DD-MM-YYYY hh:mm:ss A");
-                            console.log("entered here...3")
           		encodedString = getSnapshotString(data.trace[i].snapshot);
-                          console.log("entered here...4")
                 if(encodedString.toString().length === 0){
-                              console.log("entered here...5")
                     encodedString = getSnapshotString("noImageAvailable");
-                                console.log("entered here...6")
                 }
                 if(i == 0){
               		traceList = traceList + '<tr>';

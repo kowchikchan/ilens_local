@@ -68,7 +68,7 @@ class FRMethod:
         dt_string = now.strftime("%d%m%Y%H%M%S")
         json_values = {}
         img = adjustGamma(self.frame, gamma=1.7)
-        img = cv2.resize(img, (0, 0), fx=0.34, fy=0.34)
+        img = cv2.resize(img, (0, 0), fx=0.40, fy=0.40)
         faces = face_locations(img)
         encodesCurFrame = face_encodings(img, faces, model="large")
         for encodeFace, faceLoc in zip(encodesCurFrame, faces):

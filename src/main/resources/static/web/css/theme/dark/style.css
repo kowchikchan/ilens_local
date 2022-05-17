@@ -1973,10 +1973,10 @@ option:hover{
 
 /* Style the checkmark/indicator */
 .container-check .checkmark:after {
-  left: 27%;
-  top: 6.5px;
-  width: 6px;
-  height: 8px;
+  left: 19.3%;
+  top: 3.6px;
+  width: 4px;
+  height: 4px;
   border: solid white;
   border-width: 6px 6px 6px 6px;
   border-radius: 6px;
@@ -3481,6 +3481,9 @@ span.crop1 {
 }
 /* Phone view /////////////////////////////////////////////////////////////////// */
 @media only screen and (max-width: 500px) {
+  .studentName {
+    font-size: 12px;
+  }
   #validInput {
     font-size: 11px;
   }

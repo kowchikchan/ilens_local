@@ -359,8 +359,10 @@ function everyTenMins_refreshData(){
              },
             scales: {
               xAxes: [{
+                datasets:{
                 categoryPercentage: 0.9,
-                barPercentage: 0.9,
+                barPercentage: 0.9, 
+                },
                 gridLines: { 
                     display: false,
                     drawBorder: false,
@@ -458,7 +460,6 @@ function sixMonth_average(){
       },
       options: {
         responsive: true,
-         maintainAspectRatio: false,
         elements: {
                     point:{
                         radius: 3
@@ -570,8 +571,10 @@ function entryViolation_byLocation(){
              },
             scales: {
               xAxes: [{
+                datasets:{
                 categoryPercentage: 0.9,
                 barPercentage: 0.9,
+                },
                 gridLines: { 
                     display: false,
                     drawBorder: false,

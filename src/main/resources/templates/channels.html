@@ -21,11 +21,15 @@
                     <span class="btn-txt">Scan for devices</span>
                 </button>
                 <span id="processing_devices">Please wait it will take some time</span>
-                <nav aria-label="Page navigation example" class="pagination-nav" id="pagination">
-                    <ul class="pagination" id="tablePagination">
-                    </ul>
-                </nav>
-                <a onclick="addChannel()"><button id="addUser" class="new-button button-position">New<i class="fa fa-plus-circle" aria-hidden="true"></i></button></a>                
+                <div class="navStyle">
+                  <a onclick="addChannel()"><button id="addUser" class="new-button button-position">New<i class="fa fa-plus-circle" aria-hidden="true"></i></button></a>                
+                  <div>
+                    <nav aria-label="Page navigation example" class="pagination-nav" id="pagination">
+                        <ul class="pagination" id="tablePagination">
+                        </ul>
+                    </nav>
+                  </div>
+              </div>
                 <div class="dropdown">
                   <button class="dropBtn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                      <span id="text">Select filter</span>
@@ -41,7 +45,7 @@
         <br>
         <div class="col-md-12 row">
             <table class="clr-txt">
-                <thead>
+                <thead class="tableHead">
                 <tr>
                     <!--
                         <th class="img-th"></th> -->
@@ -58,6 +62,9 @@
                 </tr>
                 </thead>
                 <tbody class="" id="channelList">
+
+                </tbody>
+                <tbody class="" id="mobileList">
 
                 </tbody>
             </table>
@@ -102,7 +109,17 @@
       var access = [];
       var addedPersons = [];
       var removedPersons = [];
+      var windowsize = $(window).width();
       $(document).ready(function () {
+        if ( windowsize < 500 ){
+          var channelFilterVO={ status: "All" }
+          $("#channelList").hide();
+          $("#mobileList").show();
+          mobileListFun(pageNumber,channelFilterVO);
+        }else{
+          $("#channelList").show();
+          $("#mobileList").hide();
+        }
         $('[data-toggle="tooltip"]').tooltip({
         placement : 'right'
         });
@@ -135,7 +152,7 @@
   });
   $(window).on('load', function() {
       $(".pre-loading").hide();
-  });  
+  }); 
 
 var lst = [];
 function getRuntimes(){
@@ -568,7 +585,11 @@ function paging(filterKey,channelFilterVO){
             first:'',
             onPageClick: function (event, page) {
                 pageNumber = (page - 1);
-                pageTable(pageNumber,channelFilterVO);
+                if ( windowsize < 500 ){
+                  mobileListFun(pageNumber,channelFilterVO);
+                }else{
+                  pageTable(pageNumber,channelFilterVO);
+                }
             }
         }).on("page",function(event,num){});
       }
@@ -577,30 +598,45 @@ function paging(filterKey,channelFilterVO){
 }
 function allList(){  
   $("#channelList").empty();
+  $("#mobileList").empty();
   var channelFilterVO={
   status: "All"
     }
-  pageTable(pageNumber,channelFilterVO);
+    if ( windowsize < 500 ){
+      mobileListFun(pageNumber,channelFilterVO);
+        }else{
+          pageTable(pageNumber,channelFilterVO);
+        }
   $("#text").html("  All");
   var filterKey="All"
   paging(filterKey,channelFilterVO);
 }
 function activeList(){
   $("#channelList").empty();
+  $("#mobileList").empty();
   var channelFilterVO={
   status: "true"
     }
-    pageTable(pageNumber,channelFilterVO);
+    if ( windowsize < 500 ){
+      mobileListFun(pageNumber,channelFilterVO);
+        }else{
+          pageTable(pageNumber,channelFilterVO);
+        }
     $("#text").html("  Acitve");
     var filterKey="true"
   paging(filterKey,channelFilterVO);
 }
 function inActiveList(id){
   $("#channelList").empty();
+  $("#mobileList").empty();
   var channelFilterVO={
   status: "false"
     }
-    pageTable(pageNumber,channelFilterVO);
+    if ( windowsize < 500 ){
+      mobileListFun(pageNumber,channelFilterVO);
+        }else{
+          pageTable(pageNumber,channelFilterVO);
+        }
     $("#text").html("  In Acitve");
     var filterKey="false"
    paging(filterKey,channelFilterVO);
@@ -709,8 +745,13 @@ function addChannel(){
       url: "/new_device",
       type: "GET",
       async: false,
-      success: function (data){        
+      success: function (data){  
+        if ( windowsize < 500 ){
+          $("#mobileList").html(data);
+        }else{
           $("#channelList").html(data);
+        }
+          
       }
    })
 }
@@ -778,8 +819,11 @@ function startChannel(id){
     startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
 
     startserver=startserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
-
-    $("#server_"+id).html(startserver);
+    if ( windowsize < 500 ){
+    $("#server1_"+id).html(startserver);
+    }else{
+      $("#server_"+id).html(startserver);
+    }
     setTimeout(function(){ toastr.info("Channel started successfully.."); }, 1000);
     },
     error:function(err){
@@ -813,7 +857,12 @@ function restartchannel(id){
           restartserver=restartserver+'<div class="tooltipMenu rightSide">';
           restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
           restartserver=restartserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
-          $("#server_"+id).html(restartserver);
+
+          if ( windowsize < 500 ){
+            $("#server1_"+id).html(restartserver);
+            }else{
+              $("#server_"+id).html(restartserver);
+            }
           setTimeout(function(){ toastr.info("Channel Restarted successfully."); }, 1000);
         },
         error: function(err){
@@ -844,13 +893,116 @@ function stopChannel(id){
 
     stopserver=stopserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a>';
 
-     $("#server_"+id).html(stopserver);
+    if ( windowsize < 500 ){
+      $("#server1_"+id).html(stopserver);
+      }else{
+        $("#server_"+id).html(stopserver);
+    }
      setTimeout(function(){ toastr.info("Channel stopped successfully.."); }, 1000);
     },
     error:function(){
       setTimeout(function(){ toastr.error("Error found.."); }, 1000); 
     }
   });
+}
+/////////////////////////////////////////////////////////////////////////////////
+var prevSize = $(window).width();
+$(window).resize(function() {
+    var windowsize = $(window).width();
+    if ( prevSize != windowsize && windowsize < 500 ){
+      var channelFilterVO={ status: "All" }
+      $("#channelList").hide();
+      $("#mobileList").show();
+      mobileListFun(pageNumber,channelFilterVO);
+      
+    }else if ( prevSize != windowsize){
+      $("#channelList").show();
+      $("#mobileList").hide();
+    }
+  }); 
+
+
+function mobileListFun(pageNumber,channelFilterVO){
+var rL = getRuntimes();
+$("#server_table").show();
+$("#channelForm").hide();
+  $.ajax({
+     contentType: "application/json;charset=UTF-8",
+     url:"api/v1/channels/page/"+pageNumber,
+     dataType: "json",
+     headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+     data: JSON.stringify(channelFilterVO),
+     type: "POST",
+     async: false,
+     success:function(data,channelFilterVO){
+        var channelList="";
+        for(i=0;i<data.length;i++){
+          var id = data[i].id;
+          channelList=channelList+'<div class="mHead">';         
+          if(data[i].id==null){
+            channelList=channelList+'<div>------</div>';
+          }else{
+            channelList=channelList+'<div style="margin-left: 5px;">'+data[i].id+'</div>';
+          }
+          channelList=channelList+'<div class=" col-md splitIcon">';
+          if(data[i].name==null){
+            channelList=channelList+'<div>------</div>';
+          }else{
+            channelList=channelList+'<div><span class="ctext1">Name: '+'</span>'+data[i].name+'</div>';
+          }
+          channelList=channelList+'<div class="urlSty"><span class="ctext1">URL/IP: '+'</span>'+data[i].ip+'</div>';
+          channelList=channelList+'</div>';
+          if(data[i].status==false){
+          channelList=channelList+'<div class="personEnteries"><i class="fa fa-times inactive" aria-hidden="true" ></i></div>';         
+          }else{
+          channelList=channelList+'<div class="personEnteries"><i class="fa fa-check active" aria-hidden="true"></i></div>';         
+          }
+          
+          channelList=channelList+'<div id="server1_'+data[i].id+'" class="database-icon">';
+
+          channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+
+          if(rL.includes(data[i].id.toString())){
+            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+
+            channelList=channelList+'<div class="tooltipMenu rightSide">';
+
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+
+          }else{
+            if(data[i].status==false){
+              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li inactive1"><i class="fa fa-play fa-sm"></i>';
+            }else{
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm"></i>';
+            }
+          }
+
+          channelList=channelList+'<div class="tooltipMenu rightSide">';
+
+          channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a></div>';
+
+          channelList=channelList+'<div class="personEnteries"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></div>';
+          channelList=channelList+'<div><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  href=\'#\'></i></div></div>';
+          channelList=channelList+'</div>';
+        }
+        if(data == 0){
+           $(".records").html("No Records Found");
+           $('#pagination').hide();
+           $(".records").show();
+        }else{
+          $("#mobileList").html(channelList);
+          $(".records").hide();
+          $('#pagination').show();
+        }
+      },
+      error:function(err){
+         console.log(error);
+       }
+    });
 }
 
 

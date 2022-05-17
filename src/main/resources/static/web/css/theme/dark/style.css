@@ -1941,10 +1941,10 @@ option:hover{
 /* Create a custom checkbox */
 .checkmark {
   position: absolute;
-  top: -4px;
+  top: 0px;
   left: 0;
-  height: 25px;
-  width: 25px;
+  height: 19px;
+  width: 19px;
   background-color: #3a5362;
   border-radius: 11px
 }
@@ -3466,6 +3466,18 @@ button.LicenceBtn {
 button.LicenceBtn:hover {
   background: #f4be34;
   color: #062e51;
+}
+.camera_head.mb-10 {
+  text-align: right;
+}
+span.live1 {
+  float: left;
+}
+span.crop1 {
+  margin-right: 136px;
+}
+.pull-right i.fa.fa-question-circle {
+  margin-right: 11px;
 }
 /* Phone view /////////////////////////////////////////////////////////////////// */
 @media only screen and (max-width: 500px) {

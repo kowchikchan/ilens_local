@@ -1,5 +1,11 @@
 server:
   port: 8088
+  ssl:
+    key-alias: ilens_selfsigned
+    key-store-password: ilens_admin
+    key-store: classpath:ilens-ssl.pkcs12
+    key-store-provider: SUN
+    key-store-type: pkcs12
 spring:
   data:
     cassandra:
@@ -26,7 +32,7 @@ logging:
 
 ilens:
   api:
-    protocal: http
+    protocal: https
     host: 127.0.0.1
     port: 8088
     path: api/v1/ilens/dataset
@@ -34,9 +40,9 @@ ilens:
     path: python3
   user:
     train-data:
-      path: /home/baas/applications/ilens-1.0/scripts/faceDetection/face_training/training_imgs
+      path: /home/logicfocus/applications/ilens/ilens-1.0/scripts/faceDetection/face_training/training_imgs
 locations:
-  data-location: /home/baas/applications/ilens-1.0/scripts/faceDetection/extracted_imgs
-  license-location: /home/baas/applications/ilens-1.0/scripts/license
-  json-location: /home/baas/applications/ilens-1.0/scripts
-  tessearct-location: /home/baas/applications/ilens-1.0/scripts
+  data-location: /home/logicfocus/applications/ilens/snapshots
+  license-location: /home/logicfocus/applications/ilens/ilens-1.0/scripts
+  json-location: /home/logicfocus/applications/ilens/ilens-1.0/scripts
+  tessearct-location: /home/logicfocus/applications/ilens/ilens-1.0/scripts

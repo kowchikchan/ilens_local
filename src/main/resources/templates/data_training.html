@@ -21,7 +21,7 @@
             <div class="camera">
               <video id="video">Video stream not available.</video>
             </div>
-            <canvas id='canvas' width='1230' height='750'></canvas>
+            <canvas id='canvas' width='750' height='1000'></canvas>
             <div id="savedImage">
 
             </div> 
@@ -52,8 +52,8 @@ $(document).ready(function(){
   $("#trainUserId").html($("#trainId").val());
   $("#trainUserName").html($("#trainName").val());
 });
-var width = 1230;    // We will scale the photo width to this
-var height = 750;   // This will be computed based on the input stream
+var width = 750;    // We will scale the photo width to this
+var height = 1000;   // This will be computed based on the input stream
 
 var streaming = false;
 

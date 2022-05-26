@@ -11,6 +11,8 @@ $(document).ready(function(){
 $(".navbar-icon .fa").on("click",function(){
   $(".navbar-vertical").toggleClass("active");
   $(".visble-menu").toggleClass("active");
+  $(".visble-menu i").toggleClass("inactive1");
+  $(".visble-menu em").toggleClass("inactive1");
   $(".contant").toggleClass("active");
   $(".user").toggleClass("active");
   $(".top-nav").toggleClass("active");

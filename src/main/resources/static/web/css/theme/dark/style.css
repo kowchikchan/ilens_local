@@ -828,19 +828,21 @@ header .main-menu li.drop:hover > ul.drop-down {
 }
 .move-chart{
   position: absolute;
-  top: -16px;
+  top: 38px;
+  height: 115px !important;
 }
 .move-chart-1{
   position: absolute;
-  top: -17px;
+  top: 35px;
+  height: 119px !important;
 }
 .move-chart.active{
   position: absolute;
-  top: -18px;
+  top: 37px;
 }
 .move-chart-1.active{
   position: absolute;
-  top: -16px;
+  top: 33px;
 }
 
 .traffic-board{
@@ -3001,10 +3003,16 @@ tbody#attendanceList tr:hover {
   cursor: pointer;
   color: white;
 }
+/*.camera_view .fa-question-circle:before {
+  content: "\f059";
+  cursor: pointer;
+  color: white;
+  margin-left: 6px;
+}*/
 
 .fp-Video {
   border: 1px double black;
-  width: 395px;
+  width: 100%;
   height: 260px;
   overflow: hidden;
 }
@@ -3213,7 +3221,7 @@ html{
   overflow-x: hidden;
 }
 #liveVideoId{
-  width: 393px;
+  width: 100%;
   height: 258px;
 }
 
@@ -3873,7 +3881,7 @@ input#text-date {
     width: 37%;
   }
   .move-chart {
-    top: -17px;
+    top: 36px;
   }
   .col-md-5.userList {
     left: 6%;
@@ -3892,10 +3900,10 @@ input#text-date {
     width: 28%;
   }
   .move-chart-1 {
-    top: -17px;
+    top: 30px;
   }
   .move-chart-1.active {
-    top: -18px;
+    top: 28px;
   }
   .loader1 {
     width: 66px !important;
@@ -3986,7 +3994,10 @@ input#text-date {
     letter-spacing: 0.em;
   }
   .move-chart-1 {
-    top: -17px;
+    top: 28px;
+    }
+  .move-chart-1.active {
+    top: 29px;
   }
 }
 @media only screen and (min-width: 961px){

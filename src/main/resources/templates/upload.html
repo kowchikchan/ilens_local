@@ -58,12 +58,12 @@
 
 
 $("#clickButton").click(function(){
+  $(".pre-loading").show();
   var form = new FormData();
   var files = $('#upload-file-input')[0].files;
   if (files.length > 0){
     form.append('File', files[0]);
   }
-  $(".pre-loading").show();
   var sessionToken = "[[${session.USER.sessionToken}]]";
   if(files.length!=0){
   $.ajax({
@@ -77,7 +77,7 @@ $("#clickButton").click(function(){
       cache: false,
       async: false,
       success: function(data){
-        $(trainingId).ready();
+        trainingId();
 
          setTimeout(function(){ toastr.success("Success.."); }, 1000);
 
@@ -110,7 +110,7 @@ function trainingId(id){
         setTimeout(function(){ toastr.error("Error found.."); }, 1000);
       }
     });
-    setTimeout(cancelModal, 2000);
+    setTimeout(cancelModal, 1500);
 }
 
 

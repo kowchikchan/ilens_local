@@ -66,7 +66,7 @@ public class SystemConfig {
         }catch (NoSuchElementException e){
             dataApi = new DataApi();
             dataApi.setDataApi("http://127.0.0.1:61616");
-            dataApi.setReportApi("http://127.0.0.1:8088");
+            dataApi.setReportApi("https://127.0.0.1:8088");
             dataApi.setApiToken("ilens ~ org.springframework.security" +
                     ".authentication.UsernamePasswordAuthenticationToken@fc1b0f20:" +
                     " Principal: Admin; Credentials: [PROTECTED]");

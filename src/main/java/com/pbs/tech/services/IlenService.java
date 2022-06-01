@@ -297,7 +297,7 @@ public class IlenService {
                 log.info("Killing pid : {}", pid);
                 String cmd = "";
                 if(os.toLowerCase().contains("nux") || os.toLowerCase().contains("nix")){
-                    cmd = "sudo kill -9 " + pid;
+                    cmd = "kill -9 " + pid;
                 }
                 if(os.toLowerCase().contains("mac")){
                     cmd = "kill -9 " + pid;

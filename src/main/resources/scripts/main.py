@@ -1,6 +1,4 @@
-import asyncio
-import cv2, json, time, stomp, base64, argparse, threading
-import numpy as np
+import cv2, json, stomp, base64, argparse, threading, asyncio, numpy as np
 from PIL import Image
 from io import BytesIO
 from faceDetection.frMethod import FRMethod
@@ -8,7 +6,7 @@ from faceDetection.frMethod import FRMethod
 # from peopleCount.peopleCount import peopleCountMethod
 
 
-async def client(idOfCamera, cameraUrl, dataApi):
+async def publisher(idOfCamera, cameraUrl, dataApi):
     host = dataApi[:-6]
     port = dataApi[int(len(dataApi)) - 5:]
     clientConnection = stomp.Connection()
@@ -22,14 +20,15 @@ async def client(idOfCamera, cameraUrl, dataApi):
             _, buffer = cv2.imencode('.jpg', frame)
             try:
                 encodedData = base64.b64encode(buffer)
-                clientConnection.send(body=encodedData, destination='/queue/' + idOfCamera, headers={'persistent': 'true'})
+                clientConnection.send(body=encodedData, destination='/queue/' + idOfCamera,
+                                      headers={'persistent': 'true'})
             except UnicodeEncodeError:
                 continue
     # time.sleep(2)
     # clientConnection.disconnect()
 
 
-async def server(appList, idOfCamera, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken, dataApi):
+async def consumer(appList, idOfCamera, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken, dataApi):
     host = dataApi[:-6]
     port = dataApi[int(len(dataApi)) - 5:]
 
@@ -42,7 +41,10 @@ async def server(appList, idOfCamera, basePath, channelName, frConfigs, postUrl,
             frameInBytes = bytes(frame, 'utf-8')
             decodedFrame = Image.open(BytesIO(base64.b64decode(frameInBytes)))
             finalDecodedImage = np.array(decodedFrame)
-
+            if frConfigs == 'entry':
+                finalDecodedImage = finalDecodedImage[18:18 + 1060, 378:378 + 711]
+            if frConfigs == 'exit':
+                finalDecodedImage = finalDecodedImage[262:262 + 798, 898:898 + 683]
             if "fr" in appList:
                 frObject = FRMethod(finalDecodedImage, basePath, idOfCamera, channelName, frConfigs, postUrl,
                                     dataLocation, apiToken)
@@ -127,8 +129,8 @@ if __name__ == "__main__":
     # Start client and server parallely.
     async def main():
         await asyncio.gather(
-            client(cameraId, cameraURL, data['dataApi']),
-            server(appsList, cameraId, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken,
+            publisher(cameraId, cameraURL, data['dataApi']),
+            consumer(appsList, cameraId, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken,
                    data['dataApi']))
 
     asyncio.run(main())

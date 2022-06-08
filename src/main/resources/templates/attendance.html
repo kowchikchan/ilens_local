@@ -183,6 +183,7 @@
                 last: '',
                 prev: '&laquo;',
                 first:'',
+                initiateStartPageClick: false,
                 onPageClick: function (event, page) {
                     pageNumber = (page - 1);
                     if ( windowsize < 500 ){
@@ -303,7 +304,7 @@ $("#clearIcon").on("click",function(){
           	for(i=0;i<data.length;i++){
               var entryTime = moment(data[i].entry_view.time).format("DD-MM-YYYY hh:mm:ss A");
           	  attendanceList=attendanceList+'<tr>';
-          	  attendanceList=attendanceList+"<td> <button id='idTraceButton' type='button' class='btn btn-primary' onclick='getTraceMethod(this.value)' value= "+ data[i].id +'_'+ entryExitFilter.date +" >"+data[i].id+"</button></td>";
+          	  attendanceList=attendanceList+"<td> <button id='idTraceButton' type='button' class='btn btn-primary' onclick='getTraceMethod(this.value)' value= "+ data[i].entry_view.id +'_'+ entryExitFilter.date +" >"+data[i].id+"</button></td>";
               attendanceList=attendanceList+'<td>'+data[i].name+'</td>';
               attendanceList=attendanceList+'<td class="width">'+ entryTime +'</td>';
               attendanceList=attendanceList+'<td>'+data[i].entry_view.location+'</td>';
@@ -380,7 +381,7 @@ $("#clearIcon").on("click",function(){
           	for(i=0;i<data.length;i++){
               var entryTime = moment(data[i].entry_view.time).format("DD-MM-YYYY hh:mm:ss A");
           	  attendanceList=attendanceList+'<tr>';
-          	  attendanceList=attendanceList+"<td> <button id='idTraceButton' type='button' class='btn btn-primary' onclick='getTraceMethod(this.value)' value= "+ data[i].id +'_'+ entryExitFilter.date +" >"+data[i].id+"</button></td>";
+          	  attendanceList=attendanceList+"<td> <button id='idTraceButton' type='button' class='btn btn-primary' onclick='getTraceMethod(this.value)' value= "+ data[i].entry_view.id +'_'+ entryExitFilter.date +" >"+data[i].id+"</button></td>";
               attendanceList=attendanceList+'<td>'+data[i].name+'</td>';
               attendanceList=attendanceList+'<td class="width">'+ entryTime +'</td>';
               attendanceList=attendanceList+'<td>'+data[i].entry_view.location+'</td>';

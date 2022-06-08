@@ -583,6 +583,7 @@ function paging(filterKey,channelFilterVO){
             last: '',
             prev: '&laquo;',
             first:'',
+            initiateStartPageClick: false,
             onPageClick: function (event, page) {
                 pageNumber = (page - 1);
                 if ( windowsize < 500 ){
@@ -787,7 +788,7 @@ function addChannel(){
       const colonSplit = url[1].split(":");
       var ip = colonSplit[0];
       $(".pre-loading1").show()
-        liveVideoIdAtChannel = liveVideoIdAtChannel + '<img id="liveVideo-channel-live" src="http://'+ip+':5000/' + camIp + '">';
+        liveVideoIdAtChannel = liveVideoIdAtChannel + '<img id="liveVideo-channel-live" src="http://127.0.0.1:5000/' + camIp + '">';
         $("#liveVideoIdAtChannel").html(liveVideoIdAtChannel);
         $('#popup_default').openPopup({ anim: 'fade' });
         setTimeout(function(){

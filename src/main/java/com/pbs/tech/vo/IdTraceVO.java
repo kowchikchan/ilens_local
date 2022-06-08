@@ -3,13 +3,13 @@ package com.pbs.tech.vo;
 import java.util.List;
 
 public class IdTraceVO {
-    private long id;
+    private String id;
     private String name;
     private List<IdTraceDetailsVO> trace;
 
-    public long getId() { return id; }
+    public String getId() {return id;}
 
-    public void setId(long id) { this.id = id; }
+    public void setId(String id) {this.id = id;}
 
     public String getName() { return name; }
 

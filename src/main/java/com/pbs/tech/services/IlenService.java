@@ -350,16 +350,16 @@ public class IlenService {
                 entryExist.setLocation(Long.toString(channelData.getChannelId()));
                 entryExist.setName(channelData.getChannelName());
                 entryExist.setSnapshot(channelData.getSnapshot());
-                //authorization
-                AccessConfigs accessRestrictedPersonValue = accessConfigRepo.findByChannelIdAndPersonId(channelData.getChannelId(),Long.parseLong(entryExist.getId()));
-                if(accessRestrictedPersonValue==null) {
+
+                // save person details, if violated.
+                AccessConfigs accessConfigs = accessConfigRepo.findByChannelIdAndPersonId(channelData.getChannelId(),Long.parseLong(entryExist.getId()));
+                if (accessConfigs != null && accessConfigs.isEnabled()) {
                     entryViolation.setTime(now);
                     entryViolation.setType(channelData.getType());
                     entryViolation.setId(entryExit.getId());
                     entryViolation.setName(entryExit.getName());
                     entryViolation.setLocation(channelData.getChannelName());
                     entryViolation.setSnapshot(channelData.getSnapshot());
-                    //Save data to the entryViolation table, if person violated
                     entryViolationRepo.save(entryViolation);
                 }
                 entryExitRepo.save(entryExist);
@@ -454,15 +454,19 @@ public class IlenService {
 
     public long getTodayCount() {
         Calendar date = new GregorianCalendar();
-        // reset hour, minutes, seconds and millis
         date.set(Calendar.HOUR_OF_DAY, 0);
-        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.MINUTE, 1);
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
+        Date startDate = date.getTime();
 
-        Iterable slice = entryExitRepo.getTodayAttendanceCount(date.getTime());
+        date.add(Calendar.HOUR_OF_DAY, 23);
+        date.add(Calendar.MINUTE, 58);
+        date.add(Calendar.SECOND, 59);
+        date.add(Calendar.MILLISECOND, 0);
+        Date endDate = date.getTime();
 
-        return IterableUtils.size(slice);
+        return entryExitRepo.getTodayAttendanceCount(startDate, endDate).size();
     }
 
     public  Object getAttendance(@RequestBody EntryExitFilter entryExitFilter, int pageNumber) throws Exception {
@@ -495,11 +499,12 @@ public class IlenService {
                     User userObj = userRepo.findById(entryExitFilter.getId()).get();
                     name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
                     traceVO.setName(name);
+                    traceVO.setId(userObj.getUsername());
                 } catch (NoSuchElementException noSuchElementException) {
                     traceVO.setName(name);
                     log.info("Error {}", noSuchElementException.getMessage());
                 }
-                traceVO.setId(entryExitFilter.getId());
+                //traceVO.setId(entryExitFilter.getId());
                 for (EntryExitEntity entryExitEntity : slice) {
                     IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
                     idTraceDetailsVO.setTime(entryExitEntity.getTime());
@@ -525,12 +530,13 @@ public class IlenService {
                     for (int val = 0; val < getTodayCount(); val++) {
                         List<ExitView> exitDetails = this.getTodayExit(pageNumber, entities.get(val).getId());
                         EntryExit entryExit = new EntryExit();
-                        entryExit.setId(entities.get(val).getId());
+                        //entryExit.setId(entities.get(val).getId());
                         String name = "----";
                         try {
                             User userObj = userRepo.findById(Long.parseLong(entities.get(val).getId())).get();
                             name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
                             entryExit.setName(name);
+                            entryExit.setId(userObj.getUsername());
                         } catch (NoSuchElementException noSuchElementException) {
                             entryExit.setName(name);
                             log.info("Error {}", noSuchElementException.getMessage());
@@ -601,12 +607,13 @@ public class IlenService {
                         //List<ExitView> exitDetails = this.getTodayExit(pageNumber, entity.getId());
                         List<ExitView> exitDetails = this.exitData(entity.getId(), entryExitFilter.getDate());
                         EntryExit entryExit = new EntryExit();
-                        entryExit.setId(entity.getId());
+                        // entryExit.setId(entity.getId());
                         String name = "----";
                         try {
                             User userObj = userRepo.findById(Long.parseLong(entity.getId())).get();
                             name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
                             entryExit.setName(name);
+                            entryExit.setId(userObj.getUsername());
                         } catch (NoSuchElementException noSuchElementException) {
                             entryExit.setName(name);
                             log.info("Error {}", noSuchElementException.getMessage());

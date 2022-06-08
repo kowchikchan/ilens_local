@@ -314,6 +314,7 @@ function usersPaging(){
             last: '',
             prev: '&laquo;',
             first:'',
+            initiateStartPageClick: false,
             onPageClick: function (event, page) {
                 pageNumber = (page - 1);
                 $("#pageNo").val(pageNumber);

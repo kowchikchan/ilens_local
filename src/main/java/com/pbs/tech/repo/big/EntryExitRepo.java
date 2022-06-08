@@ -7,6 +7,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Date;
+import java.util.List;
 
 public interface EntryExitRepo extends CrudRepository<EntryExitEntity,String> {
 
@@ -17,8 +18,8 @@ public interface EntryExitRepo extends CrudRepository<EntryExitEntity,String> {
     @Query("SELECT * FROM EntryExit WHERE time >= ?0 group by id ALLOW FILTERING")
     Slice<EntryExitEntity> getTodayAttendance(Date today, Pageable page);
 
-    @Query("SELECT * FROM EntryExit WHERE time >= ?0 group by id ALLOW FILTERING")
-    Iterable<EntryExitEntity> getTodayAttendanceCount(Date today);
+    @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time < ?1  AND type='entry' group by id ALLOW FILTERING")
+    List<EntryExitEntity> getTodayAttendanceCount(Date startDate, Date endDate);
 
     @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time <= ?1 group by id ALLOW FILTERING")
     Iterable<EntryExitEntity> getLastHourEntryOrOnTimeEntry(Date pastOneHourOrToday, Date PresentHourOrOnTime);

@@ -152,6 +152,12 @@ public class ILensController {
     @GetMapping("/grid")
     public String grid(){return "grid";}
 
+    @GetMapping("/unknownRegistry")
+    public String unknownRegistry(){return "unknownRegistry";}
+
+    @GetMapping("/settings")
+    public String settings(){return "settings";}
+
     @GetMapping(path = "/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         request.getSession().invalidate();

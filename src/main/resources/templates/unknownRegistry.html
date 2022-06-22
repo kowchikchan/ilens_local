@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+	<title>[[${APP_NAME}]] - Agents</title>
+</head>
+<body>
+<div layout:fragment="content" class="contant">
+	<div class="pre-loading">
+    	<img class="loader" src="/web/images/loader.png" />
+  	</div>
+      <div class="heading">
+        <span class="heading-text fs-30">Unknown Registry</span>
+    </div>
+    <!-- <span>
+        <button class="btn btn-outline-warning" onclick="back()">Go Back</button>
+    </span> -->
+    <div class="main-table">
+    	<div class="col-md-12 pb-10 row m-0">
+    		<div class="col-md-12">
+    			<nav aria-label="Page navigation example" class="pagination-nav" id="attendancePage">
+              		<ul class="pagination" id="attendancePagination"></ul>
+            	</nav>
+				<div class="lens_select select_position">
+					<div class="input-group date" id="datepicker">
+						<input type="text" id="text-date" class="form-control">
+						  <span class="input-group-append"> </span>
+					 </div>
+				 </div>
+    			
+    		</div>
+    		<div class="col-md-12 row table-responsive">
+    			<table class="clr-txt">
+    				<thead>
+    					<tr>
+    						<th width="300"> Time </th>
+    						<th width="300"> Type </th>
+    						<th width="300"> Place </th>
+    						<th width="300"> Snapshot </th>
+    					</tr>
+    				</thead>
+    				<tbody class="" id="unknownList"></tbody>
+    			</table>
+    		</div>
+    	</div>
+        <div id="popup_default" class="popup">
+            <div class="popup-overlay"></div>
+            <div class="popup-content">
+              <a href="#" class="close-popup" data-id="popup_default">&times;</a>
+             <table id="imageId">
+                 
+             </table>
+          </div>
+        </div>
+		<div id="popup_default" class="popup">
+            <div class="popup-overlay"></div>
+            <div class="popup-content">
+              <a href="#" class="close-popup" data-id="popup_default">&times;</a>
+             <table id="imageId">
+                 
+             </table>
+          </div>
+        </div>
+    </div>
+	<div class="records"></div>
+<script>
+	$.fn.datepicker.defaults.format = "yyyy-mm-dd";
+	$.fn.datepicker.defaults.autoclose =true;
+	$(document).ready(function(){
+		$("#unknownRegistry").addClass('active');
+		$('#datepicker').datepicker('setDates', new Date()); 
+		var date=new Date();
+		UnknownRegistry(date);
+		 
+	})
+
+  $(function() {
+    $('#datepicker').datepicker({
+		defaultViewDate: new Date(),
+        format: "yyyy-mm-dd",
+        timePicker: true,
+        autoclose: true,
+        endDate: '+0d' 
+    });
+   
+    $('#datepicker').datepicker().on("input change", function (e) { 
+      var st1=(e.target.value);
+      var st2="T00:01:01.001Z";
+      var date = st1.concat(st2);     
+	  UnknownRegistry(date);
+    });
+  });
+
+
+	function UnknownRegistry(date){
+		var reportApi = "[[${session.REPORT_API}]]";
+		var sessionToken = "[[${session.USER.sessionToken}]]";
+		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+			var apiUrl = urlSlashCheck + "api/v1/ilens/unknown/getList"; 
+			unknownFilterVO={
+							date:date
+							}
+		var ilensApiClientVO  = {
+			api: apiUrl,
+			clientKey: sessionToken,
+			inputVo: unknownFilterVO,
+			method: "POST"
+		}
+		$("#unknownList").empty();
+			$.ajax({
+			contentType: "application/json;charset=UTF-8",
+			url: "api/v1/iLensApiClient",
+			dataType: "json",
+			headers:{'CLIENT_KEY':sessionToken},
+			type: "POST",
+			async: false,
+			data: JSON.stringify(ilensApiClientVO),
+			success: function(data){
+				var unknownList="";
+				for(i=0;i<data.length;i++){
+				var time = moment(data[i].time).format("DD-MM-YYYY hh:mm:ss A");
+				encodedString = getSnapshotString(data[i].snapshot);
+				if(encodedString.toString().length === 0){
+                    encodedString = getSnapshotString("noImageAvailable");
+                }
+				unknownList=unknownList+'<tr>';
+				unknownList=unknownList+'<td>' +time+ '</td>';
+				unknownList=unknownList+'<td>'+data[i].type+'</td>';
+				unknownList=unknownList+'<td>'+data[i].channelId +'</td>';
+				unknownList = unknownList + '<td>';
+				unknownList = unknownList + "<div class='image'>";
+				unknownList = unknownList + "<a href='#' class='open-popup' id='" + encodedString +"' data-id='popup_default' onclick='snapshotShow(this.id)'> <img src='data:image/png;base64," + encodedString + "'></a>";
+				unknownList = unknownList + "</div>";
+				unknownList = unknownList + "</td>";
+				unknownList=unknownList+'</tr>';
+				}
+				if(data==0){
+					$(".records").html("No Records Found").show();
+               		$('.pagination-nav1').hide();
+				}else{
+					$("#unknownList").html(unknownList);
+					$(".records").hide()
+				}
+				},
+
+			error:function(err){
+				console.log(err);
+				}
+			});
+	}
+
+	function getSnapshotString(snapshotValue){
+		var bs64EncodedString = "";
+    var reportApi = "[[${session.REPORT_API}]]";
+    var sessionToken = "[[${session.USER.sessionToken}]]";
+    var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+    var type="Unknown"
+    var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/snapshot/"+snapshotValue+"/"+type; 
+    var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
+		$.ajax({
+			contentType:"application/json;charset=UTF-8",
+			url:"api/v1/iLensApiClient",
+			headers:{'CLIENT_KEY':sessionToken},
+            type: "POST",
+            data: JSON.stringify(ilensApiClientVO),
+            async:false,
+            success:function(data){
+            	bs64EncodedString = data;
+            },
+            error:function(err) {
+            	console.log(err)
+            }
+		});
+		return bs64EncodedString;
+	}
+
+	    // popup open and close.
+
+	(function($) {
+      $.fn.openPopup = function( settings ) {
+        var elem = $(this);
+        var settings = $.extend({
+          anim: 'fade'
+        }, settings);
+        elem.show();
+        elem.find('.popup-content').addClass(settings.anim+'In');
+      }
+      
+      $.fn.closePopup = function( settings ) {
+        var elem = $(this);
+        var settings = $.extend({
+          anim: 'fade'
+        }, settings);
+        elem.find('.popup-content').removeClass(settings.anim+'In').addClass(settings.anim+'Out');
+        
+        setTimeout(function(){
+            elem.hide();
+            elem.find('.popup-content').removeClass(settings.anim+'Out')
+          }, 500);
+      }
+        
+    }(jQuery));
+
+	var imageId="";
+    function snapshotShow(encodeString){
+        imageId = imageId + "<img src='data:image/png;base64," + encodeString + "'>"
+        $("#imageId").html(imageId);
+        $('#popup_default').openPopup({ anim: 'fade' });
+        imageId = "";
+    }
+
+     $('.close-popup').click(function(){
+      $('#popup_default').closePopup({ anim: 'fade' });
+    });
+</script>
+
+</div>
+</body>
+</html>

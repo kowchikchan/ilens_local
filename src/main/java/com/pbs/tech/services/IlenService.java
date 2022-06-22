@@ -7,12 +7,10 @@ import com.pbs.tech.common.exception.IlensException;
 import com.pbs.tech.model.*;
 import com.pbs.tech.model.big.EntryExitEntity;
 import com.pbs.tech.model.big.EntryViolation;
+import com.pbs.tech.model.big.UnknownEntry;
 import com.pbs.tech.repo.*;
-import com.pbs.tech.repo.big.EntryExitRepo;
-import com.pbs.tech.repo.big.EntryViolationRepo;
-import com.pbs.tech.repo.big.ExitViewRepo;
+import com.pbs.tech.repo.big.*;
 import com.pbs.tech.model.big.ExitView;
-import com.pbs.tech.repo.big.PeopleCountRepo;
 import com.pbs.tech.vo.*;
 import com.pbs.tech.vo.runtime.EntryExitVo;
 import com.pbs.tech.vo.EntryViolationByLocationVo;
@@ -65,6 +63,9 @@ public class IlenService {
     ChannelsServices channelsServices;
 
     @Autowired
+    UnknownEntryRepo unknownEntryRepo;
+
+    @Autowired
     UserRepo userRepo;
 
     @Value("${ilens.api.protocal}")
@@ -91,6 +92,9 @@ public class IlenService {
 
     @Value("${locations.tessearct-location}")
     String tesseractLocation;
+
+    @Value("${locations.unknown-location}")
+    String unknownLocation;
 
     @Autowired
     private CassandraOperations cassandraTemplate;
@@ -910,11 +914,16 @@ public class IlenService {
         return encodedFile;
     }
 
-    public List<String> attendanceSnapshot(String snapshot) throws IOException {
+    public List<String> attendanceSnapshot(String snapshot, String type) throws IOException {
             String encodedString = null;
+            File file = null;
             List<String> val = new ArrayList<>();
             try {
-                File file = new File(dataLocation + "/" + snapshot + ".jpg");
+                if(type.equalsIgnoreCase("Registry")) {
+                    file = new File(dataLocation + "/" + snapshot + ".jpg");
+                }else if(type.equalsIgnoreCase("Unknown")){
+                    file = new File(unknownLocation + "/" + snapshot + ".jpg");
+                }
                 encodedString = bs64Conversion(file);
             }catch (FileNotFoundException e){
                 throw new FileNotFoundException("File Not Found Exception " + e.getMessage());
@@ -1025,5 +1034,60 @@ public class IlenService {
         }
         return entryExits;
 
+    }
+
+    public void unknownSaveDataset(UnknownInputVO unknownFilterVO) throws Exception {
+        Date now = null;
+        UnknownEntry unknownEntry = new UnknownEntry();
+        if (unknownFilterVO != null) {
+            try {
+                now = dt.parse(unknownFilterVO.getTime());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            unknownEntry.setName(unknownFilterVO.getChannelName());
+            unknownEntry.setLocation(Long.toString(unknownFilterVO.getChannelId()));
+            unknownEntry.setTime(now);
+            unknownEntry.setType(unknownFilterVO.getType());
+            unknownEntry.setSnapshot(unknownFilterVO.getSnapshot());
+            try {
+                unknownEntryRepo.save(unknownEntry);
+            } catch (Exception e) {
+                throw new Exception(e.getMessage());
+            }
+        }
+    }
+
+    public List<IdTraceDetailsVO> unknownList(UnknownFilterVO unknownFilterVO) {
+        List<IdTraceDetailsVO> idTraceDetailsVOs = new ArrayList<>();
+        Calendar cal = Calendar.getInstance();
+        if (unknownFilterVO != null) {
+            cal.setTime(unknownFilterVO.getDate());
+
+            //selected date
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 1);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            Date selectedDate = cal.getTime();
+
+            //selected date end time.
+            cal.add(Calendar.HOUR_OF_DAY, 23);
+            cal.add(Calendar.MINUTE, 58);
+            cal.add(Calendar.SECOND, 59);
+            cal.add(Calendar.MILLISECOND, 0);
+            Date endDate = cal.getTime();
+
+            List<UnknownEntry> unknownEntries = unknownEntryRepo.getUnknownList(selectedDate, endDate);
+            for (UnknownEntry unknownEntry : unknownEntries) {
+                IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
+                idTraceDetailsVO.setChannelId(unknownEntry.getLocation());
+                idTraceDetailsVO.setTime(unknownEntry.getTime());
+                idTraceDetailsVO.setType(unknownEntry.getType());
+                idTraceDetailsVO.setSnapshot(unknownEntry.getSnapshot());
+                idTraceDetailsVOs.add(idTraceDetailsVO);
+            }
+        }
+        return idTraceDetailsVOs;
     }
 }

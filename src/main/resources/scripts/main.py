@@ -1,7 +1,10 @@
+import datetime
 import cv2, json, stomp, base64, argparse, threading, asyncio, numpy as np
 from PIL import Image
 from io import BytesIO
 from faceDetection.frMethod import FRMethod
+
+
 # from npr.npr_method import detect
 # from peopleCount.peopleCount import peopleCountMethod
 
@@ -22,6 +25,7 @@ async def publisher(idOfCamera, cameraUrl, dataApi):
                 encodedData = base64.b64encode(buffer)
                 clientConnection.send(body=encodedData, destination='/queue/' + idOfCamera,
                                       headers={'persistent': 'true'})
+                print()
             except UnicodeEncodeError:
                 continue
     # time.sleep(2)
@@ -37,6 +41,7 @@ async def consumer(appList, idOfCamera, basePath, channelName, frConfigs, postUr
             print('error while receiving "%s"' % frame.body)
 
         def on_message(self, frame):
+            startTime = datetime.datetime.now()
             frame = frame.body
             frameInBytes = bytes(frame, 'utf-8')
             decodedFrame = Image.open(BytesIO(base64.b64decode(frameInBytes)))
@@ -47,7 +52,7 @@ async def consumer(appList, idOfCamera, basePath, channelName, frConfigs, postUr
                 finalDecodedImage = finalDecodedImage[262:262 + 798, 898:898 + 683]
             if "fr" in appList:
                 frObject = FRMethod(finalDecodedImage, basePath, idOfCamera, channelName, frConfigs, postUrl,
-                                    dataLocation, apiToken)
+                                    dataLocation, apiToken, startTime)
                 threading.Thread(target=frObject.liveMethod).start()
 
             # if "npr" in appsList:
@@ -79,37 +84,28 @@ if __name__ == "__main__":
         data = json.loads(f.read())
         print(f'Configurations data {data}')
     except IOError as e:
-        raise IOError("Error ", e)
+        raise IOError("Configurations Not Found ", e)
 
     # basic camera Configuration
     postUrl = data['reportApi'] if str(data['reportApi']).endswith("/") else str(data['reportApi']) + "/"
     postUrl = postUrl + "api/v1/ilens/dataset"
-    cameraId = data['id']
-    cameraIp = data['ip']
-    channelName = data['name']
-    apiToken = data['apiToken']
+    cameraId, cameraIp, channelName, apiToken = data['id'], data['ip'], data['name'], data['apiToken']
 
     # base path and data location
-    basePath = inputData.basePath
-    dataLocation = inputData.dataLocation
-
-    cameraURL = "rtsp://" + cameraIp + ":554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream"
+    basePath, dataLocation = inputData.basePath, inputData.dataLocation
+    cameraURL = "".join(["rtsp://", cameraIp, ":554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream"])
     print(f'Camera URL: {cameraURL}')
 
     # fr configurations
-    appsList = []
+    # appsList = []
     try:
-        for value in data['executions']:
-            appsList.append(value['type'])
+        appsList = [value['type'] for value in data['executions']]
         frConfigs = data['executions'][0]['config']
     except IndexError as e:
-        raise IndexError("Value Error", e)
+        raise IndexError("Configurations Not Found.", e)
 
     # npr configurations
-    minRatio = 0
-    maxRatio = 0
-    thresh_1 = 0
-    thresh_2 = 0
+    minRatio, maxRatio, thresh_1, thresh_2 = 0, 0, 0, 0
 
     for i in range(len(data['executions'])):
         if data['executions'][i]['type'] == 'npr':
@@ -119,7 +115,7 @@ if __name__ == "__main__":
                 thresh_1 = data['executions'][i]['config']['thresh1']
                 thresh_2 = data['executions'][i]['config']['thresh2']
             except IndexError as e:
-                raise KeyError("Value Error", e)
+                raise KeyError("Configurations Not Found", e)
     # peopleCount configurations
     # null
 

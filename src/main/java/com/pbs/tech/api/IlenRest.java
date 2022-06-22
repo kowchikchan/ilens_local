@@ -3,6 +3,8 @@ package com.pbs.tech.api;
 import com.pbs.tech.services.IlenService;
 import com.pbs.tech.vo.EntryExitFilter;
 import com.pbs.tech.vo.ChannelData;
+import com.pbs.tech.vo.UnknownFilterVO;
+import com.pbs.tech.vo.UnknownInputVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -92,10 +94,10 @@ public class IlenRest {
         return new ResponseEntity(ilenService.getEntryViolationsCount(),HttpStatus.OK);
     }
 
-    @GetMapping("/attendance/snapshot/{snapshot}")
+    @GetMapping("/attendance/snapshot/{snapshot}/{type}")
     public ResponseEntity<?> getSnapshot(@RequestHeader("CLIENT_KEY") String clientKey,
-                                         @PathVariable String snapshot) throws IOException {
-        return new ResponseEntity(ilenService.attendanceSnapshot(snapshot), HttpStatus.OK);
+                                         @PathVariable String snapshot, @PathVariable String type) throws IOException {
+        return new ResponseEntity(ilenService.attendanceSnapshot(snapshot, type), HttpStatus.OK);
     }
 
     @GetMapping("/runtime")
@@ -114,5 +116,17 @@ public class IlenRest {
         return new ResponseEntity<>(ilenService.attendanceFilter(entryExitFilter), HttpStatus.OK);
     }
 
+    @PostMapping("/unknown/save")
+    public ResponseEntity<?> unknownSaveDataSet(@RequestHeader("CLIENT_KEY") String clientKey,
+                                            @RequestBody UnknownInputVO unknownFilterVO) throws Exception {
+            ilenService.unknownSaveDataset(unknownFilterVO);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+    @PostMapping("/unknown/getList")
+    public ResponseEntity<?> unknownList(@RequestHeader("CLIENT_KEY") String clientKey,
+                                                @RequestBody UnknownFilterVO unknownFilterVO) throws Exception {
+
+        return new ResponseEntity<>(ilenService.unknownList(unknownFilterVO), HttpStatus.OK);
+    }
 }
 

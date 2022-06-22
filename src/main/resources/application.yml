@@ -40,9 +40,10 @@ ilens:
     path: python3
   user:
     train-data:
-      path: /home/logicfocus/applications/ilens/ilens-1.0/scripts/faceDetection/face_training/training_imgs
+      path: /home/logicfocus/ilens/ilens-1.0/scripts/faceDetection/face_training/training_imgs
 locations:
-  data-location: /home/logicfocus/applications/ilens/snapshots
-  license-location: /home/logicfocus/applications/ilens/ilens-1.0/scripts
-  json-location: /home/logicfocus/applications/ilens/ilens-1.0/scripts
-  tessearct-location: /home/logicfocus/applications/ilens/ilens-1.0/scripts
+  data-location: /home/logicfocus/ilens/snapshots
+  license-location: /home/logicfocus/ilens/ilens-1.0/scripts
+  json-location: /home/logicfocus/ilens/ilens-1.0/scripts
+  tessearct-location: /home/logicfocus/ilens/ilens-1.0/scripts
+  unknown-location: /home/logicfocus/ilens/snapshots/unknown

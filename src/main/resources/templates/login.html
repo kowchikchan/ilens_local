@@ -27,38 +27,40 @@
     <div class="pre-loading">
       <img class="loader" src="/web/images/loader.png" />
     </div>
-    <div class="Login-content">
-      <div class="col-md-12 row">
-        <div class="Login_panal">
-           <label class="ybg-lable">Login</label>
-           <div id="user-credentials">
-            <i id="warn-icon" class="fa fa-exclamation-triangle warning-icon sty" aria-hidden="true"><div id="validInput"></div></i>
-          </div> 
-          <div id="user-credentials1">
-            <i id="warn-icon1" class="fa fa-times-circle warning-icon sty" aria-hidden="true"><div id="validInput1"></div></i>
-          </div>   
-          <div class="input_part col-md-10 p-0">
-            <div class="col-md-12 p-0">
-              <label class="input-labels">Username/Email ID</label>
-              <input type="text" id="userId" name="Username" class="lens_input" placeholder="Username/Email ID"/>
-              <span class="validate-login">Invalid User Credentials</span>
-            </div>
-            <div class="col-md-12 p-0">
-              <label class="input-labels">Password</label>
-              <input type="password" id="userSecret" name="Username" class="lens_input login-pass pr-40" placeholder="Password"/>
-              <i id="login_password" class="fa fa-eye show-password"></i>
-              <span class="validate-login">Invalid Password</span>
-            </div>
-          </div>
-          <div class="">
-            <button id="login" class="submit-btn" onclick="checkLogin();">Login</button>
-            <div class="pf-div"><a href="#">Forgot Password?</a></div>
-          </div>
-          <div class="img-bg-line">
-            <img src="/web/images/lines.png" id="live_c2" />
-          </div>
+    <div class="Login-content col-lg-12">
+      <div class="col-lg-1"></div>
+      <div class="col-lg-4 pt-5 pb-5">
+        <div class="warning-icon" id="user-credentials">
+          <i id="warn-icon" class="fa fa-exclamation-triangle"><div id="validInput"></div></i>
         </div>
+        <div class="warning-icon" id="user-credentials1">
+          <i id="warn-icon1" class="fa fa-exclamation-triangle"><div id="validInput1"></div></i>
+        </div>
+        <div class="Login_panal">
+          <label class="ybg-lable">Login</label>
+         <div class="input_part col-md-10 p-0">
+           <div class="col-md-12 p-0">
+             <label class="input-labels">Username/Email ID</label>
+             <input type="text" id="userId" name="Username" class="lens_input" placeholder="Username/Email ID"/>
+             <span class="validate-login">Invalid User Credentials</span>
+           </div>
+           <div class="col-md-12 p-0">
+             <label class="input-labels">Password</label>
+             <input type="password" id="userSecret" name="Username" class="lens_input login-pass pr-40" placeholder="Password"/>
+             <i id="login_password" class="fa fa-eye show-password"></i>
+             <span class="validate-login">Invalid Password</span>
+           </div>
+         </div>
+         <div class="">
+           <button id="login" class="submit-btn" onclick="checkLogin();">Login</button>
+           <!-- <div class="pf-div"><a href="#">Forgot Password?</a></div> -->
+         </div>
+         <div class="img-bg-line">
+           <img src="/web/images/lines.png" id="live_c2" />
+         </div>
+       </div>
       </div>
+      <div class="col-lg-7"></div>
       <div class="login-logo">
         <img src="/web/images/Asset 2.png" class="w-100" />
       </div>
@@ -103,12 +105,12 @@ $(document).keypress(function (e) {
 function checkLogin(){
   if($.trim($('#userId').val()) == ""){
     $("#user-credentials").show();
-    $("#warn-icon").show();
+    $("#user-credentials1").hide();
     $('#validInput').html("Please Enter User Id/Email");
     return false;
   }else if($.trim($('#userSecret').val()) == ""){
     $("#user-credentials").show();
-    $("#warn-icon").show();
+    $("#user-credentials1").hide();
     $('#validInput').html("Please Enter Password");
     return false;
   }
@@ -133,11 +135,9 @@ function loginUser(){
                window.location.href = "/";
             }else{
                 console.log("error" + xhr.status);
-                
+                  $('#user-credentials').hide();
                   $("#user-credentials1").show();
-                  $("#warn-icon1").show();
                   $('#validInput1').html("Username or Password is Not Valid");
-                  $('#validInput1').show();
             }
         }
     })

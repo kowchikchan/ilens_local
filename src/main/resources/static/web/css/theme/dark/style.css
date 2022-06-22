@@ -116,8 +116,8 @@ body{
 .Login_panal {
   background-color: #f9c631;
   padding: 20px 15px;
-  margin: 6% 6% 0;
-  width: 32%;
+  margin: 6% 12% 0;
+  width: 100%;
   height: 500px;
   box-shadow: 0px 0px 11px 2px rgba(0,0,0,0.75);
   border-radius: 10px;
@@ -568,16 +568,16 @@ header .main-menu li.drop:hover > ul.drop-down {
 }
 
 .img-bg-line{
-  top: 69%;
+  top: 64%;
   position: absolute;
   width: 23%;
-  left: 6%;
+  left: 12%;
 }
 .bg-out {
   position: absolute;
   top: 26%;
   left: 44%;
-  width: 700px;
+  width: 47%;
 }
 .tdspan{
   margin-right: 10px;
@@ -719,9 +719,7 @@ header .main-menu li.drop:hover > ul.drop-down {
   position: fixed;
   top: 0;
   color: white;
-  left: 34.25rem;
   height: 46px;
-  background-color: #062e51;
   z-index: 6;
   transition: 1s;
 }
@@ -1363,8 +1361,7 @@ input:disabled{
   padding: 10px 20px;
   top: 0;
   transition: 1s;
-  z-index: 5;
-  background-color: #062e51;
+  z-index: 100;
   width: 100%;
   height: 45px;
 }
@@ -2255,12 +2252,19 @@ option:hover{
 }
 
 #user-credentials{
-  margin-top: 5px;
-  margin-bottom: 5px;
+  position: inherit;
+  margin: 0% 12%;
+  border-radius: 6px;
+  display: none;
+}
+#user-credentials1{
+  position: inherit;
+  margin: 0% 12%;
+  border-radius: 6px;
+  display: none;
 }
 
 #warn-icon{
-  display: none;
   color: #f9c631;
 }
 
@@ -2528,9 +2532,9 @@ fa-warning:before, .fa-exclamation-triangle:before {
   .fs-30{
     font-size: 17px;
   }
-  .Date-time-div{
-    left: 36%;
-  }
+  .Date-time {
+    width: 176px;
+}
 }
 
 .input-labels{
@@ -3255,18 +3259,12 @@ img#live_c2 {
   border-radius: 7px;
 }
 #warn-icon1 {
-  display: none;
   color: red;
-}
-#user-credentials1 {
-  margin-top: 5px;
-  margin-bottom: 5px;
 }
 #validInput1 {
   display: inline;
   color: white;
   font-family: 'Montserrat', sans-serif;
-  margin-left: 10px;
 }
 
 .inactive1{
@@ -3278,7 +3276,7 @@ i.fa.fa-check.active2 {
 }
 .dropBtn{
   position: relative;
-   width: 137px;
+   width: 161px;
    cursor: pointer;
    background-color: #1e384800;
    text-align: left;
@@ -3329,7 +3327,9 @@ a.dropdown-item {
   top: 3px;
 }
 .dropdown-toggle::after {
-  margin-left: 17px;
+  float: right;
+    margin-top: 9px;
+    margin-right: 8px;
 }
 span#text {
   margin-left: 11px;
@@ -3505,7 +3505,16 @@ span.crop1 {
     top: 30px;
   }
   #user-credentials {
-    margin-bottom: 13px;
+    margin: 5% 6%;
+    width: 92%;
+    margin-top: 16%;
+    margin-bottom: -6%;
+  }
+  #user-credentials1 {
+    margin: 5% 6%;
+    width: 92%;
+    margin-top: 16%;
+    margin-bottom: -6%;
   }
   .form-body {
     bottom: 0px;
@@ -3644,7 +3653,8 @@ span.crop1 {
   }
   .Login_panal{
     width: 90%;
-    margin-top: 33%;
+    padding: 20px 15px;
+    margin: 14% 7% 0;
   }
   .login-logo{
     position: absolute;
@@ -3661,10 +3671,13 @@ span.crop1 {
   }
   img#live_c2 {
     height: 41vw;
-    width: 88vw;
+    width: 85vw;
     margin: auto;
     top: auto;
-}
+  }
+  .img-bg-line {
+    left: 8%;
+  }
   .sty {
     width: 82%;
     top: 14%;
@@ -3735,9 +3748,7 @@ input#text-date {
     width: 140%;
   }
   .Date-time {
-    margin-top: 17px;
-    margin-left: -50px;
-    width: 194px;
+    margin-top: 7px;
 }
   .contant {
     margin-top: 6%;
@@ -3916,7 +3927,26 @@ input#text-date {
   }
 }
 
+@media only screen and (min-width: 501px) and (max-width: 991px) {
 
+  .Login_panal {
+    width: 32vw;
+    margin: 3% 12% 0;
+  }
+  .warning-icon {
+    width: 35%;
+    font-size: 12px;
+  }
+  #user-credentials {
+    margin: 0% 11.4%;
+  }
+  #user-credentials1 {
+    margin: 0% 11.4%;
+  }
+  .bg-out {
+    width: 550px;
+  }
+}
 @media only screen and (min-width: 501px) and (max-width: 960px) {
   .top-nav.active {
     position: absolute;
@@ -3926,10 +3956,6 @@ input#text-date {
   }
   #video {
     position: initial;
-    }
-    .Login_panal {
-      width: 32vw;
-      margin-top: 11%;
     }
     .bg-out {
       position: absolute;
@@ -4036,4 +4062,24 @@ tbody#nprList:hover {
     top: 5%;
     left: 7%;
   }
+}
+.retains_sec{
+  position: relative;
+  width: 161px;
+  cursor: pointer;
+  background-color: #1e384800;
+  text-align: left;
+  padding: 4px;
+  color: #fff;
+  border: 1px solid #a08852;
+  border-radius: 6px;
+  text-decoration: none;
+}
+#Select option {
+  background: #062e51;
+  font-size: 15px;
+}
+.save_check{
+  height: 18px;
+  width: 19px;
 }

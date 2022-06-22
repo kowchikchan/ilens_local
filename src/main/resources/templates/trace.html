@@ -111,7 +111,8 @@
     var reportApi = "[[${session.REPORT_API}]]";
     var sessionToken = "[[${session.USER.sessionToken}]]";
     var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
-    var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/snapshot/"+snapshotValue; 
+    var type="Registry"
+    var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/snapshot/"+snapshotValue+"/"+type; 
     var ilensApiClientVO  = {
         api: apiUrl,
         clientKey: sessionToken,

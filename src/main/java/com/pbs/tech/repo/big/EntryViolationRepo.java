@@ -1,6 +1,5 @@
 package com.pbs.tech.repo.big;
 
-import com.pbs.tech.model.big.EntryExitEntity;
 import com.pbs.tech.model.big.EntryViolation;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.domain.Pageable;
@@ -19,5 +18,8 @@ public interface EntryViolationRepo extends CrudRepository<EntryViolation,String
 
     @Query("SELECT * FROM EntryViolation WHERE time >= ?0 and location = ?1 group by id ALLOW FILTERING")
     List<EntryViolation> getEntryViolationsByLoc(Date today, String location);
+
+    @Query("SELECT * FROM EntryViolation WHERE time >= ?0 AND time < ?1 ALLOW FILTERING")
+    List<EntryViolation> getViolationList(Date time1, Date time2);
 
 }

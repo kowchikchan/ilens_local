@@ -74,8 +74,6 @@ $("#clickButton").click(function(){
       enctype: 'multipart/form-data',
       contentType: false,
       processData: false,
-      cache: false,
-      async: false,
       success: function(data){
         trainingId();
 
@@ -89,7 +87,7 @@ $("#clickButton").click(function(){
   }else{
     setTimeout(function(){ toastr.error("Image file is empty"); }, 1000);
   }
-   window.setInterval(function(){
+  setTimeout(function(){
     $(".pre-loading").hide();
     }, 2000);
 })

@@ -1,8 +1,6 @@
 package com.pbs.tech.repo.big;
 
-import com.pbs.tech.model.big.EntryExitEntity;
 import com.pbs.tech.model.big.EntryViolation;
-import com.pbs.tech.model.big.UnknownEntry;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

@@ -9,7 +9,7 @@
     	<img class="loader" src="/web/images/loader.png" />
   	</div>
       <div class="heading">
-        <span class="heading-text fs-30">Unknown Registry</span>
+        <span class="heading-text fs-30">Violation</span>
     </div>
     <!-- <span>
         <button class="btn btn-outline-warning" onclick="back()">Go Back</button>
@@ -29,13 +29,15 @@
     			<table class="clr-txt">
     				<thead>
     					<tr>
+                            <th width="300"> ID </th>
+                            <th width="300"> Name </th>
     						<th width="300"> Time </th>
     						<th width="300"> Type </th>
-    						<th width="300"> Place </th>
+    						<th width="300"> Location</th>
     						<th width="300"> Snapshot </th>
     					</tr>
     				</thead>
-    				<tbody class="" id="unknownList"></tbody>
+    				<tbody class="" id="violationList"></tbody>
     			</table>
     		</div>
     	</div>
@@ -63,7 +65,7 @@
 	$.fn.datepicker.defaults.format = "yyyy-mm-dd";
 	$.fn.datepicker.defaults.autoclose =true;
 	$(document).ready(function(){
-		$("#unknownRegistry").addClass('active');
+		$("#violation").addClass('active');
 		$('#datepicker').datepicker('setDates', new Date()); 
 		var date=new Date();
 		UnknownRegistry(date);
@@ -82,17 +84,16 @@
     $('#datepicker').datepicker().on("input change", function (e) { 
       var st1=(e.target.value);
       var st2="T00:01:01.001Z";
-      var date = st1.concat(st2);     
-	  UnknownRegistry(date);
+      var date = st1.concat(st2); 
+      UnknownRegistry(date);    
     });
   });
 
-
-	function UnknownRegistry(date){
+  function UnknownRegistry(date){
 		var reportApi = "[[${session.REPORT_API}]]";
 		var sessionToken = "[[${session.USER.sessionToken}]]";
 		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
-			var apiUrl = urlSlashCheck + "api/v1/ilens/unknown/getList"; 
+			var apiUrl = urlSlashCheck + "/api/v1/violation/access/getList"; 
 			unknownFilterVO={
 							date:date
 							}
@@ -102,7 +103,7 @@
 			inputVo: unknownFilterVO,
 			method: "POST"
 		}
-		$("#unknownList").empty();
+		$("#violationList").empty();
 			$.ajax({
 			contentType: "application/json;charset=UTF-8",
 			url: "api/v1/iLensApiClient",
@@ -112,28 +113,30 @@
 			async: false,
 			data: JSON.stringify(ilensApiClientVO),
 			success: function(data){
-				var unknownList="";
+				var violationList="";
 				for(i=0;i<data.length;i++){
 				var time = moment(data[i].time).format("DD-MM-YYYY hh:mm:ss A");
 				encodedString = getSnapshotString(data[i].snapshot);
 				if(encodedString.toString().length === 0){
                     encodedString = getSnapshotString("noImageAvailable");
                 }
-				unknownList=unknownList+'<tr>';
-				unknownList=unknownList+'<td>' +time+ '</td>';
-				unknownList=unknownList+'<td>'+data[i].type+'</td>';
-				unknownList=unknownList+'<td>'+data[i].channelId +'</td>';
-				unknownList = unknownList + '<td>';
-				unknownList = unknownList + "<div class='image'>";
-				unknownList = unknownList + "<a href='#' class='open-popup' id='" + encodedString +"' data-id='popup_default' onclick='snapshotShow(this.id)'> <img src='data:image/png;base64," + encodedString + "'></a>";
-				unknownList = unknownList + "</div>";
-				unknownList = unknownList + "</td>";
-				unknownList=unknownList+'</tr>';
+				violationList=violationList+'<tr>';
+				violationList=violationList+'<td>' +data[i].id+ '</td>';
+				violationList=violationList+'<td>'+data[i].name+'</td>';
+				violationList=violationList+'<td>'+time +'</td>';
+                violationList=violationList+'<td>'+data[i].location +'</td>';
+                violationList=violationList+'<td>'+data[i].type +'</td>';
+				violationList = violationList + '<td>';
+				violationList = violationList + "<div class='image'>";
+				violationList = violationList + "<a href='#' class='open-popup' id='" + encodedString +"' data-id='popup_default' onclick='snapshotShow(this.id)'> <img src='data:image/png;base64," + encodedString + "'></a>";
+				violationList = violationList + "</div>";
+				violationList = violationList + "</td>";
+				violationList=violationList+'</tr>';
 				}
 				if(data==0){
 					$(".records").html("No Records Found").show();
 				}else{
-					$("#unknownList").html(unknownList);
+					$("#violationList").html(violationList);
 					$(".records").hide()
 				}
 				},
@@ -144,12 +147,13 @@
 			});
 	}
 
+    
 	function getSnapshotString(snapshotValue){
 		var bs64EncodedString = "";
     var reportApi = "[[${session.REPORT_API}]]";
     var sessionToken = "[[${session.USER.sessionToken}]]";
     var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
-    var type="Unknown"
+    var type="Registry"
     var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/snapshot/"+snapshotValue+"/"+type; 
     var ilensApiClientVO  = {
         api: apiUrl,
@@ -212,6 +216,7 @@
      $('.close-popup').click(function(){
       $('#popup_default').closePopup({ anim: 'fade' });
     });
+
 </script>
 
 </div>

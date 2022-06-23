@@ -168,4 +168,13 @@ if($.trim($('#UserID').val()) == ""){
       updateUser();
   }
 }
+$('#UserID').keyup(function(e) {
+  if (/\D/g.test(this.value))
+  {
+    // Filter non-digits from input value.
+    this.value = this.value.replace(/\D/g, '');
+    $("#user-credentials").show();
+    $('#validInput').html("Member ID only allow numeric");
+  }
+});
 </script>

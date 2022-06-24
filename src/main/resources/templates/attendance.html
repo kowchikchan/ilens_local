@@ -263,7 +263,7 @@ $("#clearIcon").on("click",function(){
     success: function (data){     
       for(i = 0; i < data.length; i++){    
         if(i==0) continue;            
-        userList.push(data[i].id+" ["+data[i].firstName+" "+data[i].lastName+"]");
+        userList.push(data[i].userId+" ["+data[i].firstName+" "+data[i].lastName+"]");
       }      
     }    
    });

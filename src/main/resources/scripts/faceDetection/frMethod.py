@@ -89,7 +89,7 @@ class FRMethod:
                     if matches[matchIndex]:
                         emp_id = modelLabels[matchIndex]
                         face_file_name = "".join([self.dataLocation, "/", dt_string, ".jpg"])
-                        json_values["entryExit"] = [{"id": emp_id, "name": " "}]
+                        json_values["entryExit"] = [{"id": emp_id, "name": ""}]
                         json_values["entryViolationVos"] = None
                         json_values["npr"] = None
                         json_values["socialViolation"] = None
@@ -106,7 +106,7 @@ class FRMethod:
                         except ConnectionError as e:
                             raise ConnectionError("Connection Exception {}", e)
                 else:
-                    face_file_name = "".join([self.dataLocation, "/unknown_entries/", dt_string, ".jpg"])
+                    face_file_name = "".join([self.dataLocation, "/unknown/", dt_string, ".jpg"])
                     cv2.imwrite(face_file_name, cv2.resize(cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB), (490, 334),
                                                            interpolation=cv2.INTER_AREA))
                     try:

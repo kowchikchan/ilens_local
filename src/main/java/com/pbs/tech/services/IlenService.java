@@ -350,9 +350,16 @@ public class IlenService {
                 entryExist.setTime(now);
                 entryExist.setType(channelData.getType());
                 entryExist.setId(entryExit.getId());
-                entryExist.setName(entryExit.getName());
+                String name = "----";
+                try {
+                    User userObj = userRepo.findByUsername(entryExit.getId());
+                    name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
+                    entryExist.setName(name);
+                } catch (NoSuchElementException noSuchElementException) {
+                    entryExist.setName(name);
+                    log.info("Error {}", noSuchElementException.getMessage());
+                }
                 entryExist.setLocation(Long.toString(channelData.getChannelId()));
-                entryExist.setName(channelData.getChannelName());
                 entryExist.setSnapshot(channelData.getSnapshot());
 
                 // save person details, if violated.
@@ -498,7 +505,7 @@ public class IlenService {
             try {
                 List<EntryExitEntity> slice = cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
                 List<IdTraceDetailsVO> idTraceDetailsVOList = new ArrayList<>();
-                String name = "----";
+                /*String name = "----";
                 try {
                     User userObj = userRepo.findById(entryExitFilter.getId()).get();
                     name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
@@ -507,9 +514,11 @@ public class IlenService {
                 } catch (NoSuchElementException noSuchElementException) {
                     traceVO.setName(name);
                     log.info("Error {}", noSuchElementException.getMessage());
-                }
+                }*/
                 //traceVO.setId(entryExitFilter.getId());
                 for (EntryExitEntity entryExitEntity : slice) {
+                    traceVO.setId(entryExitEntity.getId());
+                    traceVO.setName(entryExitEntity.getName());
                     IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
                     idTraceDetailsVO.setTime(entryExitEntity.getTime());
                     idTraceDetailsVO.setType(entryExitEntity.getType());
@@ -535,7 +544,7 @@ public class IlenService {
                         List<ExitView> exitDetails = this.getTodayExit(pageNumber, entities.get(val).getId());
                         EntryExit entryExit = new EntryExit();
                         //entryExit.setId(entities.get(val).getId());
-                        String name = "----";
+                        /*String name = "----";
                         try {
                             User userObj = userRepo.findById(Long.parseLong(entities.get(val).getId())).get();
                             name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
@@ -544,7 +553,9 @@ public class IlenService {
                         } catch (NoSuchElementException noSuchElementException) {
                             entryExit.setName(name);
                             log.info("Error {}", noSuchElementException.getMessage());
-                        }
+                        }*/
+                        entryExit.setId(entities.get(val).getId());
+                        entryExit.setName(entities.get(val).getName());
                         entryExit.setEntry_view(entities.get(val));
                         entryExit.setExit_view(exitDetails);
                         entryExits.add(entryExit);
@@ -612,7 +623,9 @@ public class IlenService {
                         List<ExitView> exitDetails = this.exitData(entity.getId(), entryExitFilter.getDate());
                         EntryExit entryExit = new EntryExit();
                         // entryExit.setId(entity.getId());
-                        String name = "----";
+                        entryExit.setId(entity.getId());
+                        entryExit.setName(entity.getName());
+                        /*String name = "----";
                         try {
                             User userObj = userRepo.findById(Long.parseLong(entity.getId())).get();
                             name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
@@ -621,7 +634,7 @@ public class IlenService {
                         } catch (NoSuchElementException noSuchElementException) {
                             entryExit.setName(name);
                             log.info("Error {}", noSuchElementException.getMessage());
-                        }
+                        }*/
                         entryExit.setEntry_view(entity);
                         entryExit.setExit_view(exitDetails);
                         entryExits.add(entryExit);
@@ -1017,14 +1030,15 @@ public class IlenService {
             for (EntryExitEntity entity : entities) {
                 List<ExitView> exitDetails = this.exitData(entity.getId(), entryExitFilter.getDate());
                 entryExit.setId(entity.getId());
-                String name = "----";
+                entryExit.setName(entity.getName());
+                /* String name = "----";
                 try {
                     User userObj = userRepo.findById(Long.parseLong(entity.getId())).get();
                     name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
                     entryExit.setName(name);
                 } catch (NoSuchElementException noSuchElementException) {
                     entryExit.setName(name);
-                }
+                }*/
                 entryExit.setEntry_view(entity);
                 entryExit.setExit_view(exitDetails);
                 entryExits.add(entryExit);

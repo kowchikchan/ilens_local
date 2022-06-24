@@ -10,10 +10,9 @@ from faceDetection.frMethod import FRMethod
 
 
 async def publisher(idOfCamera, cameraUrl, dataApi):
-    host = dataApi[:-6]
+    host = str(dataApi[:-6]).split("//")[1]
     port = dataApi[int(len(dataApi)) - 5:]
-    clientConnection = stomp.Connection()
-    clientConnection.set_ssl(for_hosts=[(host, port)])
+    clientConnection = stomp.Connection([(host, port)])
     clientConnection.connect('admin', 'password', wait=True)
     videoCapture = cv2.VideoCapture(cameraUrl)
     while videoCapture.isOpened():
@@ -33,7 +32,7 @@ async def publisher(idOfCamera, cameraUrl, dataApi):
 
 
 async def consumer(appList, idOfCamera, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken, dataApi):
-    host = dataApi[:-6]
+    host = str(dataApi[:-6]).split("//")[1]
     port = dataApi[int(len(dataApi)) - 5:]
 
     class MyListener(stomp.ConnectionListener):
@@ -62,9 +61,8 @@ async def consumer(appList, idOfCamera, basePath, channelName, frConfigs, postUr
             #     threadPeople = threading.Thread(target=peopleCountMethod(frame, cameraId, channelName, postUrl,
             #                                                              fps)).start()
 
-    serverConnection = stomp.Connection()
+    serverConnection = stomp.Connection([(host, port)])
     serverConnection.set_listener('', MyListener())
-    serverConnection.set_ssl(for_hosts=[(host, port)])
     serverConnection.connect('admin', 'password', wait=True)
     serverConnection.subscribe(destination='/queue/' + idOfCamera, id=1, ack='auto')
     while True:

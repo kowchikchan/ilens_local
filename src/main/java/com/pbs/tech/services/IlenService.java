@@ -113,6 +113,7 @@ public class IlenService {
 
     @Async
     public void startRuntime(String id) throws IlensException, JSONException, IOException, InterruptedException {
+        HashMap<String, String> usersList = new HashMap<>();
         //TODO: check if already running.
         if (isRunning(id)) {
             throw new IlensException("Arleady Running");
@@ -145,8 +146,18 @@ public class IlenService {
         }catch (IndexOutOfBoundsException e){
             throw new IndexOutOfBoundsException("Index Error " + e.getMessage());
         }
+        try {
+            List<User> userObj = (List<User>) userRepo.findAll();
+            for (User user : userObj) {
+                usersList.put(user.getUsername(), user.getFirstName() + " " + user.getLastName());
+            }
+        }catch (NoSuchElementException e){
+            throw new NoSuchElementException(e.getMessage());
+        }
 
         JSONObject configJson = new JSONObject();
+        JSONObject userListJson = new JSONObject();
+        userListJson.put("usersList", usersList);
         configJson.put("dataApi", dataApi.getDataApi());
         configJson.put("reportApi", dataApi.getReportApi());
         configJson.put("apiToken", dataApi.getApiToken());
@@ -192,6 +203,11 @@ public class IlenService {
             FileWriter file = new FileWriter(filePath);
             file.write(String.valueOf(configJson));
             file.close();
+
+            //save user list as json.
+            FileWriter userList = new FileWriter(configsJsonPath + "/userList.json");
+            userList.write(String.valueOf(userListJson));
+            userList.close();
 
             //set permission.
             File filePermission = new File(filePath);
@@ -350,15 +366,7 @@ public class IlenService {
                 entryExist.setTime(now);
                 entryExist.setType(channelData.getType());
                 entryExist.setId(entryExit.getId());
-                String name = "----";
-                try {
-                    User userObj = userRepo.findByUsername(entryExit.getId());
-                    name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
-                    entryExist.setName(name);
-                } catch (NoSuchElementException noSuchElementException) {
-                    entryExist.setName(name);
-                    log.info("Error {}", noSuchElementException.getMessage());
-                }
+                entryExist.setName(entryExit.getName());
                 entryExist.setLocation(Long.toString(channelData.getChannelId()));
                 entryExist.setSnapshot(channelData.getSnapshot());
 

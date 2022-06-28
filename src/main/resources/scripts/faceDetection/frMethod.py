@@ -1,8 +1,13 @@
 import os, cv2, json, pickle, requests, urllib3, numpy as np
 from datetime import datetime
-from face_recognition import face_encodings
-from face_recognition import face_locations
+from face_recognition import face_encodings, face_locations
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+try:
+    f = open(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)) + "/userList.json", "r")
+    data = json.loads(f.read())
+except IOError as e:
+    raise IOError("Users list not found", e)
 
 
 def adjustGamma(image, gamma=1.0):
@@ -40,7 +45,7 @@ def featuresAndLabels():
             loadedModelLabel = pickle.load(open(os.path.join(path, fileName), 'rb'))
             for eachLabel in loadedModelLabel:
                 modelLabel.append(eachLabel)
-    print(f'Labels, {modelLabel}')
+    print(f'Labels: {modelLabel}')
     return modelFeature, modelLabel
 
 
@@ -61,9 +66,8 @@ class FRMethod:
         self.startTime = startTime
 
     def liveMethod(self):
-        now = datetime.now()
+        now, json_values, emp_name = datetime.now(), {}, "----"
         dt_string = now.strftime("%d%m%Y%H%M%S")
-        json_values = {}
         img = adjustGamma(self.frame, gamma=1.7)
         img = cv2.resize(img, (0, 0), fx=0.30, fy=0.30)
         faces = face_locations(img)
@@ -88,8 +92,9 @@ class FRMethod:
                     matchIndex = np.argmin(faceDistance)
                     if matches[matchIndex]:
                         emp_id = modelLabels[matchIndex]
+                        if data['usersList'].get(emp_id): emp_name = data['usersList'].get(emp_id)
                         face_file_name = "".join([self.dataLocation, "/", dt_string, ".jpg"])
-                        json_values["entryExit"] = [{"id": emp_id, "name": ""}]
+                        json_values["entryExit"] = [{"id": emp_id, "name": emp_name}]
                         json_values["entryViolationVos"] = None
                         json_values["npr"] = None
                         json_values["socialViolation"] = None
@@ -98,8 +103,8 @@ class FRMethod:
                         try:
                             headers = {'Content-type': 'application/json', 'Accept': 'text/plain',
                                        'CLIENT_KEY': str(self.apiToken)}
-                            response = requests.post(url=self.postURL, data=json.dumps(json_values), headers=headers,
-                                                     verify=False)
+                            response = requests.post(url=self.postURL + "/dataset", data=json.dumps(json_values),
+                                                     headers=headers, verify=False)
                             diff1 = datetime.now() - self.startTime
                             print()
                             print("[INFO]: Captured Information Post Response : {}", response.status_code)
@@ -112,8 +117,8 @@ class FRMethod:
                     try:
                         headers = {'Content-type': 'application/json', 'Accept': 'text/plain',
                                    'CLIENT_KEY': str(self.apiToken)}
-                        requests.post(url="https://127.0.0.1:8088/api/v1/ilens/unknown/save", data=json.dumps(json_values), headers=headers,
-                                                 verify=False)
+                        requests.post(url=self.postURL + "/unknown/save", data=json.dumps(json_values),
+                                      headers=headers, verify=False)
                     except ConnectionError as e:
                         raise ConnectionError("Connection Exception {}", e)
             json_values.clear()

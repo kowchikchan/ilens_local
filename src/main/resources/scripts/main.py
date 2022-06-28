@@ -15,7 +15,7 @@ async def publisher(idOfCamera, cameraUrl, dataApi):
     clientConnection = stomp.Connection([(host, port)])
     clientConnection.connect('admin', 'password', wait=True)
     videoCapture = cv2.VideoCapture(cameraUrl)
-    while videoCapture.isOpened():
+    while True:
         await asyncio.sleep(0)
         ret, frame = videoCapture.read()
         if ret:
@@ -80,19 +80,19 @@ if __name__ == "__main__":
     try:
         f = open(inputData.jsonInput, "r")
         data = json.loads(f.read())
-        print(f'Configurations data {data}')
+        # print(f'Configurations data {data}')
     except IOError as e:
         raise IOError("Configurations Not Found ", e)
 
     # basic camera Configuration
     postUrl = data['reportApi'] if str(data['reportApi']).endswith("/") else str(data['reportApi']) + "/"
-    postUrl = postUrl + "api/v1/ilens/dataset"
+    postUrl = postUrl + "api/v1/ilens"
     cameraId, cameraIp, channelName, apiToken = data['id'], data['ip'], data['name'], data['apiToken']
 
     # base path and data location
     basePath, dataLocation = inputData.basePath, inputData.dataLocation
     cameraURL = "".join(["rtsp://", cameraIp, ":554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream"])
-    print(f'Camera URL: {cameraURL}')
+    print(f'Camera: {cameraIp}')
 
     # fr configurations
     # appsList = []

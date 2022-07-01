@@ -199,10 +199,10 @@ echo " JAVA_OPTS=$JAVA_OPTS"
 echo " @extra_java_opts_property@=$@extra_java_opts_property@"
 echo " CMD=$JAVACMD $@"
 echo "--------------------------------------------------------------"
-echo " POWERED By LOGICFOCUS TECH"
+echo " POWERED By LOGICFOCUS TECH."
 echo "--------------------------------------------------------------"
 # Starting Queue
-nohup .$HOME/ilens/queue/apache-activemq-5.16.4/bin/activemq start
+nohup $HOME/ilens/queue/apache-activemq-5.16.4/bin/activemq start
 nohup $JAVACMD $@ > /dev/null  2>&1 &
 
 echo $! > pid.out

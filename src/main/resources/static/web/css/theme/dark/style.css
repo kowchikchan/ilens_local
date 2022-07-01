@@ -4123,6 +4123,16 @@ button#retains-period-dd {
   margin-top: -10px;
 }
 
+#grace-time{
+  position: relative;
+  margin-top: 29px;
+}
+
+#timeSelector{
+  width: 12%;
+  margin-left: 10px;
+}
+
 
 
 

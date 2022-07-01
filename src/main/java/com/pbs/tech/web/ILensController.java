@@ -161,6 +161,9 @@ public class ILensController {
     @GetMapping("/violation")
     public String violation(){return "violation";}
 
+    @GetMapping("/data_configuration")
+    public String dataConfiguration(){return "data_configuration";}
+
     @GetMapping(path = "/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         request.getSession().invalidate();

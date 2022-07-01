@@ -111,6 +111,9 @@ public class IlenService {
     @Autowired
     DataApiRepo dataApiRepo;
 
+    @Autowired
+    ConfigurationServices configurationServices;
+
     @Async
     public void startRuntime(String id) throws IlensException, JSONException, IOException, InterruptedException {
         HashMap<String, String> usersList = new HashMap<>();
@@ -729,6 +732,9 @@ public class IlenService {
 
     public long getOnTimeEntry() {
         Calendar date = new GregorianCalendar();
+        Configurations configuration = configurationServices.getList();
+        String[] onTimeList = configuration.getOnTime().split(":");
+
         // reset hour, minutes, seconds and millis
         date.set(Calendar.HOUR_OF_DAY, 0);
         date.set(Calendar.MINUTE, 0);
@@ -736,8 +742,8 @@ public class IlenService {
         date.set(Calendar.MILLISECOND, 0);
         Date today = date.getTime();
         //set limit on 8'o clock.
-        date.set(Calendar.HOUR_OF_DAY,9);
-        date.set(Calendar.MINUTE, 30);
+        date.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onTimeList[0]));
+        date.set(Calendar.MINUTE, Integer.parseInt(onTimeList[1]));
         Date onTime = date.getTime();
         Iterable slice = entryExitRepo.getLastHourEntryOrOnTimeEntry(today,onTime);
 
@@ -746,17 +752,20 @@ public class IlenService {
 
     public long getGraceTimeEntry() {
         Calendar date = new GregorianCalendar();
+        Configurations configuration = configurationServices.getList();
+        String[] onTimeList = configuration.getOnTime().split(":");
+        String[] graceTimeList = configuration.getGraceTime().split(":");
 
         //set onTime.
-        date.set(Calendar.HOUR_OF_DAY,9);
-        date.set(Calendar.MINUTE, 30);
+        date.set(Calendar.HOUR_OF_DAY,Integer.parseInt(onTimeList[0]));
+        date.set(Calendar.MINUTE, Integer.parseInt(onTimeList[1]));
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
         Date onTime = date.getTime();
 
         //Set graceTime.
-        date.set(Calendar.HOUR_OF_DAY, 10);
-        date.set(Calendar.MINUTE,0);
+        date.set(Calendar.HOUR_OF_DAY, Integer.parseInt(graceTimeList[0]));
+        date.set(Calendar.MINUTE,Integer.parseInt(graceTimeList[1]));
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
 

@@ -3090,6 +3090,7 @@ object {
   color: white;
     margin-left: 50px;
     font-size: 16px;
+    display: initial; !important;
 }
 .dlens_input {
   width: 35%;
@@ -3298,6 +3299,7 @@ a.dropdown-item {
 .dropdown-menu.show {
   background: #062e51;
   border: 1px solid #f9c631;
+  min-width: 11rem;
 }
 .footer1 {
   justify-content: flex-end;
@@ -4085,3 +4087,46 @@ tbody#nprList:hover {
   height: 18px;
   width: 19px;
 }
+button#retains-period-dd {
+    position: relative;
+    left: 249px;
+    top: -26px;
+}
+.dropBtn-retains {
+    position: relative;
+    width: 180px;
+    cursor: pointer;
+    background-color: #1e384800;
+    text-align: left;
+    padding: 4px;
+    color: #fff;
+    font-size: 17px;
+    border: 1px solid #a08852;
+    border-radius: 6px;
+    text-decoration: none;
+    top: 16px;
+}
+
+#videoSaveOption{
+  position: relative;
+  display: block;
+  padding-left: 1.25rem;
+  margin-left: 246px;
+  margin-top: -22px;
+  width: 26px;
+  height: 21px
+}
+
+#data-configuration-margin{
+  position: relative;
+  margin-left: -58px;
+  margin-top: -10px;
+}
+
+
+
+
+
+
+
+

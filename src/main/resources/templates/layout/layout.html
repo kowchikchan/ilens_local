@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.css"/>
     <link rel="stylesheet" href="/vendor/fontawesome/css/font-awesome.css"/>
     <link rel="stylesheet" href="/vendor/jquery-autocomplete/css/styles.css"/>
+    <link rel="stylesheet" href="/vendor/web-6.1.1/css/all.css"/>
+    <link rel="stylesheet" href="/vendor/web-6.1.1/css/all.min.css"/>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +39,7 @@
     <header class="sidebar-section">
         <div class="navbar-vertical">
             <div class="user row">
-                <img src="/web/images/2.png">
+                <img src="/web/images/profile.png">
                 <div class="ml-10">
                     <span class="username">[[${session.USER.userId}]]</span><br>
                     <span id="UserRole">[[${session.ROLE}]]</span>
@@ -75,12 +77,14 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#Adms" id="navadms" data-toggle="collapse" aria-expanded="false"> <i class="fa fa-user-plus nav-icon ex" data-toggle="tooltip" data-original-title="Administration"></i><span>Administration  </span>
+                    <a href="#Adms" id="navadms" data-toggle="collapse" aria-expanded="false"> <i class="fas fa-user-cog nav-icon ex" data-toggle="tooltip" data-original-title="Administration"></i><span>Administration  </span>
                     </a>
                     <ul id="Adms" class="nav nav-second collapse mk">
                         <li class="sec_li"><a href="/data_api"  id="dataapi"><i class="fa fa-cloud" data-toggle="tooltip" data-original-title="Data Api"></i> <span>Data Api</span>
                         </a></li>
                         <li class="sec_li"><a href="/licence"  id="licence"><i class="fa fa-newspaper-o" data-toggle="tooltip" data-original-title="licenece"></i> <span>Licenece</span>
+                        </a></li>
+                        <li class="sec_li"><a href="/data_configuration"  id="data_configuration"><i class="fa-solid fa-gear" data-toggle="tooltip" data-original-title="Configurations"></i> <span>Configurations</span>
                         </a></li>
                         <!-- <li class="sec_li"><a href="/settings"  id="settings"><i class="fa fa fa-gear" data-toggle="tooltip" data-original-title="Settings"></i> <span>Settings</span>
                         </a></li>                                      -->
@@ -88,7 +92,7 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="/profile" id="profile"><em class="fa fa-user nav-icon" data-toggle="tooltip" data-original-title="Profile"></em><span>Profile</span>
+                    <a href="/profile" id="profile"><em class="fas fa-user-circle nav-icon fa-lg" data-toggle="tooltip" data-original-title="Profile"></em><span>Profile</span>
                     </a>
                 </li>
                 <img src="/web/images/Asset 1.png" class="nav-logo">

@@ -111,8 +111,12 @@ public class IlenService {
     @Autowired
     DataApiRepo dataApiRepo;
 
+    @Autowired
+    ConfigurationServices configurationServices;
+
     @Async
     public void startRuntime(String id) throws IlensException, JSONException, IOException, InterruptedException {
+        HashMap<String, String> usersList = new HashMap<>();
         //TODO: check if already running.
         if (isRunning(id)) {
             throw new IlensException("Arleady Running");
@@ -145,8 +149,18 @@ public class IlenService {
         }catch (IndexOutOfBoundsException e){
             throw new IndexOutOfBoundsException("Index Error " + e.getMessage());
         }
+        try {
+            List<User> userObj = (List<User>) userRepo.findAll();
+            for (User user : userObj) {
+                usersList.put(user.getUsername(), user.getFirstName() + " " + user.getLastName());
+            }
+        }catch (NoSuchElementException e){
+            throw new NoSuchElementException(e.getMessage());
+        }
 
         JSONObject configJson = new JSONObject();
+        JSONObject userListJson = new JSONObject();
+        userListJson.put("usersList", usersList);
         configJson.put("dataApi", dataApi.getDataApi());
         configJson.put("reportApi", dataApi.getReportApi());
         configJson.put("apiToken", dataApi.getApiToken());
@@ -192,6 +206,11 @@ public class IlenService {
             FileWriter file = new FileWriter(filePath);
             file.write(String.valueOf(configJson));
             file.close();
+
+            //save user list as json.
+            FileWriter userList = new FileWriter(configsJsonPath + "/userList.json");
+            userList.write(String.valueOf(userListJson));
+            userList.close();
 
             //set permission.
             File filePermission = new File(filePath);
@@ -352,7 +371,6 @@ public class IlenService {
                 entryExist.setId(entryExit.getId());
                 entryExist.setName(entryExit.getName());
                 entryExist.setLocation(Long.toString(channelData.getChannelId()));
-                entryExist.setName(channelData.getChannelName());
                 entryExist.setSnapshot(channelData.getSnapshot());
 
                 // save person details, if violated.
@@ -498,7 +516,7 @@ public class IlenService {
             try {
                 List<EntryExitEntity> slice = cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
                 List<IdTraceDetailsVO> idTraceDetailsVOList = new ArrayList<>();
-                String name = "----";
+                /*String name = "----";
                 try {
                     User userObj = userRepo.findById(entryExitFilter.getId()).get();
                     name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
@@ -507,9 +525,11 @@ public class IlenService {
                 } catch (NoSuchElementException noSuchElementException) {
                     traceVO.setName(name);
                     log.info("Error {}", noSuchElementException.getMessage());
-                }
+                }*/
                 //traceVO.setId(entryExitFilter.getId());
                 for (EntryExitEntity entryExitEntity : slice) {
+                    traceVO.setId(entryExitEntity.getId());
+                    traceVO.setName(entryExitEntity.getName());
                     IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
                     idTraceDetailsVO.setTime(entryExitEntity.getTime());
                     idTraceDetailsVO.setType(entryExitEntity.getType());
@@ -535,7 +555,7 @@ public class IlenService {
                         List<ExitView> exitDetails = this.getTodayExit(pageNumber, entities.get(val).getId());
                         EntryExit entryExit = new EntryExit();
                         //entryExit.setId(entities.get(val).getId());
-                        String name = "----";
+                        /*String name = "----";
                         try {
                             User userObj = userRepo.findById(Long.parseLong(entities.get(val).getId())).get();
                             name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
@@ -544,7 +564,9 @@ public class IlenService {
                         } catch (NoSuchElementException noSuchElementException) {
                             entryExit.setName(name);
                             log.info("Error {}", noSuchElementException.getMessage());
-                        }
+                        }*/
+                        entryExit.setId(entities.get(val).getId());
+                        entryExit.setName(entities.get(val).getName());
                         entryExit.setEntry_view(entities.get(val));
                         entryExit.setExit_view(exitDetails);
                         entryExits.add(entryExit);
@@ -612,7 +634,9 @@ public class IlenService {
                         List<ExitView> exitDetails = this.exitData(entity.getId(), entryExitFilter.getDate());
                         EntryExit entryExit = new EntryExit();
                         // entryExit.setId(entity.getId());
-                        String name = "----";
+                        entryExit.setId(entity.getId());
+                        entryExit.setName(entity.getName());
+                        /*String name = "----";
                         try {
                             User userObj = userRepo.findById(Long.parseLong(entity.getId())).get();
                             name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
@@ -621,7 +645,7 @@ public class IlenService {
                         } catch (NoSuchElementException noSuchElementException) {
                             entryExit.setName(name);
                             log.info("Error {}", noSuchElementException.getMessage());
-                        }
+                        }*/
                         entryExit.setEntry_view(entity);
                         entryExit.setExit_view(exitDetails);
                         entryExits.add(entryExit);
@@ -708,6 +732,9 @@ public class IlenService {
 
     public long getOnTimeEntry() {
         Calendar date = new GregorianCalendar();
+        Configurations configuration = configurationServices.getList();
+        String[] onTimeList = configuration.getOnTime().split(":");
+
         // reset hour, minutes, seconds and millis
         date.set(Calendar.HOUR_OF_DAY, 0);
         date.set(Calendar.MINUTE, 0);
@@ -715,8 +742,8 @@ public class IlenService {
         date.set(Calendar.MILLISECOND, 0);
         Date today = date.getTime();
         //set limit on 8'o clock.
-        date.set(Calendar.HOUR_OF_DAY,9);
-        date.set(Calendar.MINUTE, 30);
+        date.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onTimeList[0]));
+        date.set(Calendar.MINUTE, Integer.parseInt(onTimeList[1]));
         Date onTime = date.getTime();
         Iterable slice = entryExitRepo.getLastHourEntryOrOnTimeEntry(today,onTime);
 
@@ -725,17 +752,20 @@ public class IlenService {
 
     public long getGraceTimeEntry() {
         Calendar date = new GregorianCalendar();
+        Configurations configuration = configurationServices.getList();
+        String[] onTimeList = configuration.getOnTime().split(":");
+        String[] graceTimeList = configuration.getGraceTime().split(":");
 
         //set onTime.
-        date.set(Calendar.HOUR_OF_DAY,9);
-        date.set(Calendar.MINUTE, 30);
+        date.set(Calendar.HOUR_OF_DAY,Integer.parseInt(onTimeList[0]));
+        date.set(Calendar.MINUTE, Integer.parseInt(onTimeList[1]));
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
         Date onTime = date.getTime();
 
         //Set graceTime.
-        date.set(Calendar.HOUR_OF_DAY, 10);
-        date.set(Calendar.MINUTE,0);
+        date.set(Calendar.HOUR_OF_DAY, Integer.parseInt(graceTimeList[0]));
+        date.set(Calendar.MINUTE,Integer.parseInt(graceTimeList[1]));
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
 
@@ -1017,14 +1047,15 @@ public class IlenService {
             for (EntryExitEntity entity : entities) {
                 List<ExitView> exitDetails = this.exitData(entity.getId(), entryExitFilter.getDate());
                 entryExit.setId(entity.getId());
-                String name = "----";
+                entryExit.setName(entity.getName());
+                /* String name = "----";
                 try {
                     User userObj = userRepo.findById(Long.parseLong(entity.getId())).get();
                     name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
                     entryExit.setName(name);
                 } catch (NoSuchElementException noSuchElementException) {
                     entryExit.setName(name);
-                }
+                }*/
                 entryExit.setEntry_view(entity);
                 entryExit.setExit_view(exitDetails);
                 entryExits.add(entryExit);

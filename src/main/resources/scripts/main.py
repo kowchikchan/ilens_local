@@ -10,13 +10,12 @@ from faceDetection.frMethod import FRMethod
 
 
 async def publisher(idOfCamera, cameraUrl, dataApi):
-    host = dataApi[:-6]
+    host = str(dataApi[:-6]).split("//")[1]
     port = dataApi[int(len(dataApi)) - 5:]
-    clientConnection = stomp.Connection()
-    clientConnection.set_ssl(for_hosts=[(host, port)])
+    clientConnection = stomp.Connection([(host, port)])
     clientConnection.connect('admin', 'password', wait=True)
     videoCapture = cv2.VideoCapture(cameraUrl)
-    while videoCapture.isOpened():
+    while True:
         await asyncio.sleep(0)
         ret, frame = videoCapture.read()
         if ret:
@@ -33,7 +32,7 @@ async def publisher(idOfCamera, cameraUrl, dataApi):
 
 
 async def consumer(appList, idOfCamera, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken, dataApi):
-    host = dataApi[:-6]
+    host = str(dataApi[:-6]).split("//")[1]
     port = dataApi[int(len(dataApi)) - 5:]
 
     class MyListener(stomp.ConnectionListener):
@@ -62,9 +61,8 @@ async def consumer(appList, idOfCamera, basePath, channelName, frConfigs, postUr
             #     threadPeople = threading.Thread(target=peopleCountMethod(frame, cameraId, channelName, postUrl,
             #                                                              fps)).start()
 
-    serverConnection = stomp.Connection()
+    serverConnection = stomp.Connection([(host, port)])
     serverConnection.set_listener('', MyListener())
-    serverConnection.set_ssl(for_hosts=[(host, port)])
     serverConnection.connect('admin', 'password', wait=True)
     serverConnection.subscribe(destination='/queue/' + idOfCamera, id=1, ack='auto')
     while True:
@@ -82,19 +80,19 @@ if __name__ == "__main__":
     try:
         f = open(inputData.jsonInput, "r")
         data = json.loads(f.read())
-        print(f'Configurations data {data}')
+        # print(f'Configurations data {data}')
     except IOError as e:
         raise IOError("Configurations Not Found ", e)
 
     # basic camera Configuration
     postUrl = data['reportApi'] if str(data['reportApi']).endswith("/") else str(data['reportApi']) + "/"
-    postUrl = postUrl + "api/v1/ilens/dataset"
+    postUrl = postUrl + "api/v1/ilens"
     cameraId, cameraIp, channelName, apiToken = data['id'], data['ip'], data['name'], data['apiToken']
 
     # base path and data location
     basePath, dataLocation = inputData.basePath, inputData.dataLocation
     cameraURL = "".join(["rtsp://", cameraIp, ":554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream"])
-    print(f'Camera URL: {cameraURL}')
+    print(f'Camera: {cameraIp}')
 
     # fr configurations
     # appsList = []

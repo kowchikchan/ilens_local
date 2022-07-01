@@ -21,7 +21,6 @@ public class ChannelsRest {
 
     @GetMapping("/{filter}")
     public ResponseEntity<Object> getChannels(@RequestHeader("CLIENT_KEY") String clientKey, @PathVariable(required = false) String filter){
-        System.out.println("Filler "+filter);
         return new ResponseEntity<Object>(channelsServices.getConnected(filter), HttpStatus.OK);
     }
 

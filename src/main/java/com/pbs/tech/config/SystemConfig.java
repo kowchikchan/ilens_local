@@ -1,6 +1,8 @@
 package com.pbs.tech.config;
 
+import com.pbs.tech.model.Configurations;
 import com.pbs.tech.model.DataApi;
+import com.pbs.tech.repo.ConfigurationsRepo;
 import com.pbs.tech.repo.DataApiRepo;
 import com.pbs.tech.services.UserService;
 import com.pbs.tech.vo.UserVo;
@@ -29,6 +31,9 @@ public class SystemConfig {
 
     @Autowired
     DataApiRepo dataApiRepo;
+
+    @Autowired
+    ConfigurationsRepo configurationsRepo;
 
     @Value("${ilens.python.path}")
     String pythonPath;
@@ -65,12 +70,28 @@ public class SystemConfig {
             dataApi = dataApiRepo.findById(0L).get();
         }catch (NoSuchElementException e){
             dataApi = new DataApi();
-            dataApi.setDataApi("http://127.0.0.1:61616");
+            dataApi.setDataApi("http://127.0.0.1:61613");
             dataApi.setReportApi("https://127.0.0.1:8088");
             dataApi.setApiToken("ilens ~ org.springframework.security" +
                     ".authentication.UsernamePasswordAuthenticationToken@fc1b0f20:" +
                     " Principal: Admin; Credentials: [PROTECTED]");
             dataApiRepo.save(dataApi);
+        }
+
+        // Default Configurations.
+        Configurations configurations;
+        try {
+            configurations = configurationsRepo.findById(0L).get();
+        }catch (NoSuchElementException e){
+            configurations = new Configurations();
+            configurations.setId(0L);
+            configurations.setRetainsPeriod(0);
+            configurations.setVideoStatus(false);
+            configurations.setOnTime("8:0");
+            configurations.setGraceTime("8:10");
+            configurations.setCreatedBy("Admin");
+            configurations.setCreatedDt(new Date());
+            configurationsRepo.save(configurations);
         }
 
         // Start RTSP Server.

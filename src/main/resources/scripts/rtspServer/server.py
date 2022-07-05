@@ -26,4 +26,5 @@ async def main(ip):
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, threaded=True)
+    context = ('ilensCert.crt', 'ilensKey.key')
+    app.run(host='0.0.0.0', port=5000, threaded=True, ssl_context=context)

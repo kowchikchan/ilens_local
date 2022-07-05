@@ -265,11 +265,11 @@ $(document).ready(function(){
   const url = window.location.href.toString().split("//");
   const colonSplit = url[1].split(":");
   var ip = colonSplit[0];
-  liveVideoDiv = liveVideoDiv + '<img id="liveVideoId" src="http://127.0.0.1:5000/' + camIp + '">';
+  liveVideoDiv = liveVideoDiv + '<img id="liveVideoId" src="http://'+ ip +':5000/' + camIp + '">';
   $("#liveVideoDiv").html(liveVideoDiv).show();
 
   var liveVideoDivAtFR = "";
-  liveVideoDivAtFR = liveVideoDivAtFR + '<img id="liveVideoIdAtFr" src="http://127.0.0.1:5000/' + camIp + '">'
+  liveVideoDivAtFR = liveVideoDivAtFR + '<img id="liveVideoIdAtFr" src="http://'+ ip +':5000/' + camIp + '">'
   $("#liveVideoDivAtFR").html(liveVideoDivAtFR).show();
 
 

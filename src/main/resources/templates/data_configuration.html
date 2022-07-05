@@ -1,58 +1,86 @@
 <!DOCTYPE html>
 <html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
 <head>
-  <title>[[${APP_NAME}]] - Agents</title>
+	<title>[[${APP_NAME}]] - Agents</title>
 </head>
 <body>
 <div layout:fragment="content" class="contant">
-  <div class="pre-loading">
-    <img class="loader" src="/web/images/loader.png" />
-  </div>
-  <div class="heading">
-    <span class="heading-text fs-30">Data Configurations</span>
-  </div>
-  <div class="main-table zoom2">
-    <div class="data_api">
-      <div class="apisty">
-        <div class="col-md-12 p-0" id="data-configuration-margin">
-          <label class="dinput-labels">Data retains period <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Data Retains Period keeps the data for the required number of days." ></i></label>
-          <div></div>
-          <div></div>
-          <!-- <input type="text"  class="dlens_input"  id="apiValue" /> -->
-            <button class="dropBtn-retains dropdown-toggle" type="button" id="retains-period-dd" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <span id="text">Retains periods</span>
-            </button>
-            <div class="dropdown-menu" aria-labelledby="retains-period-dd">
-              <a class="dropdown-item" href="#" id="fil"  onclick="eachSelect($(this).text())">30 Days</a>
-              <a class="dropdown-item" href="#" id="fil" onclick="eachSelect($(this).text())">35 Days</a>
-              <a class="dropdown-item" href="#" id="fil" onclick="eachSelect($(this).text())" >40 Days</a>
-            </div>
-        <div class="col-md-12 p-0"> 
-          <label class="dinput-labels">Video save option <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="If video save option checked, your video will save; otherwise, it won't." ></i></label>
-            <input class="form-check-input" type="checkbox" value="" id="videoSaveOption"/>
-          <!-- <input type="text"  class="Report_input"  id="reportValue" /> -->
+	<div class="pre-loading">
+    	<img class="loader" src="/web/images/loader.png" />
+  	</div>
+      <div class="heading">
+        <span class="heading-text fs-30">Settings</span>
+    </div>
+    <div class="main-table">  
+        <div class="data_api">
+                <div class="apisty">
+                    <div class="row g-0">	
+                        <div class="col-md-12 dFlex">
+                            <div class="col-md-2">
+                            <label class="config_labels">Data retains period <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="don" ></i></label>
+                            </div>
+                            <div class="col-md-8">
+                                <select class="retains_sec" id="dayRetains" name="dayRetains">                  
+                                    <option selected="" value="0">Retains periods</option>
+                                    <option value="30">30 Days</option>
+                                    <option value="35">35 Days</option>
+                                    <option value="40">40 Days</option>
+                                </select>
+                            </div>
+                        </div>    
+                        <div class="col-md-12 dFlex pt-3">
+                            <div class="col-md-2">
+                                <label class="config_labels">Expected entry time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="don" ></i></label>
+                            </div>
+                            <div class="col-md-8">
+                                <input type="text" id="timeSelector" class="expectedEntry" name="timeSelector"/>
+                            </div>
+                        </div>      
+                        <div class="col-md-12 dFlex pt-3">
+                            <div class="col-md-2">
+                                <label class="config_labels">Grace Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="don" ></i></label>
+                            </div>
+                            <div class="col-md-8">
+                                <input type="text" id="graceTime" class="expectedEntry" name="graceTIme"/>
+                            </div>    
+                        </div>
+                        <div class="col-md-12 dFlex pt-3">
+                            <div class="col-md-2">
+                                <label class="config_labels">Video save option <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="don" ></i></label>
+                            </div>
+                            <div class="col-md-8">
+                                <input type="checkbox" class="save_check" id="saveCheck" name="savecheck">
+                            </div>
+                        </div> 
+                    </div>
+                 </div>
+        <div>
+            <button type="button"  class="api-button" id="update" >Update</button>
         </div>
 
-        <div></div>
-        <div></div>
-
-        <div class="col-md-12 p-0" id="grace-time">
-          <label class="dinput-labels">Expected entry time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="depending on this time, display the on-time entry data." ></i></label>
-          <input type="time" id="timeSelector" name="timeSelector">
-        
-        </div>
-
-      </div>
     </div>
-    <div>
-      <button type="button"  class="api-button" id="update" >Update</button>
-    </div>
-  </div>
-  <script>
+<script>
   	$(document).ready(function(){
+        configurationsList();
+      $('#timeSelector').datetimepicker({
+        format: 'LT',
+        showClear:true,
+        toolbarPlacement: 'bottom',
+        showClose:true
+      });
+    //   var dates= moment().format("MM/DD/YYYY");
+    //   var datetime = moment(dates+" "+$('#timeSelector').val()).add(30, 'minutes');
+      $('#graceTime').datetimepicker({
+        format: 'LT',
+        showClear:true,
+        toolbarPlacement: 'bottom',
+        // maxDate: datetime,
+        showClose:true
+      });
+    //   console.log(moment(datetime).add(30, 'minutes').format("DD/MM/YYYY HH:mm a"));
       $("#navadms").addClass('active');
       $("#Adms").addClass('show');
-      $("#dataapi").addClass('active');
+      $("#data_configuration").addClass('active');
       toastr.options = {
           debug: false,
           newestOnTop: false,
@@ -66,16 +94,75 @@
          })
     })
 
-$("#update").click(function(){console.log("update clicked");})
+    $("#update").click(function(){
+    var retainsPeriod=$("#dayRetains").val();
+    var videoStatus=$("#saveCheck").is(':checked') ? true : false;
+    var graceTime=$("#graceTime").val();
+    var graceTimeMins=($("#graceTime").val()).split(":");
+    if(graceTimeMins[1].charAt(0) == '0'){
+        graceTime = graceTimeMins[0]+":"+graceTimeMins[1].replace('0','');
+    }
+    var onTime=$("#timeSelector").val();
+    var onTimeMin=($("#timeSelector").val()).split(":");
+    if(onTimeMin[1].charAt(0) == '0'){
+        onTime = onTimeMin[0]+":"+onTimeMin[1].replace('0','');
+    }
+    var id=0;
+      var data={
+        retainsPeriod:retainsPeriod,
+        onTime:onTime,
+        videoStatus:videoStatus,
+        graceTime:graceTime,
+        id:id
+      }
+    var sessionToken = "[[${session.API_TOKEN}]]";
+    var apiUrl = "api/v1/configurations/save";
+     $.ajax({
+          contentType: "application/json;charset=UTF-8",
+          url:apiUrl,
+          headers:{'CLIENT_KEY':sessionToken},
+          type: 'POST',
+          data: JSON.stringify(data),
+          async: false,
+          success: function(data){
+            setTimeout(function(){ toastr.success("Configuration updated"); }, 1000);
+          },
+          error: function(err){
+            setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+          }
+        });
+    })
+    
+    function configurationsList(){
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/configurations/list";  
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url: apiUrl,
+            dataType:'json',      
+            headers:{'CLIENT_KEY': sessionToken},
+            type: 'GET',
+            async: false,
+            success: function(data){ 
+                    $("#dayRetains").val(data.retainsPeriod);
+                    $("#timeSelector").val(data.onTime);
+                    $("#graceTime").val(data.graceTime);
+                    if(data.videoStatus == true){
+                        $("#saveCheck").prop( "checked", true )
+                    }
 
-  function eachSelect(values){
-    console.log("selected value : " + values);
-    $("#text").html(values);
-  }
+            },
+            error: function(err){
+                setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+            }
+        });
+    }
+
+
 
 
 </script>
-</div>
 
+</div>
 </body>
 </html>

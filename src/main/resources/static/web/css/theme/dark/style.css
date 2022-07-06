@@ -4127,10 +4127,49 @@ button#retains-period-dd {
   position: relative;
   margin-top: 29px;
 }
-
-#timeSelector{
-  width: 12%;
-  margin-left: 10px;
+.expectedEntry {
+  position: relative;
+  cursor: pointer;
+  background-color: #1e384800;
+  text-align: left;
+  padding: 4px;
+  color: #fff;
+  border: 1px solid #a08852;
+  border-radius: 6px;
+  text-decoration: none;
+  width: 162px;
+}
+.bootstrap-datetimepicker-widget table td i {
+  color: #f9c631 !important;
+}
+.bootstrap-datetimepicker-widget table td i:hover {
+  color: #084174 !important;
+}
+#graceTime option {
+  background: #084174;
+}
+#dayRetains option {
+  background: #084174;
+}
+.config_labels {
+  color: white;
+  font-size: 16px;
+  display: initial;
+}
+.dFlex{
+  display:flex;
+}
+@media only screen and (max-width:764px) {
+  .dFlex{
+    display:grid;
+    text-align: center;
+  }
+  .retains_sec{
+    width: 100%;
+  }
+  .expectedEntry{
+    width: 100%;
+  }
 }
 
 

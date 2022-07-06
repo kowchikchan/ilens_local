@@ -25,7 +25,7 @@ async def publisher(idOfCamera, cameraUrl, dataApi):
                 clientConnection.send(body=encodedData, destination='/queue/' + idOfCamera,
                                       headers={'persistent': 'true'})
                 print()
-            except UnicodeEncodeError:
+            except Exception as e:
                 continue
     # time.sleep(2)
     # clientConnection.disconnect()

@@ -85,10 +85,10 @@ public class SystemConfig {
         }catch (NoSuchElementException e){
             configurations = new Configurations();
             configurations.setId(0L);
-            configurations.setRetainsPeriod(0);
+            configurations.setRetainsPeriod(30);
             configurations.setVideoStatus(false);
-            configurations.setOnTime("8:0");
-            configurations.setGraceTime("8:10");
+            configurations.setOnTime("9:0 AM");
+            configurations.setGraceTime("9:10 AM");
             configurations.setCreatedBy("Admin");
             configurations.setCreatedDt(new Date());
             configurationsRepo.save(configurations);

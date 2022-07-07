@@ -2,8 +2,10 @@ package com.pbs.tech.config;
 
 import com.pbs.tech.model.Configurations;
 import com.pbs.tech.model.DataApi;
+import com.pbs.tech.model.ReportPeriod;
 import com.pbs.tech.repo.ConfigurationsRepo;
 import com.pbs.tech.repo.DataApiRepo;
+import com.pbs.tech.repo.ReportPeriodRepo;
 import com.pbs.tech.services.UserService;
 import com.pbs.tech.vo.UserVo;
 import org.slf4j.Logger;
@@ -34,6 +36,9 @@ public class SystemConfig {
 
     @Autowired
     ConfigurationsRepo configurationsRepo;
+
+    @Autowired
+    ReportPeriodRepo reportPeriodRepo;
 
     @Value("${ilens.python.path}")
     String pythonPath;
@@ -92,6 +97,22 @@ public class SystemConfig {
             configurations.setCreatedBy("Admin");
             configurations.setCreatedDt(new Date());
             configurationsRepo.save(configurations);
+        }
+
+        // Default Report API Data.
+        ReportPeriod reportPeriod;
+        try {
+            reportPeriod = reportPeriodRepo.findById(0L).get();
+        }catch (NoSuchElementException e){
+            reportPeriod = new ReportPeriod();
+            reportPeriod.setId(0L);
+            reportPeriod.setReportPeriod(7);
+            reportPeriod.setMail("ilens.logicfocus@logicfocus.com");
+            reportPeriod.setCreatedBy("Admin");
+            reportPeriod.setCreatedDt(new Date());
+            reportPeriod.setCreatedBy("Admin");
+            reportPeriod.setUpdatedDt(new Date());
+            reportPeriodRepo.save(reportPeriod);
         }
 
         // Start RTSP Server.

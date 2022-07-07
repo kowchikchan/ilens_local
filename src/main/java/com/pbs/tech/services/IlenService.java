@@ -144,8 +144,10 @@ public class IlenService {
 
         // get data api and client key
         DataApi dataApi = null;
+        Configurations configurations = null;
         try {
             dataApi = dataApiRepo.findById(Long.valueOf(0)).get();
+            configurations = configurationServices.getList();
         }catch (IndexOutOfBoundsException e){
             throw new IndexOutOfBoundsException("Index Error " + e.getMessage());
         }
@@ -161,6 +163,7 @@ public class IlenService {
         JSONObject configJson = new JSONObject();
         JSONObject userListJson = new JSONObject();
         userListJson.put("usersList", usersList);
+        configJson.put("videoSave", configurations.isVideoStatus());
         configJson.put("dataApi", dataApi.getDataApi());
         configJson.put("reportApi", dataApi.getReportApi());
         configJson.put("apiToken", dataApi.getApiToken());

@@ -9,23 +9,27 @@ from faceDetection.frMethod import FRMethod
 # from peopleCount.peopleCount import peopleCountMethod
 
 
-async def publisher(idOfCamera, cameraUrl, dataApi):
+async def publisher(idOfCamera, cameraUrl, dataApi, vidStatus):
     host = str(dataApi[:-6]).split("//")[1]
     port = dataApi[int(len(dataApi)) - 5:]
     clientConnection = stomp.Connection([(host, port)])
     clientConnection.connect('admin', 'password', wait=True)
     videoCapture = cv2.VideoCapture(cameraUrl)
+    # output = cv2.VideoWriter('out.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 20, (400, 400))
     while True:
         await asyncio.sleep(0)
         ret, frame = videoCapture.read()
         if ret:
+            # if vidStatus == 'True':
+            #    resizedWindow = cv2.resize(frame, (400, 400), fx=0, fy=0, interpolation=cv2.INTER_CUBIC)
+            #    output.write(resizedWindow)
             _, buffer = cv2.imencode('.jpg', frame)
             try:
                 encodedData = base64.b64encode(buffer)
                 clientConnection.send(body=encodedData, destination='/queue/' + idOfCamera,
                                       headers={'persistent': 'true'})
                 print()
-            except UnicodeEncodeError:
+            except Exception as e:
                 continue
     # time.sleep(2)
     # clientConnection.disconnect()
@@ -87,7 +91,8 @@ if __name__ == "__main__":
     # basic camera Configuration
     postUrl = data['reportApi'] if str(data['reportApi']).endswith("/") else str(data['reportApi']) + "/"
     postUrl = postUrl + "api/v1/ilens"
-    cameraId, cameraIp, channelName, apiToken = data['id'], data['ip'], data['name'], data['apiToken']
+    cameraId, cameraIp, channelName, apiToken, videoStatus = data['id'], data['ip'], data['name'], data['apiToken'], \
+                                                             data['videoSave']
 
     # base path and data location
     basePath, dataLocation = inputData.basePath, inputData.dataLocation
@@ -123,7 +128,7 @@ if __name__ == "__main__":
     # Start client and server parallely.
     async def main():
         await asyncio.gather(
-            publisher(cameraId, cameraURL, data['dataApi']),
+            publisher(cameraId, cameraURL, data['dataApi'], videoStatus),
             consumer(appsList, cameraId, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken,
                    data['dataApi']))
 

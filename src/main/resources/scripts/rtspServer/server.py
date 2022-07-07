@@ -1,8 +1,7 @@
-import cv2
-import imutils
+import cv2, imutils, os
 from flask import Flask, Response, request
-
 app = Flask(__name__)
+dirName = os.path.dirname(__file__)
 
 
 def getFrames(camIp):
@@ -26,4 +25,5 @@ async def main(ip):
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, threaded=True)
+    context = (dirName + '/ilensCert.crt', dirName+'/ilensKey.key')
+    app.run(host='0.0.0.0', port=5000, threaded=True, ssl_context=context)

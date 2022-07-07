@@ -144,8 +144,10 @@ public class IlenService {
 
         // get data api and client key
         DataApi dataApi = null;
+        Configurations configurations = null;
         try {
             dataApi = dataApiRepo.findById(Long.valueOf(0)).get();
+            configurations = configurationServices.getList();
         }catch (IndexOutOfBoundsException e){
             throw new IndexOutOfBoundsException("Index Error " + e.getMessage());
         }
@@ -161,6 +163,7 @@ public class IlenService {
         JSONObject configJson = new JSONObject();
         JSONObject userListJson = new JSONObject();
         userListJson.put("usersList", usersList);
+        configJson.put("videoSave", configurations.isVideoStatus());
         configJson.put("dataApi", dataApi.getDataApi());
         configJson.put("reportApi", dataApi.getReportApi());
         configJson.put("apiToken", dataApi.getApiToken());
@@ -476,18 +479,8 @@ public class IlenService {
 
     public long getTodayCount() {
         Calendar date = new GregorianCalendar();
-        date.set(Calendar.HOUR_OF_DAY, 0);
-        date.set(Calendar.MINUTE, 1);
-        date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
-        Date startDate = date.getTime();
-
-        date.add(Calendar.HOUR_OF_DAY, 23);
-        date.add(Calendar.MINUTE, 58);
-        date.add(Calendar.SECOND, 59);
-        date.add(Calendar.MILLISECOND, 0);
-        Date endDate = date.getTime();
-
+        Date startDate = this.getDayStTime(date.getTime());
+        Date endDate = this.getDayEndTime(date.getTime());
         return entryExitRepo.getTodayAttendanceCount(startDate, endDate).size();
     }
 
@@ -501,14 +494,9 @@ public class IlenService {
             SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
             IdTraceVO traceVO = new IdTraceVO();
 
-            cal.setTime(entryExitFilter.getDate());
-            cal.set(Calendar.HOUR_OF_DAY, 23);
-            cal.set(Calendar.MINUTE, 59);
-            cal.set(Calendar.SECOND, 59);
-            cal.set(Calendar.MILLISECOND, 0);
 
             String selectedDate = df.format(entryExitFilter.getDate());
-            String endDate = df.format(cal.getTime());
+            String endDate = df.format(this.getDayEndTime(cal.getTime()));
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("SELECT * FROM ilens.EntryExit WHERE time >= " + "'" + selectedDate + "'" + " AND time<= "
                     + "'" + endDate + "'" +" AND id=" + "'" + entryExitFilter.getId() +"'" + " ALLOW FILTERING");
@@ -580,23 +568,13 @@ public class IlenService {
                 log.info("With filter...");
                 List<SearchCriteria> specificationValues = new ArrayList<>();
                 if (entryExitFilter.getDate() != null && !StringUtils.isEmpty(entryExitFilter.getDate().toString())) {
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(entryExitFilter.getDate());
 
                     //selected date
                     SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
-                    cal.set(Calendar.HOUR_OF_DAY, 0);
-                    cal.set(Calendar.MINUTE, 1);
-                    cal.set(Calendar.SECOND, 0);
-                    cal.set(Calendar.MILLISECOND, 0);
-                    String selectedDate = df.format(cal.getTime());
+                    String selectedDate = df.format(this.getDayStTime(entryExitFilter.getDate()));
 
                     //selected date end time.
-                    cal.add(Calendar.HOUR_OF_DAY, 23);
-                    cal.add(Calendar.MINUTE, 58);
-                    cal.add(Calendar.SECOND, 59);
-                    cal.add(Calendar.MILLISECOND, 0);
-                    String endDate = df.format(cal.getTime());
+                    String endDate = df.format(this.getDayEndTime(entryExitFilter.getDate()));
 
                     //start time.
                     specificationValues.add(new SearchCriteria("time", ">=", selectedDate));
@@ -661,22 +639,12 @@ public class IlenService {
     public List<ExitView> exitData(String id, Date selectedDate){
         SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
         List<ExitView> exitView = new ArrayList<>();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(selectedDate);
 
         // start time
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 1);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        String startDt = df.format(cal.getTime());
+        String startDt = df.format(this.getDayStTime(selectedDate));
 
         // end time
-        cal.add(Calendar.HOUR_OF_DAY, 23);
-        cal.add(Calendar.MINUTE, 58);
-        cal.add(Calendar.SECOND, 59);
-        cal.add(Calendar.MILLISECOND, 0);
-        String endDt = df.format(cal.getTime());
+        String endDt = df.format(this.getDayEndTime(selectedDate));
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("SELECT * FROM ilens.ExitView WHERE time>=" + "'" + startDt + "'" + " AND time<="
@@ -733,7 +701,7 @@ public class IlenService {
     public long getOnTimeEntry() {
         Calendar date = new GregorianCalendar();
         Configurations configuration = configurationServices.getList();
-        String[] onTimeList = configuration.getOnTime().split(":");
+        String[] onTimeList = configuration.getOnTime().split(" ")[0].split(":");
 
         // reset hour, minutes, seconds and millis
         date.set(Calendar.HOUR_OF_DAY, 0);
@@ -753,8 +721,8 @@ public class IlenService {
     public long getGraceTimeEntry() {
         Calendar date = new GregorianCalendar();
         Configurations configuration = configurationServices.getList();
-        String[] onTimeList = configuration.getOnTime().split(":");
-        String[] graceTimeList = configuration.getGraceTime().split(":");
+        String[] onTimeList = configuration.getOnTime().split(" ")[0].split(":");
+        String[] graceTimeList = configuration.getGraceTime().split(" ")[0].split(":");
 
         //set onTime.
         date.set(Calendar.HOUR_OF_DAY,Integer.parseInt(onTimeList[0]));
@@ -780,6 +748,11 @@ public class IlenService {
         int sum = 0;
         //get current date.
         int currentDate =date.get(Calendar.DATE);
+
+        // configurations data.
+        Configurations configuration = configurationServices.getList();
+        String[] onTimeList = configuration.getOnTime().split(" ")[0].split(":");
+
         //Find on time entry on each data.
         for(int i=1;i<=currentDate;i++) {
             //reset all values.
@@ -789,8 +762,12 @@ public class IlenService {
             date.set(Calendar.SECOND, 0);
             date.set(Calendar.MILLISECOND, 0);
             Date monthTime = date.getTime();
+
             //set limit on 8'o clock.
-            date.set(Calendar.HOUR_OF_DAY,8);
+            date.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onTimeList[0]));
+            date.set(Calendar.MINUTE,Integer.parseInt(onTimeList[1]));
+            date.set(Calendar.SECOND, 0);
+            date.set(Calendar.MILLISECOND, 0);
             Date onTime = date.getTime();
             try {
                 Iterable slice = entryExitRepo.getLastHourEntryOrOnTimeEntry(monthTime, onTime);
@@ -828,11 +805,18 @@ public class IlenService {
         SimpleDateFormat df = new SimpleDateFormat("MMM yyyy");
         ArrayList<SixMonthAverageVo> totalSixMonthAverage = new ArrayList<>();
         Calendar date = new GregorianCalendar();
+
+        // configurations data.
+        Configurations configuration = configurationServices.getList();
+        String[] onTimeList = configuration.getOnTime().split(" ")[0].split(":");
+
         //Find total number of users.
         List<UserVo> userVos = userRepo.findByAll();
         int sum = 0;
+
         //get before six month data.
         date.add(Calendar.MONTH,-6);
+
         //Loop over last six month.
         for(int j = 0; j <= 5; j++ ) {
             SixMonthAverageVo sixMonthAverageVo = new SixMonthAverageVo();
@@ -846,8 +830,12 @@ public class IlenService {
                 date.set(Calendar.SECOND, 0);
                 date.set(Calendar.MILLISECOND, 0);
                 Date monthTime = date.getTime();
+
                 //set limit on 8'o clock.
-                date.set(Calendar.HOUR_OF_DAY, 8);
+                date.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onTimeList[0]));
+                date.set(Calendar.MINUTE,Integer.parseInt(onTimeList[1]));
+                date.set(Calendar.SECOND, 0);
+                date.set(Calendar.MILLISECOND, 0);
                 Date onTime = date.getTime();
                 try {
                     Iterable slice = entryExitRepo.getLastHourEntryOrOnTimeEntry(monthTime, onTime);
@@ -964,6 +952,11 @@ public class IlenService {
 
     public long getLateEntry() throws Exception {
         long count = 0;
+
+        // Configurations.
+        Configurations configuration = configurationServices.getList();
+        String[] graceTimeList = configuration.getGraceTime().split(" ")[0].split(":");
+
         GregorianCalendar date = new GregorianCalendar();
         EntryExitFilter entryExitFilter=new EntryExitFilter();
 
@@ -975,8 +968,8 @@ public class IlenService {
         entryExitFilter.setDate(date.getTime());
 
         // on time.
-        date.set(Calendar.HOUR_OF_DAY, 10);
-        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.HOUR_OF_DAY, Integer.parseInt(graceTimeList[0]));
+        date.set(Calendar.MINUTE, Integer.parseInt(graceTimeList[1]));
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
         Date compareDate = date.getTime();
@@ -994,23 +987,9 @@ public class IlenService {
         List<EntryExit> entryExits = new ArrayList<>();
         List<SearchCriteria> specificationValues = new ArrayList<>();
         if (entryExitFilter.getDate() != null && !StringUtils.isEmpty(entryExitFilter.getDate().toString())) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(entryExitFilter.getDate());
-
-            //selected date
             SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 1);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            String selectedDate = df.format(cal.getTime());
-
-            //selected date end time.
-            cal.add(Calendar.HOUR_OF_DAY, 23);
-            cal.add(Calendar.MINUTE, 58);
-            cal.add(Calendar.SECOND, 59);
-            cal.add(Calendar.MILLISECOND, 0);
-            String endDate = df.format(cal.getTime());
+            String selectedDate = df.format(this.getDayStTime(entryExitFilter.getDate()));
+            String endDate = df.format(this.getDayEndTime(entryExitFilter.getDate()));
 
             //start time
             specificationValues.add(new SearchCriteria("time", ">=", selectedDate));
@@ -1091,24 +1070,9 @@ public class IlenService {
 
     public List<IdTraceDetailsVO> unknownList(UnknownFilterVO unknownFilterVO) {
         List<IdTraceDetailsVO> idTraceDetailsVOs = new ArrayList<>();
-        Calendar cal = Calendar.getInstance();
         if (unknownFilterVO != null) {
-            cal.setTime(unknownFilterVO.getDate());
-
-            //selected date
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 1);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            Date selectedDate = cal.getTime();
-
-            //selected date end time.
-            cal.add(Calendar.HOUR_OF_DAY, 23);
-            cal.add(Calendar.MINUTE, 58);
-            cal.add(Calendar.SECOND, 59);
-            cal.add(Calendar.MILLISECOND, 0);
-            Date endDate = cal.getTime();
-
+            Date selectedDate = this.getDayStTime(unknownFilterVO.getDate());;
+            Date endDate = this.getDayEndTime(unknownFilterVO.getDate());
             List<UnknownEntry> unknownEntries = unknownEntryRepo.getUnknownList(selectedDate, endDate);
             for (UnknownEntry unknownEntry : unknownEntries) {
                 IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
@@ -1121,4 +1085,27 @@ public class IlenService {
         }
         return idTraceDetailsVOs;
     }
+
+    public Date getDayStTime(Date startDate){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 1);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+    public Date getDayEndTime(Date endDate){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(endDate);
+
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 58);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+
 }

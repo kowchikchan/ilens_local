@@ -16,6 +16,7 @@ public class Configurations extends Audit{
 
     private String onTime;
     private String graceTime;
+    private long gracePeriod;
 
     public long getId() {return id;}
 
@@ -36,4 +37,8 @@ public class Configurations extends Audit{
     public String getGraceTime() {return graceTime;}
 
     public void setGraceTime(String graceTime) {this.graceTime = graceTime;}
+
+    public long getGracePeriod() {return gracePeriod;}
+
+    public void setGracePeriod(long gracePeriod) {this.gracePeriod = gracePeriod;}
 }

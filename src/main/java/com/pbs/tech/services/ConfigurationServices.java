@@ -25,6 +25,7 @@ public class ConfigurationServices {
             configurations1.setVideoStatus(configurations.isVideoStatus());
             configurations1.setOnTime(configurations.getOnTime());
             configurations1.setGraceTime(configurations.getGraceTime());
+            configurations1.setGracePeriod(configurations.getGracePeriod());
             configurations1.setUpdatedBy("Admin");
             configurations1.setUpdatedDt(new Date());
             configurationsRepo.save(configurations1);

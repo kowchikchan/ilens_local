@@ -94,6 +94,7 @@ public class SystemConfig {
             configurations.setVideoStatus(false);
             configurations.setOnTime("9:0 AM");
             configurations.setGraceTime("9:10 AM");
+            configurations.setGracePeriod(10);
             configurations.setCreatedBy("Admin");
             configurations.setCreatedDt(new Date());
             configurationsRepo.save(configurations);

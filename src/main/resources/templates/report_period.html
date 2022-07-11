@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+	<title>[[${APP_NAME}]] - Report Period</title>
+</head>c
+<body>
+<div layout:fragment="content" class="contant">
+	<div class="pre-loading">
+    	<img class="loader" src="/web/images/loader.png" />
+  	</div>
+      <div class="heading">
+        <span class="heading-text fs-30">Report Period</span>
+    </div>
+    <div class="main-table">  
+        <div class="data_api">
+                <div class="apisty">
+                    <div class="row g-0">	
+                        <div class="col-md-12 dFlex">
+                            <div class="col-md-2">
+                            <label class="config_labels">Report interval <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Ilens will send an attendance report for the chosen period to the specified report receipt email address." ></i></label>
+                            </div>
+                            <div class="col-md-8">
+                                <select class="retains_sec" id="interval" name="interval">                  
+                                    <option value="1">1 Week</option>
+                                    <option value="2">2 Week</option>
+                                    <option value="4">1 Month</option>
+                                </select>
+                            </div>
+                        </div>    
+                        <div class="col-md-12 dFlex pt-3">
+                            <div class="col-md-2">
+                                <label class="config_labels">Report receipt <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The attendance report will be sent to this email address." ></i></label>
+                            </div>
+                            <div class="col-md-8">
+                                <input type="text" id="receipt" class="Report_receipt" name="receipt"/>
+                                <div class="text-warning ml-3 errorDiv"><i class="fas fa-exclamation-triangle"><span id="errorMsg" class="text-white"></span></i></div>
+                            </div>
+                        </div>      
+                    </div>
+                 </div>
+        <div>
+            <button type="button"  class="api-button" id="update">Update</button>
+        </div>
+
+    </div>
+<script>
+    $(document).ready(function(){
+        $("#navadms").addClass('active');
+        $("#Adms").addClass('show');
+        $("#reportPeriod").addClass('active'); 
+        reportlist();
+        toastr.options = {
+          debug: false,
+          newestOnTop: false,
+          positionClass: "toast-bottom-right",
+          closeButton: true,
+          progressBar: false,
+        }
+        $('[data-toggle1="tooltip"]').tooltip({trigger:'click'}); 
+        $(".fa-question-circle").mouseleave(function(){
+                $('[data-toggle1="tooltip"]').tooltip('hide');
+        })  
+    });
+
+ 
+    $('#update').click(function() {  
+        var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        var emailaddressVal = $("#receipt").val();
+        if(emailaddressVal == '') {
+            $("#errorMsg").html('Please enter your email address.');
+            $(".errorDiv").show();
+            return false;
+        }else if(!emailReg.test(emailaddressVal)) {
+            $("#errorMsg").html('Enter a valid email address.');
+            $(".errorDiv").show();
+            return false;
+        }else{
+            $(".errorDiv").hide();
+            save();
+        }
+    });
+
+    function reportlist(){
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/report/list";  
+        $.ajax({
+                contentType: "application/json;charset=UTF-8",
+                url: apiUrl,
+                dataType:'json',      
+                headers:{'CLIENT_KEY': sessionToken},
+                type: 'GET',
+                async: false,
+                success: function(data){ 
+                    $("#interval").val(data.reportPeriod);
+                    $("#receipt").val(data.mail);
+
+                },
+                error: function(err){
+                    setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+                }
+            });
+    }
+
+    
+    function save(){
+        var reportPeriod= $("#interval").val();
+        var mail= $("#receipt").val();
+       var data={
+            reportPeriod:reportPeriod,
+            mail:mail,
+            id:0
+        }
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/report/save";  
+        $.ajax({
+                contentType: "application/json;charset=UTF-8",
+                url: apiUrl,   
+                headers:{'CLIENT_KEY': sessionToken},
+                type: 'POST',
+                data: JSON.stringify(data),
+                async: false,
+                success: function(data){ 
+                    setTimeout(function(){ toastr.success("Configuration updated"); }, 1000);
+                },
+                error: function(err){
+                    setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+                }
+            });
+    }
+
+</script>
+
+</div>
+</body>
+</html>

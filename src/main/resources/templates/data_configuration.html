@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
 <head>
-	<title>[[${APP_NAME}]] - Agents</title>
-</head>
+	<title>[[${APP_NAME}]] - Data Configurations</title>
+</head>c
 <body>
 <div layout:fragment="content" class="contant">
 	<div class="pre-loading">
     	<img class="loader" src="/web/images/loader.png" />
   	</div>
       <div class="heading">
-        <span class="heading-text fs-30">Settings</span>
+        <span class="heading-text fs-30">Configurations</span>
     </div>
     <div class="main-table">  
         <div class="data_api">
@@ -17,11 +17,10 @@
                     <div class="row g-0">	
                         <div class="col-md-12 dFlex">
                             <div class="col-md-2">
-                            <label class="config_labels">Data retains period <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="don" ></i></label>
+                            <label class="config_labels">Data retains period <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Data Retains Period keeps the data for the required number of days." ></i></label>
                             </div>
                             <div class="col-md-8">
                                 <select class="retains_sec" id="dayRetains" name="dayRetains">                  
-                                    <option selected="" value="0">Retains periods</option>
                                     <option value="30">30 Days</option>
                                     <option value="35">35 Days</option>
                                     <option value="40">40 Days</option>
@@ -30,7 +29,7 @@
                         </div>    
                         <div class="col-md-12 dFlex pt-3">
                             <div class="col-md-2">
-                                <label class="config_labels">Expected entry time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="don" ></i></label>
+                                <label class="config_labels">Expected entry time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Depending on this time, display the on-time entry data." ></i></label>
                             </div>
                             <div class="col-md-8">
                                 <input type="text" id="timeSelector" class="expectedEntry" name="timeSelector"/>
@@ -38,15 +37,19 @@
                         </div>      
                         <div class="col-md-12 dFlex pt-3">
                             <div class="col-md-2">
-                                <label class="config_labels">Grace Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="don" ></i></label>
+                                <label class="config_labels">Grace Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="This time is used to determine grace entry." ></i></label>
                             </div>
                             <div class="col-md-8">
-                                <input type="text" id="graceTime" class="expectedEntry" name="graceTIme"/>
+                                <select class="retains_sec" id="graceTime" name="graceTime">                  
+                                    <option value=10>10 Mins</option>
+                                    <option value=20>20 Mins</option>
+                                    <option value=30>30 Mins</option>
+                                </select>
                             </div>    
                         </div>
                         <div class="col-md-12 dFlex pt-3">
                             <div class="col-md-2">
-                                <label class="config_labels">Video save option <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="don" ></i></label>
+                                <label class="config_labels">Video save option <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="If video save option checked, your video will save; otherwise, it won't." ></i></label>
                             </div>
                             <div class="col-md-8">
                                 <input type="checkbox" class="save_check" id="saveCheck" name="savecheck">
@@ -70,13 +73,6 @@
       });
     //   var dates= moment().format("MM/DD/YYYY");
     //   var datetime = moment(dates+" "+$('#timeSelector').val()).add(30, 'minutes');
-      $('#graceTime').datetimepicker({
-        format: 'LT',
-        showClear:true,
-        toolbarPlacement: 'bottom',
-        // maxDate: datetime,
-        showClose:true
-      });
     //   console.log(moment(datetime).add(30, 'minutes').format("DD/MM/YYYY HH:mm a"));
       $("#navadms").addClass('active');
       $("#Adms").addClass('show');
@@ -98,21 +94,26 @@
     var retainsPeriod=$("#dayRetains").val();
     var videoStatus=$("#saveCheck").is(':checked') ? true : false;
     var graceTime=$("#graceTime").val();
-    var graceTimeMins=($("#graceTime").val()).split(":");
-    if(graceTimeMins[1].charAt(0) == '0'){
-        graceTime = graceTimeMins[0]+":"+graceTimeMins[1].replace('0','');
-    }
     var onTime=$("#timeSelector").val();
     var onTimeMin=($("#timeSelector").val()).split(":");
+    var graceTime1=parseInt((onTimeMin[1]).split(" ")[0])+parseInt(graceTime);
+    if(graceTime1 > 59){
+        var graceTime=(parseInt(onTimeMin[0])+1)+":"+((parseInt((onTimeMin[1]).split(" ")[0])+parseInt(graceTime))%60)+" "+(onTimeMin[1]).split(" ")[1]; 
+    }else{
+        var graceTime=onTimeMin[0]+":"+(parseInt((onTimeMin[1]).split(" ")[0])+parseInt(graceTime))+" "+(onTimeMin[1]).split(" ")[1]; 
+    }
+    // var graceTime=onTimeMin[0]+":"+(parseInt((onTimeMin[1]).split(" ")[0])+parseInt(graceTime))+" "+(onTimeMin[1]).split(" ")[1];
     if(onTimeMin[1].charAt(0) == '0'){
         onTime = onTimeMin[0]+":"+onTimeMin[1].replace('0','');
     }
+    var gracePeriod=$("#graceTime").val();
     var id=0;
       var data={
         retainsPeriod:retainsPeriod,
         onTime:onTime,
         videoStatus:videoStatus,
         graceTime:graceTime,
+        gracePeriod:gracePeriod,
         id:id
       }
     var sessionToken = "[[${session.API_TOKEN}]]";
@@ -146,7 +147,8 @@
             success: function(data){ 
                     $("#dayRetains").val(data.retainsPeriod);
                     $("#timeSelector").val(data.onTime);
-                    $("#graceTime").val(data.graceTime);
+                    // var graceTime=((data.graceTime+"").split(":")[1]).split(" ")[0];
+                    $("#graceTime").val(data.gracePeriod);
                     if(data.videoStatus == true){
                         $("#saveCheck").prop( "checked", true )
                     }

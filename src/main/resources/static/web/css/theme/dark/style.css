@@ -4170,8 +4170,34 @@ button#retains-period-dd {
   .expectedEntry{
     width: 100%;
   }
+  .Report_receipt{
+    width: 100%;
+  }
+}
+.Report_receipt{
+  position: relative;
+  cursor: pointer;
+  background-color: #1e384800;
+  text-align: left;
+  padding: 4px;
+  padding-left: 10px;
+  color: #fff;
+  border: 1px solid #a08852;
+  border-radius: 6px;
+  text-decoration: none;
+  width: 389px;
 }
 
+#interval option {
+ background-color: #084174;
+}
+span#errorMsg{
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+.errorDiv{
+  display: none;
+}
 
 
 

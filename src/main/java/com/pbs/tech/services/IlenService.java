@@ -34,6 +34,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class IlenService {
@@ -79,7 +80,6 @@ public class IlenService {
 
     @Value("${ilens.api.path}")
     String apiPath;
-
 
     @Value("${ilens.python.path}")
     String pythonPath;
@@ -1101,10 +1101,92 @@ public class IlenService {
         cal.setTime(endDate);
 
         cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 58);
-        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 58);
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
+    }
+
+    public ReportVO totalEntries(long week) throws Exception {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.WEEK_OF_MONTH, -(int)week);
+        int repeatValue = 7;
+        if(week == 2){ repeatValue = 14; }else if(week == 4){repeatValue = 28;}
+        long onTimeCount = 0;
+        long graceTimeCount = 0;
+        long lateEntryCount = 0;
+
+        List<Long> onTimeEntryListByDay = new ArrayList<>();
+        List<Long> graceTimeEntryListByDay = new ArrayList<>();
+        List<Long> beyondGraceEntryListByDay = new ArrayList<>();
+
+        ReportVO reportVO = new ReportVO();
+        Configurations configuration = configurationServices.getList();
+        String[] graceTimeList = configuration.getGraceTime().split(" ")[0].split(":");
+        String[] onTimeList = configuration.getOnTime().split(" ")[0].split(":");
+        List<EntryExit> lstEtyExt = new ArrayList<>();
+        for(int i=0; i<repeatValue; i++){
+            // day timings.
+            Date dayStTime = this.getDayStTime(cal.getTime());
+            Date dayEdTime = this.getDayEndTime(cal.getTime());
+
+            // set on time
+            cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onTimeList[0]));
+            cal.set(Calendar.MINUTE,Integer.parseInt(onTimeList[1]));
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            Date onTime = cal.getTime();
+
+            // set grace time.
+            cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(graceTimeList[0]));
+            cal.set(Calendar.MINUTE, Integer.parseInt(graceTimeList[1]));
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            Date graceTime = cal.getTime();
+
+            List<EntryExitEntity> onTimeEntryData = entryExitRepo.getTodayAttendanceCount(dayStTime, onTime);
+            List<EntryExitEntity> graceTimeData = entryExitRepo.getTodayAttendanceCount(onTime, graceTime);
+            List<EntryExitEntity> lateEntryData = entryExitRepo.getLateEntry(graceTime, dayEdTime);
+
+            // attendance data
+            EntryExitFilter entryExitFilter = new EntryExitFilter();
+            entryExitFilter.setId(0);
+            entryExitFilter.setLocation("");
+            entryExitFilter.setName("");
+            entryExitFilter.setDate(dayStTime);
+
+            List<EntryExit> entryExit = (List<EntryExit>) this.getAttendance(entryExitFilter, 0);
+            for(EntryExit entryExit1: entryExit){
+                lstEtyExt.add(entryExit1);
+            }
+            onTimeEntryListByDay.add((long) onTimeEntryData.size());
+            graceTimeEntryListByDay.add((long) graceTimeData.size());
+            beyondGraceEntryListByDay.add((long) lateEntryData.size());
+
+            onTimeCount += onTimeEntryData.size();
+            graceTimeCount += graceTimeData.size();
+            lateEntryCount += lateEntryData.size();
+
+            cal.add(Calendar.DATE, 1);
+        }
+
+        JSONObject reportGraphData = new JSONObject();
+        reportGraphData.put("onTimeList", onTimeEntryListByDay);
+        reportGraphData.put("graceTimeList", graceTimeEntryListByDay);
+        reportGraphData.put("lateTimeList",  beyondGraceEntryListByDay);
+
+        try {
+            FileWriter userList = new FileWriter(configsJsonPath + "/userList.json");
+            userList.write(String.valueOf(reportGraphData));
+            userList.close();
+        }catch (Exception exception){
+            throw new Exception("Exception" + exception.getMessage());
+        }
+        reportVO.setOnTime(onTimeCount);
+        reportVO.setGraceTime(graceTimeCount);
+        reportVO.setLateTime(lateEntryCount);
+        reportVO.setEntryExitList(lstEtyExt);
+        return reportVO;
     }
 
 

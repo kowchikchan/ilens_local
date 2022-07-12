@@ -109,6 +109,7 @@ public class SystemConfig {
             reportPeriod.setId(0L);
             reportPeriod.setReportPeriod(7);
             reportPeriod.setMail("ilens.logicfocus@logicfocus.com");
+            reportPeriod.setPreviousDate(new Date());
             reportPeriod.setCreatedBy("Admin");
             reportPeriod.setCreatedDt(new Date());
             reportPeriod.setCreatedBy("Admin");

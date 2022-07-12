@@ -1,6 +1,5 @@
 package com.pbs.tech.services;
 
-import com.pbs.tech.model.Configurations;
 import com.pbs.tech.model.ReportPeriod;
 import com.pbs.tech.repo.ReportPeriodRepo;
 import org.slf4j.Logger;
@@ -24,6 +23,7 @@ public class ReportServices {
             reportPeriod1.setId(reportPeriod.getId());
             reportPeriod1.setReportPeriod(reportPeriod.getReportPeriod());
             reportPeriod1.setMail(reportPeriod.getMail());
+            reportPeriod1.setPreviousDate(reportPeriod1.getPreviousDate());
             reportPeriod1.setUpdatedBy("Admin");
             reportPeriod1.setUpdatedDt(new Date());
             reportPeriodRepo.save(reportPeriod1);

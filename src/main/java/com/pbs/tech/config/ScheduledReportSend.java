@@ -50,8 +50,8 @@ public class ScheduledReportSend {
     @Value("${mail.port}")
     String port;
 
-    @Scheduled(cron = "0 22 17 * * *")
-    public void sendReport() throws Exception, DocumentException, MalformedURLException, IOException {
+    @Scheduled(cron = "0 1 0 * * *")
+    public void sendReport() throws Exception {
         log.info("Report Triggered.");
         ReportPeriod reportPeriod = reportServices.getList();
         long rptPeriod = 7;
@@ -181,7 +181,7 @@ public class ScheduledReportSend {
                     String outTime = "----";
 
                     if (reportVO.getEntryExitList().get(i).getEntry_view() != null) {
-                        name = reportVO.getEntryExitList().get(i).getName().toString();
+                        name = reportVO.getEntryExitList().get(i).getName();
                         inLocation = reportVO.getEntryExitList().get(i).getEntry_view().getLocation();
                         inTime = formatTime.format(reportVO.getEntryExitList().get(i).getEntry_view().getTime());
                     }

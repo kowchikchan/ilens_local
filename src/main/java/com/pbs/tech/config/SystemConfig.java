@@ -2,9 +2,11 @@ package com.pbs.tech.config;
 
 import com.pbs.tech.model.Configurations;
 import com.pbs.tech.model.DataApi;
+import com.pbs.tech.model.MenuStatus;
 import com.pbs.tech.model.ReportPeriod;
 import com.pbs.tech.repo.ConfigurationsRepo;
 import com.pbs.tech.repo.DataApiRepo;
+import com.pbs.tech.repo.MenuStatusRepo;
 import com.pbs.tech.repo.ReportPeriodRepo;
 import com.pbs.tech.services.UserService;
 import com.pbs.tech.vo.UserVo;
@@ -39,6 +41,9 @@ public class SystemConfig {
 
     @Autowired
     ReportPeriodRepo reportPeriodRepo;
+
+    @Autowired
+    MenuStatusRepo menuStatusRepo;
 
     @Value("${ilens.python.path}")
     String pythonPath;
@@ -115,6 +120,17 @@ public class SystemConfig {
             reportPeriod.setCreatedBy("Admin");
             reportPeriod.setUpdatedDt(new Date());
             reportPeriodRepo.save(reportPeriod);
+        }
+
+        // save menu status.
+        MenuStatus menuStatus;
+        try {
+            menuStatus = menuStatusRepo.findById(1L).get();
+        }catch (NoSuchElementException e){
+            menuStatus = new MenuStatus();
+            menuStatus.setId(1L);
+            menuStatus.setStatus(false);
+            menuStatusRepo.save(menuStatus);
         }
 
         // Start RTSP Server.

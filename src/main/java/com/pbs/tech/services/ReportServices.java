@@ -35,10 +35,21 @@ public class ReportServices {
     public ReportPeriod getList(){
         ReportPeriod reportPeriod = null;
         try {
-            reportPeriod = reportPeriodRepo.findById(Long.valueOf(0)).get();
+            reportPeriod = reportPeriodRepo.findById(Long.valueOf(1)).get();
         }catch (NoSuchElementException e){
             throw new NoSuchElementException("No Such Element Found " + e.getMessage());
         }
         return reportPeriod;
+    }
+
+    public void putConfigs() throws Exception {
+        try {
+            ReportPeriod rprtPeriod = reportPeriodRepo.findById(Long.valueOf(1)).get();
+            rprtPeriod.setPreviousDate(new Date());
+            rprtPeriod.setUpdatedDt(new Date());
+            reportPeriodRepo.save(rprtPeriod);
+        }catch (Exception e){
+            throw new Exception("Configurations Not saved " + e.getMessage());
+        }
     }
 }

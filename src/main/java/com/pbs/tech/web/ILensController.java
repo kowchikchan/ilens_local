@@ -67,6 +67,7 @@ public class ILensController {
                 session.setAttribute("USER", userVo);
                 session.setAttribute("ROLE", userVo.getRole());
                 session.setAttribute("USER_ID", userVo.getUserId());
+                session.setAttribute("APP_NAME", "iLens");
                 session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
                 DataApi dataApi;
                 try {
@@ -155,8 +156,8 @@ public class ILensController {
     @GetMapping("/unknownRegistry")
     public String unknownRegistry(){return "unknownRegistry";}
 
-    @GetMapping("/settings")
-    public String settings(){return "settings";}
+    @GetMapping("/report_period")
+    public String settings(){return "report_period";}
 
     @GetMapping("/violation")
     public String violation(){return "violation";}

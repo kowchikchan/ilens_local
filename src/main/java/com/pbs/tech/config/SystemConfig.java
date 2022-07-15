@@ -103,11 +103,11 @@ public class SystemConfig {
         // Default Report API Data.
         ReportPeriod reportPeriod;
         try {
-            reportPeriod = reportPeriodRepo.findById(0L).get();
+            reportPeriod = reportPeriodRepo.findById(1L).get();
         }catch (NoSuchElementException e){
             reportPeriod = new ReportPeriod();
-            reportPeriod.setId(0L);
-            reportPeriod.setReportPeriod(7);
+            reportPeriod.setId(1L);
+            reportPeriod.setReportPeriod(1);
             reportPeriod.setMail("ilens.logicfocus@logicfocus.com");
             reportPeriod.setPreviousDate(new Date());
             reportPeriod.setCreatedBy("Admin");

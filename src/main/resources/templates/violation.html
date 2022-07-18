@@ -50,42 +50,30 @@
              </table>
           </div>
         </div>
-		<div id="popup_default" class="popup">
-            <div class="popup-overlay"></div>
-            <div class="popup-content">
-              <a href="#" class="close-popup" data-id="popup_default">&times;</a>
-             <table id="imageId">
-                 
-             </table>
-          </div>
-        </div>
     </div>
 	<div class="records"></div>
 <script>
-	$.fn.datepicker.defaults.format = "yyyy-mm-dd";
-	$.fn.datepicker.defaults.autoclose =true;
 	$(document).ready(function(){
 		$("#violation").addClass('active');
-		$('#datepicker').datepicker('setDates', new Date()); 
 		var date=new Date();
 		UnknownRegistry(date);
 		 
 	})
 
   $(function() {
-    $('#datepicker').datepicker({
-		defaultViewDate: new Date(),
-        format: "yyyy-mm-dd",
-        timePicker: true,
-        autoclose: true,
-        endDate: '+0d' 
-    });
+	$("#text-date").datetimepicker({
+		toolbarPlacement: 'bottom',
+		defaultDate: new Date(),
+		format: 'YYYY-MM-DD',
+		maxDate:new Date(),
+      });
    
-    $('#datepicker').datepicker().on("input change", function (e) { 
-      var st1=(e.target.value);
-      var st2="T00:01:01.001Z";
-      var date = st1.concat(st2); 
-      UnknownRegistry(date);    
+	  $("#text-date").on("dp.change", function (e) {
+		var date=e.date.format(e.date._f)	
+		var st1=date;
+		var st2="T00:01:01.001Z";
+		var date = st1.concat(st2);    
+		UnknownRegistry(date);
     });
   });
 

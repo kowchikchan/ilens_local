@@ -560,6 +560,10 @@ header .main-menu li.drop:hover > ul.drop-down {
 }
 .user .username{
   font-family: 'monstserrat', sans-serif;
+  font-size: 20px;
+}
+#UserRole{
+  font-size: 14px;
 }
 .navbar-icon .fa{
   font-size: 25px;

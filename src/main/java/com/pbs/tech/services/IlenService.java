@@ -490,13 +490,10 @@ public class IlenService {
         if(entryExitFilter.getId() != 0){
 
             // Person detailed report by id
-            GregorianCalendar cal = new GregorianCalendar();
             SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
             IdTraceVO traceVO = new IdTraceVO();
-
-
-            String selectedDate = df.format(entryExitFilter.getDate());
-            String endDate = df.format(this.getDayEndTime(cal.getTime()));
+            String selectedDate = df.format(this.getDayStTime(entryExitFilter.getDate()));
+            String endDate = df.format(this.getDayEndTime(entryExitFilter.getDate()));
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("SELECT * FROM ilens.EntryExit WHERE time >= " + "'" + selectedDate + "'" + " AND time<= "
                     + "'" + endDate + "'" +" AND id=" + "'" + entryExitFilter.getId() +"'" + " ALLOW FILTERING");
@@ -504,17 +501,6 @@ public class IlenService {
             try {
                 List<EntryExitEntity> slice = cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
                 List<IdTraceDetailsVO> idTraceDetailsVOList = new ArrayList<>();
-                /*String name = "----";
-                try {
-                    User userObj = userRepo.findById(entryExitFilter.getId()).get();
-                    name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
-                    traceVO.setName(name);
-                    traceVO.setId(userObj.getUsername());
-                } catch (NoSuchElementException noSuchElementException) {
-                    traceVO.setName(name);
-                    log.info("Error {}", noSuchElementException.getMessage());
-                }*/
-                //traceVO.setId(entryExitFilter.getId());
                 for (EntryExitEntity entryExitEntity : slice) {
                     traceVO.setId(entryExitEntity.getId());
                     traceVO.setName(entryExitEntity.getName());

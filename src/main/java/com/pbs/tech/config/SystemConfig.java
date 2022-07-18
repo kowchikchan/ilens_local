@@ -48,6 +48,12 @@ public class SystemConfig {
     @Value("${ilens.python.path}")
     String pythonPath;
 
+    @Value("${default-config.user}")
+    String user;
+
+    @Value("${default-config.password}")
+    String password;
+
     @EventListener(ApplicationReadyEvent.class)
     public void addDefaultUser() throws Exception {
 
@@ -55,8 +61,8 @@ public class SystemConfig {
         UserVo userVo = new UserVo();
         try {
             userVo.setId(1l);
-            userVo.setUserId("Admin");
-            userVo.setUserSecret("Admin");
+            userVo.setUserId(user);
+            userVo.setUserSecret(password);
             userVo.setRole("Admin");
             userVo.setFirstName("Default User");
             userVo.setLastName("Default User");
@@ -64,9 +70,9 @@ public class SystemConfig {
             userVo.setActive(true);
             userVo.setDepartment("Infra");
             userVo.setLocation("Default");
-            userVo.setCreateBy("Dev");
+            userVo.setCreateBy(user);
             userVo.setCreatedDt(new Date());
-            userVo.setUpdatedBy("Dev");
+            userVo.setUpdatedBy(user);
             userVo.setUpdatedDt(new Date());
 
             userService.addUser(userVo);
@@ -100,7 +106,7 @@ public class SystemConfig {
             configurations.setOnTime("9:0 AM");
             configurations.setGraceTime("9:10 AM");
             configurations.setGracePeriod(10);
-            configurations.setCreatedBy("Admin");
+            configurations.setCreatedBy(user);
             configurations.setCreatedDt(new Date());
             configurationsRepo.save(configurations);
         }
@@ -115,9 +121,9 @@ public class SystemConfig {
             reportPeriod.setReportPeriod(1);
             reportPeriod.setMail("ilens.logicfocus@logicfocus.com");
             reportPeriod.setPreviousDate(new Date());
-            reportPeriod.setCreatedBy("Admin");
+            reportPeriod.setCreatedBy(user);
             reportPeriod.setCreatedDt(new Date());
-            reportPeriod.setCreatedBy("Admin");
+            reportPeriod.setCreatedBy(user);
             reportPeriod.setUpdatedDt(new Date());
             reportPeriodRepo.save(reportPeriod);
         }

@@ -166,9 +166,9 @@ public class ScheduledReportSend {
 
             attList.addCell("Name");
             attList.addCell("Entry location");
-            attList.addCell("Entry Data&Time");
+            attList.addCell("Entry Data time");
             attList.addCell("Exit location");
-            attList.addCell("Exit Date&Time");
+            attList.addCell("Exit Date time");
 
             //PdfPTable attnList = new PdfPTable(5);
             SimpleDateFormat formatTime = new SimpleDateFormat("dd-MM-yyyy hh.mm aa");

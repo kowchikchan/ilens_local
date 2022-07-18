@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
 <head>
-	<title>[[${APP_NAME}]] - Report Period</title>
+	<title>[[${session.APP_NAME}]] - Report Period</title>
 </head>c
 <body>
 <div layout:fragment="content" class="contant">
@@ -108,7 +108,7 @@
        var data={
             reportPeriod:reportPeriod,
             mail:mail,
-            id:0
+            id:1
         }
         var sessionToken = "[[${session.API_TOKEN}]]";
         var apiUrl = "api/v1/report/save";  

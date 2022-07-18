@@ -2,9 +2,11 @@ package com.pbs.tech.config;
 
 import com.pbs.tech.model.Configurations;
 import com.pbs.tech.model.DataApi;
+import com.pbs.tech.model.MenuStatus;
 import com.pbs.tech.model.ReportPeriod;
 import com.pbs.tech.repo.ConfigurationsRepo;
 import com.pbs.tech.repo.DataApiRepo;
+import com.pbs.tech.repo.MenuStatusRepo;
 import com.pbs.tech.repo.ReportPeriodRepo;
 import com.pbs.tech.services.UserService;
 import com.pbs.tech.vo.UserVo;
@@ -40,8 +42,17 @@ public class SystemConfig {
     @Autowired
     ReportPeriodRepo reportPeriodRepo;
 
+    @Autowired
+    MenuStatusRepo menuStatusRepo;
+
     @Value("${ilens.python.path}")
     String pythonPath;
+
+    @Value("${default-config.user}")
+    String user;
+
+    @Value("${default-config.password}")
+    String password;
 
     @EventListener(ApplicationReadyEvent.class)
     public void addDefaultUser() throws Exception {
@@ -50,8 +61,8 @@ public class SystemConfig {
         UserVo userVo = new UserVo();
         try {
             userVo.setId(1l);
-            userVo.setUserId("Admin");
-            userVo.setUserSecret("Admin");
+            userVo.setUserId(user);
+            userVo.setUserSecret(password);
             userVo.setRole("Admin");
             userVo.setFirstName("Default User");
             userVo.setLastName("Default User");
@@ -59,9 +70,9 @@ public class SystemConfig {
             userVo.setActive(true);
             userVo.setDepartment("Infra");
             userVo.setLocation("Default");
-            userVo.setCreateBy("Dev");
+            userVo.setCreateBy(user);
             userVo.setCreatedDt(new Date());
-            userVo.setUpdatedBy("Dev");
+            userVo.setUpdatedBy(user);
             userVo.setUpdatedDt(new Date());
 
             userService.addUser(userVo);
@@ -94,7 +105,8 @@ public class SystemConfig {
             configurations.setVideoStatus(false);
             configurations.setOnTime("9:0 AM");
             configurations.setGraceTime("9:10 AM");
-            configurations.setCreatedBy("Admin");
+            configurations.setGracePeriod(10);
+            configurations.setCreatedBy(user);
             configurations.setCreatedDt(new Date());
             configurationsRepo.save(configurations);
         }
@@ -102,17 +114,29 @@ public class SystemConfig {
         // Default Report API Data.
         ReportPeriod reportPeriod;
         try {
-            reportPeriod = reportPeriodRepo.findById(0L).get();
+            reportPeriod = reportPeriodRepo.findById(1L).get();
         }catch (NoSuchElementException e){
             reportPeriod = new ReportPeriod();
-            reportPeriod.setId(0L);
-            reportPeriod.setReportPeriod(7);
+            reportPeriod.setId(1L);
+            reportPeriod.setReportPeriod(1);
             reportPeriod.setMail("ilens.logicfocus@logicfocus.com");
-            reportPeriod.setCreatedBy("Admin");
+            reportPeriod.setPreviousDate(new Date());
+            reportPeriod.setCreatedBy(user);
             reportPeriod.setCreatedDt(new Date());
-            reportPeriod.setCreatedBy("Admin");
+            reportPeriod.setCreatedBy(user);
             reportPeriod.setUpdatedDt(new Date());
             reportPeriodRepo.save(reportPeriod);
+        }
+
+        // save menu status.
+        MenuStatus menuStatus;
+        try {
+            menuStatus = menuStatusRepo.findById(1L).get();
+        }catch (NoSuchElementException e){
+            menuStatus = new MenuStatus();
+            menuStatus.setId(1L);
+            menuStatus.setStatus(false);
+            menuStatusRepo.save(menuStatus);
         }
 
         // Start RTSP Server.

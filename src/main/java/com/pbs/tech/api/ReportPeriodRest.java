@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/api/v1/report")
 public class ReportPeriodRest {
@@ -16,8 +18,8 @@ public class ReportPeriodRest {
 
     @PostMapping("/save")
     public ResponseEntity<Object> saveReportConfig(@RequestHeader("CLIENT_KEY") String clientKey,
-                                                     @RequestBody ReportPeriod reportPeriod) throws Exception {
-        reportServices.saveReportConfigs(reportPeriod);
+                                                     @RequestBody ReportPeriod reportPeriod, HttpServletRequest request) throws Exception {
+        reportServices.saveReportConfigs(reportPeriod, request);
         return new ResponseEntity<Object>(HttpStatus.ACCEPTED);
     }
 

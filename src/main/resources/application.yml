@@ -41,6 +41,17 @@ ilens:
   user:
     train-data:
       path: /home/logicfocus/ilens/ilens-1.0/scripts/faceDetection/face_training/training_imgs
+
+mail:
+  host: smtp.gmail.com
+  port: 587
+  user-name: abithkumar.a@logicfocus.net
+  password: mysnqilnpwlqjzfa
+
+default-config:
+  user: Admin
+  password: Admin
+
 locations:
   data-location: /home/logicfocus/ilens/snapshots
   license-location: /home/logicfocus/ilens/ilens-1.0/scripts

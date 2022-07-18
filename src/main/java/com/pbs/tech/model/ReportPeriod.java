@@ -3,6 +3,7 @@ package com.pbs.tech.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.Date;
 
 @Entity
 public class ReportPeriod extends Audit{
@@ -14,6 +15,8 @@ public class ReportPeriod extends Audit{
     private long reportPeriod;
 
     private String mail;
+
+    private Date previousDate;
 
     public long getId() {return id;}
 
@@ -27,4 +30,7 @@ public class ReportPeriod extends Audit{
 
     public void setMail(String mail) {this.mail = mail;}
 
+    public Date getPreviousDate() {return previousDate;}
+
+    public void setPreviousDate(Date previousDate) {this.previousDate = previousDate;}
 }

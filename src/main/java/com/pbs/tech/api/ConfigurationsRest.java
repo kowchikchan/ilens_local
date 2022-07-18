@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/v1/configurations")
@@ -16,8 +17,8 @@ public class ConfigurationsRest {
 
     @PostMapping("/save")
     public ResponseEntity<Object> postConfigurations(@RequestHeader("CLIENT_KEY") String clientKey,
-                                              @RequestBody Configurations configurations) throws Exception {
-        configurationServices.saveConfigurations(configurations);
+                                              @RequestBody Configurations configurations, HttpServletRequest request) throws Exception {
+        configurationServices.saveConfigurations(configurations, request);
         return new ResponseEntity<Object>(HttpStatus.ACCEPTED);
     }
 

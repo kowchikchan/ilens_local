@@ -27,6 +27,9 @@ public interface EntryExitRepo extends CrudRepository<EntryExitEntity,String> {
     @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time < ?1 group by id ALLOW FILTERING")
     Iterable<EntryExitEntity> getEveryTenMinutes(Date pastOneHourOrToday, Date PresentHourOrOnTime);
 
+    @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time < ?1 AND type='entry' group by id ALLOW FILTERING")
+    List<EntryExitEntity> getLateEntry(Date stTime, Date endTime);
+
     // @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time <= ?1 group by id ALLOW FILTERING")
     // Iterable<EntryExitEntity> getGraceTime(Date onTime,Date graceTime);
 

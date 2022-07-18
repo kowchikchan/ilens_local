@@ -45,8 +45,8 @@ ilens:
 mail:
   host: smtp.gmail.com
   port: 587
-  user-name: abithkumar.a@logicfocus.net
-  password: mysnqilnpwlqjzfa
+  user-name: admin@logicfocus.net
+  password: fzteixkjcpwufgsx
 
 default-config:
   user: Admin

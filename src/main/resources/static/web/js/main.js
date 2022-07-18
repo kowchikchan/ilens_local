@@ -1,4 +1,6 @@
+var Status=[];
 $(document).ready(function(){
+  onLoadMenu();
 	$(".date-move").on("click",function(){
 		$(".Date-time-div").toggleClass("close-div");
     $(this).toggleClass("fa-chevron-down");
@@ -7,8 +9,57 @@ $(document).ready(function(){
 	window.setInterval(function(){
 		dateTime();
 }, 1000);
-       
+
 $(".navbar-icon .fa").on("click",function(){
+  var status=Status[Status.length - 1];
+  if(status==true){
+    status=false; 
+  }else{
+     status=true;
+  }
+  Status.push(status); 
+     var data={
+       id:1,
+       status:status
+     }
+     $.ajax({
+         contentType: "application/json;charset=UTF-8",
+         url: "api/v1/menuStatus/save",   
+         headers:{'CLIENT_KEY': "[[${session.API_TOKEN}]]"},
+         type: 'POST', 
+         data: JSON.stringify(data),
+         async: false,
+         success: function(data){ 
+           toggleMenu();
+         },
+         error: function(err){
+           console.log(err);
+         }
+     });
+   });
+
+});
+
+function onLoadMenu(){
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "/api/v1/menuStatus/list",   
+    headers:{'CLIENT_KEY': "[[${session.API_TOKEN}]]"},
+    type: 'GET',
+    async: false,
+    success: function(data){ 
+      if(data.status==true){
+        toggleMenu();
+      }
+      Status.push(data.status);
+    },
+    error: function(err){
+      console.log(err);
+    }
+    });
+}
+
+ function toggleMenu(){
   $(".navbar-vertical").toggleClass("active");
   $(".visble-menu").toggleClass("active");
   $(".visble-menu i").toggleClass("inactive1");
@@ -20,9 +71,8 @@ $(".navbar-icon .fa").on("click",function(){
   $(".move-chart").toggleClass("active");
   $(".move-chart-1").toggleClass("active");
   $(".gp-text").toggleClass("active");
-});
+};
 
-});
 
 function ddmm(n) {
   return (n < 10 ? '0' : '') + n;

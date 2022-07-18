@@ -31,14 +31,12 @@
                   </div>
               </div>
                 <div class="dropdown">
-                  <button class="dropBtn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                     <span id="text">Select filter</span>
-                  </button>
-                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                      <a class="dropdown-item" href="#" id="fil"  onclick="allList()">All</a>
-                      <a class="dropdown-item" href="#" id="fil" onclick="activeList()">Active</a>
-                      <a class="dropdown-item" href="#" id="fil" onclick="inActiveList()" >In Active</a>
-                  </div>
+                  <select id="userFilter" name="" class="dropBtn">
+                    <option value="All" selected>All</option>
+                    <option value="true">Active</option>
+                    <option value="false">In Active</option>
+                </select>
+                  <!-- <button class="dropBtn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               </div>
             </div>
         </div>
@@ -111,15 +109,17 @@
       var removedPersons = [];
       var windowsize = $(window).width();
       $(document).ready(function () {
+        var channelFilterVO={ status: "All" }
         if ( windowsize < 500 ){
-          var channelFilterVO={ status: "All" }
           $("#channelList").hide();
           $("#mobileList").show();
           mobileListFun(pageNumber,channelFilterVO);
         }else{
           $("#channelList").show();
           $("#mobileList").hide();
+          pageTable(pageNumber,channelFilterVO);
         }
+        paging("All",channelFilterVO);
         $('[data-toggle="tooltip"]').tooltip({
         placement : 'right'
         });
@@ -130,11 +130,10 @@
         $("#channels").addClass('active');
         $("#channels").on("click",function(){
           $(".pre-loading").show();
-            window.setInterval(function(){
+            window.setTimeout(function(){
               $(".pre-loading").hide();
             }, 3000);
         });
-        allList();
         $("#channelForm").show();
         toastr.options = {
           debug: false,
@@ -597,51 +596,6 @@ function paging(filterKey,channelFilterVO){
       }
   });
 }
-function allList(){  
-  $("#channelList").empty();
-  $("#mobileList").empty();
-  var channelFilterVO={
-  status: "All"
-    }
-    if ( windowsize < 500 ){
-      mobileListFun(pageNumber,channelFilterVO);
-        }else{
-          pageTable(pageNumber,channelFilterVO);
-        }
-  $("#text").html("  All");
-  var filterKey="All"
-  paging(filterKey,channelFilterVO);
-}
-function activeList(){
-  $("#channelList").empty();
-  $("#mobileList").empty();
-  var channelFilterVO={
-  status: "true"
-    }
-    if ( windowsize < 500 ){
-      mobileListFun(pageNumber,channelFilterVO);
-        }else{
-          pageTable(pageNumber,channelFilterVO);
-        }
-    $("#text").html("  Acitve");
-    var filterKey="true"
-  paging(filterKey,channelFilterVO);
-}
-function inActiveList(id){
-  $("#channelList").empty();
-  $("#mobileList").empty();
-  var channelFilterVO={
-  status: "false"
-    }
-    if ( windowsize < 500 ){
-      mobileListFun(pageNumber,channelFilterVO);
-        }else{
-          pageTable(pageNumber,channelFilterVO);
-        }
-    $("#text").html("  In Acitve");
-    var filterKey="false"
-   paging(filterKey,channelFilterVO);
-}
 
 var pageNumber=0;
 function pageTable(pageNumber,channelFilterVO){
@@ -1006,7 +960,23 @@ $("#channelForm").hide();
     });
 }
 
+$('#userFilter').on('change', function() {
+  var status=this.value;
+  $("#channelList").empty();
+  $("#mobileList").empty();
+  var channelFilterVO={
+  status: status
+  }
 
+  if ( windowsize < 500 ){
+    mobileListFun(pageNumber,channelFilterVO);
+  }else{
+    pageTable(pageNumber,channelFilterVO);
+  }
+  var filterKey=status;
+  paging(filterKey,channelFilterVO);
+
+})
 
 </script>
 </div>

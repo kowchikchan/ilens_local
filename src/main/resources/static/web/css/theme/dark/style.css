@@ -4198,6 +4198,17 @@ span#errorMsg{
 .errorDiv{
   display: none;
 }
+.bootstrap-datetimepicker-widget.dropdown-menu {
+  padding: 2px !important;
+  width: 15em !important;
+}
+.bootstrap-datetimepicker-widget table:hover th:hover {
+color: #084174;
+background-color: #fff;
+}
+.bootstrap-datetimepicker-widget table td.disabled, .bootstrap-datetimepicker-widget table td.disabled:hover {
+  color: #63676a !important;
+}
 
 
 

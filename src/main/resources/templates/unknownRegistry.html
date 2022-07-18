@@ -60,33 +60,29 @@
     </div>
 	<div class="records"></div>
 <script>
-	$.fn.datepicker.defaults.format = "yyyy-mm-dd";
-	$.fn.datepicker.defaults.autoclose =true;
 	$(document).ready(function(){
 		$("#unknownRegistry").addClass('active');
-		$('#datepicker').datepicker('setDates', new Date()); 
 		var date=new Date();
 		UnknownRegistry(date);
 		 
 	})
 
-  $(function() {
-    $('#datepicker').datepicker({
-		defaultViewDate: new Date(),
-        format: "yyyy-mm-dd",
-        timePicker: true,
-        autoclose: true,
-        endDate: '+0d' 
-    });
-   
-    $('#datepicker').datepicker().on("input change", function (e) { 
-      var st1=(e.target.value);
-      var st2="T00:01:01.001Z";
-      var date = st1.concat(st2);     
-	  UnknownRegistry(date);
-    });
-  });
+	$("#text-date").datetimepicker({
+		toolbarPlacement: 'bottom',
+		defaultDate: new Date(),
+		format: 'YYYY-MM-DD',
+		maxDate:new Date(),
+      });
 
+	$(function () {
+       $("#text-date").on("dp.change", function (e) {
+		var date=e.date.format(e.date._f)	
+		var st1=date;
+		var st2="T00:01:01.001Z";
+		var date = st1.concat(st2);     
+		UnknownRegistry(date);
+       });
+    });
 
 	function UnknownRegistry(date){
 		var reportApi = "[[${session.REPORT_API}]]";

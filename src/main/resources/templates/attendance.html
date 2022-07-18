@@ -63,7 +63,7 @@
     $("#attendance").addClass('active');
     $("#attendance").on("click",function(){
         $(".pre-loading").show();
-          window.setInterval(function(){
+          window.setTimeout(function(){
             $(".pre-loading").hide();
           }, 2000);
       });
@@ -78,18 +78,12 @@
 
   var res = "";
   $(function() {
-    $('#datepicker').datepicker({
-        defaultDate: new Date(),
-        format: "yyyy-mm-dd",
-        timePicker: true,
-        autoclose: true
-
-    });
     var selected = (new Date()).toISOString().split('T')[0];
-    $('#datepicker').datepicker('setDate', new Date());
-    $( "#datepicker" ).datepicker({
-        buttonImageOnly: true,
-        buttonText: "Select date"
+    $("#text-date").datetimepicker({
+		toolbarPlacement: 'bottom',
+		defaultDate: new Date(),
+		format: 'YYYY-MM-DD',
+		maxDate:new Date(),
     });
 
     var entryExitFilter = "";
@@ -101,7 +95,8 @@
       var epoch=idString.split("=")[1];
       epoch=epoch*1000;
       epoch=epoch+(new Date().getTimezoneOffset() *-1);
-      $('#datepicker').datepicker("setDate", new Date(epoch) );
+      var d = new Date(epoch); // The 0 there is the key, which sets the date to the epoch
+      $('#text-date').data("DateTimePicker").date(d);
       var date1=$("#text-date").val();
       entryExitFilter={
         date:date1,
@@ -123,26 +118,26 @@
     }else{
     attendanceList(entryExitFilter, pageNumber);
     }
-    $('#datepicker').datepicker().on("input change", function (e) { 
 
-      //2021-12-23T04:25:25.754Z//
-      var st1=(e.target.value);
-      var st2="T00:01:01.001Z";
-      selected1 = st1.concat(st2);
+    $("#text-date").on("dp.change", function (e) {
+		var date=e.date.format(e.date._f)	
+		var st1=date;
+		var st2="T00:01:01.001Z";
+		var selected1 = st1.concat(st2);
 
-      var pageNumber = 0;
-      entryExitFilter={
-        date:selected1, 
-        id:0,
-        location:"",
-        name:""
-      }
-      if ( windowsize < 500 ){
+    var pageNumber = 0;
+    entryExitFilter={
+      date:selected1, 
+      id:0,
+      location:"",
+      name:""
+    }
+    if ( windowsize < 500 ){
         mobileAttendance(entryExitFilter, pageNumber);
       }else{
       attendanceList(entryExitFilter, pageNumber);
       }
-    });
+     });
   });
 
 

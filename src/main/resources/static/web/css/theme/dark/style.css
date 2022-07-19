@@ -2259,8 +2259,8 @@ option:hover{
 
 #user-credentials{
   position: inherit;
-  margin: 0% 12%;
   border-radius: 6px;
+  margin-bottom: 7px;
   display: none;
 }
 #user-credentials1{
@@ -3513,10 +3513,8 @@ span.crop1 {
     top: 30px;
   }
   #user-credentials {
-    margin: 5% 6%;
-    width: 92%;
-    margin-top: 16%;
-    margin-bottom: -6%;
+    margin-top: 2%;
+    margin-bottom: -2%;
   }
   #user-credentials1 {
     margin: 5% 6%;
@@ -3942,7 +3940,6 @@ input#text-date {
     margin: 3% 12% 0;
   }
   .warning-icon {
-    width: 35%;
     font-size: 12px;
   }
   #user-credentials {
@@ -4214,6 +4211,9 @@ background-color: #fff;
   color: #63676a !important;
 }
 
+#userFilter option {
+  background-color: #062e51 !important;
+}
 
 
 

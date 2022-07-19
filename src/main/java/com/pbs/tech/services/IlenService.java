@@ -114,7 +114,6 @@ public class IlenService {
     @Autowired
     ConfigurationServices configurationServices;
 
-    @Async
     public void startRuntime(String id) throws IlensException, JSONException, IOException, InterruptedException {
         HashMap<String, String> usersList = new HashMap<>();
         //TODO: check if already running.
@@ -202,7 +201,6 @@ public class IlenService {
         configJson.put("executions" , executionsConfigs);
         configJson.put("name", channel.getName().replace(" ", ""));
         configJson.put("tesseract", tesseractLocation);
-        String result = "";
         try {
             //save configurations as json
             String filePath = configsJsonPath + "/" + id + ".json";
@@ -229,7 +227,7 @@ public class IlenService {
         } catch (IOException e) {
             throw new IOException("IO Exception {}" + e.getMessage());
         }
-        String s = null;
+        //String s = null;
 
         //script executing command.
         String executeCmd = pythonPath + " " +scriptPath + "/main.py" + " -i " + configsJsonPath + "/" + id + ".json"
@@ -243,7 +241,7 @@ public class IlenService {
         runTime.setPid(p.pid());
         runtimes.add(runTime);
 
-        // read output.
+        /*// read output.
         BufferedReader in  = new BufferedReader(new InputStreamReader(p.getInputStream()));
         try {
             p.waitFor();
@@ -258,7 +256,7 @@ public class IlenService {
         while ((s = stderr.readLine()) != null) {
             log.error("Error : {}", s);
         }
-        stderr.close();
+        stderr.close();*/
 
 /*        try {
             log.info("Start with {}", configJson);

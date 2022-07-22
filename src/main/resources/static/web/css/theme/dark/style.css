@@ -4215,6 +4215,17 @@ background-color: #fff;
   background-color: #062e51 !important;
 }
 
+#licence-record{
+  position: relative;
+  top: 175px;
+}
+
+#licence-warn{
+  position: relative;
+  left: 30px;
+  font-size: 14px;
+  }
+
 
 
 

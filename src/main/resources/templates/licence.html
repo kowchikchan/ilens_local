@@ -28,23 +28,17 @@
                 <th width="300">Expire Date</th>
     					</tr>
     				</thead>
-    				<tbody>
-              <tr>
-                <td>Logicfocus India</td>
-                <td>10</td>
-                <td>12-12-12</td>
-                <td>....</td>
-                <td>12-12-24</td>
-              </tr>
-            </tbody>
+            <tbody class="" id="licenceLst"></tbody>
     			</table>
           <div id="Licence"></div>
     		</div>
+        <div class="records" id="licence-record"></div>
 <script>
   $(document).ready(function(){    
       $("#navadms").addClass('active');
       $("#licence").addClass('active');
       $("#Adms").addClass('show');
+      getLicenceDetails();
     
   })
   function importlicence(){  
@@ -59,6 +53,35 @@
 
       }
    })
+}
+
+function getLicenceDetails(){
+  var licenceLst = "";
+  $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      dataType: "json",
+      headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+      url:"/api/v1/license" ,
+      type: "GET",
+      async: false,
+      success: function (data){
+        if(data == null){
+          console.log("null");
+          $("#licenceLst").hide();
+          $(".records").html("No Licence Found <div id='licence-warn'>Please contact Administrator! </div>").show();
+        }else{
+          licenceLst = licenceLst + '<tr>';
+          licenceLst = licenceLst + '<td>' + data.clientName + '</td>';
+          licenceLst = licenceLst + '<td>' + data.serverCount + '</td>';
+          licenceLst = licenceLst + '<td>' + data.startDate + '</td>';
+          licenceLst = licenceLst + '<td>' + data.type + '</td>';
+          licenceLst = licenceLst + '<td>' + data.validTo + '</td>';
+          $(".records").hide();
+          $("#licenceLst").html(licenceLst).show();
+        }
+      }
+   });
+
 }
 
 </script>

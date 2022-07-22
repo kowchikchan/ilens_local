@@ -64,6 +64,7 @@ $("#clickButton").click(function(){
       success: function(data){              
          setTimeout(function(){ toastr.success("Success.."); }, 1000);
          cancelModal();
+         getLicenceDetails();
       },
       error: function(err){
         setTimeout(function(){ toastr.error("Error found.."); }, 1000);

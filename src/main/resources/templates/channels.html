@@ -538,7 +538,12 @@ function save(){
           setTimeout(function(){ toastr.success("Configuration updated.."); }, 1000);
         },
         error:function(err){
-          setTimeout(function(){ toastr.error("Error found.."); }, 1000);          }
+          if(err.responseText.includes("Server count exceed")){
+            setTimeout(function(){ toastr.error("Your license count has exceeded it's limit."); }, 1000);
+          }else if(err.responseText.includes("No Licence Found!")){
+            setTimeout(function(){ toastr.error("No Licence Found."); }, 1000);
+          }else{
+          setTimeout(function(){ toastr.error("Error found.."); }, 1000);}          }
   });
 }
 

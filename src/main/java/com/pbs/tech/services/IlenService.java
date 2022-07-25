@@ -16,7 +16,6 @@ import com.pbs.tech.vo.runtime.EntryExitVo;
 import com.pbs.tech.vo.EntryViolationByLocationVo;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.data.cassandra.core.query.CassandraPageRequest;
 import org.springframework.data.domain.Slice;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -96,6 +94,9 @@ public class IlenService {
     @Value("${locations.unknown-location}")
     String unknownLocation;
 
+    @Value("${ilens.user.train-data.path}")
+    String trainingImagePath;
+
     @Autowired
     private CassandraOperations cassandraTemplate;
 
@@ -114,7 +115,7 @@ public class IlenService {
     @Autowired
     ConfigurationServices configurationServices;
 
-    public void startRuntime(String id) throws IlensException, JSONException, IOException, InterruptedException {
+    public void startRuntime(String id) throws Exception {
         HashMap<String, String> usersList = new HashMap<>();
         //TODO: check if already running.
         if (isRunning(id)) {
@@ -227,18 +228,27 @@ public class IlenService {
         } catch (IOException e) {
             throw new IOException("IO Exception {}" + e.getMessage());
         }
-        //String s = null;
-
-        //script executing command.
-        String executeCmd = pythonPath + " " +scriptPath + "/main.py" + " -i " + configsJsonPath + "/" + id + ".json"
+        /*String s = null;
+        script executing command.*/
+        /*String executeCmd = pythonPath + " " +scriptPath + "/main.py" + " -i " + configsJsonPath + "/" + id + ".json"
                 + " -b " + scriptPath + " -d "+ dataLocation;
         log.info("CMD {}", executeCmd);
         Process p = Runtime.getRuntime().exec(executeCmd);
-        log.info("process id {}", p.pid());
+        log.info("process id {}", p.pid());*/
+        long pid = 0;
+        try {
+            ProcessBuilder builder = new ProcessBuilder(pythonPath, scriptPath + "/main.py", "-i", configsJsonPath +
+                    "/" + id + ".json", "-b", scriptPath, "-d", dataLocation);
+            log.info("CMD:"+String.join(" ",builder.command()));
+            Process process = builder.start();
+            pid = process.pid();
+        }catch (Exception e){
+            throw new Exception("Exception " + e.getMessage());
+        }
 
         // add run time.
         ChannelRunTime runTime = new ChannelRunTime(id);
-        runTime.setPid(p.pid());
+        runTime.setPid(pid);
         runtimes.add(runTime);
 
         /*// read output.
@@ -592,22 +602,22 @@ public class IlenService {
                     log.info("Generated Query : " + stringBuilder);
                     List<EntryExitEntity> entities = cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
                     for (EntryExitEntity entity : entities) {
-                        //List<ExitView> exitDetails = this.getTodayExit(pageNumber, entity.getId());
                         List<ExitView> exitDetails = this.exitData(entity.getId(), entryExitFilter.getDate());
                         EntryExit entryExit = new EntryExit();
-                        // entryExit.setId(entity.getId());
                         entryExit.setId(entity.getId());
                         entryExit.setName(entity.getName());
-                        /*String name = "----";
                         try {
-                            User userObj = userRepo.findById(Long.parseLong(entity.getId())).get();
-                            name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
-                            entryExit.setName(name);
-                            entryExit.setId(userObj.getUsername());
-                        } catch (NoSuchElementException noSuchElementException) {
-                            entryExit.setName(name);
-                            log.info("Error {}", noSuchElementException.getMessage());
-                        }*/
+                            Channel ch = this.getChannelDetailsById(Long.parseLong(entity.getLocation()));
+                            entity.setLocation(ch.getName());
+
+                            // exit
+                            if(exitDetails.size() > 0){
+                                Channel ch1 = this.getChannelDetailsById(Long.parseLong(exitDetails.get(0).getLocation()));
+                                exitDetails.get(0).setLocation(ch1.getName());
+                            }
+                        }catch (Exception e){
+                            log.info("no channel found");
+                        }
                         entryExit.setEntry_view(entity);
                         entryExit.setExit_view(exitDetails);
                         entryExits.add(entryExit);
@@ -617,6 +627,16 @@ public class IlenService {
                 }
             }
             return entryExits;
+        }
+    }
+
+    public Channel getChannelDetailsById(long id) throws Exception {
+        Channel channel = null;
+        try {
+            channel = channelRepo.findById(id).get();
+            return channel;
+        }catch (Exception e){
+            throw new Exception("no channel found");
         }
     }
 
@@ -925,6 +945,14 @@ public class IlenService {
                     file = new File(dataLocation + "/" + snapshot + ".jpg");
                 }else if(type.equalsIgnoreCase("Unknown")){
                     file = new File(unknownLocation + "/" + snapshot + ".jpg");
+                }else if(type.equalsIgnoreCase("trainingImage")) {
+                    File fileDir = new File(trainingImagePath + "/" + snapshot);
+                    String[] fileNames = fileDir.list();
+                    if (fileNames != null && fileNames.length > 0) {
+                        file = new File(trainingImagePath + "/" + snapshot + "/" + fileNames[0]);
+                    }else{
+                        file = new File(dataLocation + "/noImageAvailable.jpg");
+                    }
                 }
                 encodedString = bs64Conversion(file);
             }catch (FileNotFoundException e){

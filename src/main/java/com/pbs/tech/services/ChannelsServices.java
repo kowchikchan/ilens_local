@@ -3,14 +3,8 @@ package com.pbs.tech.services;
  *
  */
 
-import com.pbs.tech.model.AccessConfigs;
-import com.pbs.tech.model.Channel;
-import com.pbs.tech.model.FRConfig;
-import com.pbs.tech.model.NprConfig;
-import com.pbs.tech.repo.AccessConfigRepo;
-import com.pbs.tech.repo.ChannelRepo;
-import com.pbs.tech.repo.FRConfigRepo;
-import com.pbs.tech.repo.NprConfigRepo;
+import com.pbs.tech.model.*;
+import com.pbs.tech.repo.*;
 import com.pbs.tech.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.*;
-import java.security.KeyException;
 import java.util.*;
+
+import static com.pbs.tech.config.LicenceValidate.isValidLicence;
 
 @Service
 public class ChannelsServices {
@@ -38,6 +33,9 @@ public class ChannelsServices {
 
     @Autowired
     AccessConfigRepo accessConfigRepo;
+
+    @Autowired
+    LicenceRepo licenceRepo;
 
     Logger log= LoggerFactory.getLogger(ChannelsServices.class);
 
@@ -150,8 +148,19 @@ public class ChannelsServices {
         }
     }
 
-    public void saveChannel(ChannelVo vo){
-        log.info("Channel update now");
+    public void saveChannel(ChannelVo vo) throws Exception {
+        Licence licence;
+        try {
+            licence = licenceRepo.findById(1L).get();
+        }catch (Exception e){
+           throw new Exception("No Licence Found! " + e.getMessage());
+        }
+
+        LicenceVo licenceVo = isValidLicence(licence.getLicenceStr());
+        if(vo.isStatus() && getPageCount("true") >= Long.parseLong(licenceVo.getServerCount())){
+            throw new Exception("Server count exceed");
+        }
+
         //now save channelConfig
         Channel channel=new Channel();
         channel.setId(vo.getId());
@@ -225,7 +234,8 @@ public class ChannelsServices {
 
                 }
                 }
-        }
+        log.info("Channel updated.");
+    }
 
     public void deleteChannel(long id){
         try {

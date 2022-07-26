@@ -156,8 +156,8 @@ public class ILensController {
     @GetMapping("/unknownRegistry")
     public String unknownRegistry(){return "unknownRegistry";}
 
-    @GetMapping("/report_period")
-    public String settings(){return "report_period";}
+    @GetMapping("/report")
+    public String report(){return "report";}
 
     @GetMapping("/violation")
     public String violation(){return "violation";}

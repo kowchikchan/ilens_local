@@ -154,7 +154,7 @@ public class IlenService {
         try {
             List<User> userObj = (List<User>) userRepo.findAll();
             for (User user : userObj) {
-                usersList.put(user.getUsername(), user.getFirstName() + " " + user.getLastName());
+                usersList.put(user.getUsername().toLowerCase(), user.getFirstName() + " " + user.getLastName());
             }
         }catch (NoSuchElementException e){
             throw new NoSuchElementException(e.getMessage());
@@ -359,7 +359,7 @@ public class IlenService {
     SimpleDateFormat dt = new SimpleDateFormat("ddMMyyyyHHmmss");
 
 
-    public void saveDataSet(ChannelData channelData) {
+    public void saveDataSet(ChannelData channelData) throws Exception {
         boolean x = true;
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -385,7 +385,14 @@ public class IlenService {
                 entryExist.setSnapshot(channelData.getSnapshot());
 
                 // save person details, if violated.
-                AccessConfigs accessConfigs = accessConfigRepo.findByChannelIdAndPersonId(channelData.getChannelId(),Long.parseLong(entryExist.getId()));
+                User user = null;
+                try {
+                    user = userRepo.findByUsername(entryExist.getId());
+                }catch (Exception e){
+                    throw new Exception("No user found"+ e.getMessage());
+                }
+                AccessConfigs accessConfigs = accessConfigRepo.findByChannelIdAndPersonId(channelData.getChannelId(),
+                        String.valueOf(user.getId()));
                 if (accessConfigs != null && accessConfigs.isEnabled()) {
                     entryViolation.setTime(now);
                     entryViolation.setType(channelData.getType());
@@ -495,7 +502,7 @@ public class IlenService {
     public  Object getAttendance(@RequestBody EntryExitFilter entryExitFilter, int pageNumber) throws Exception {
         List<EntryExit> entryExits = new ArrayList<>();
 
-        if(entryExitFilter.getId() != 0){
+        if(!StringUtils.isBlank(entryExitFilter.getId())){
 
             // Person detailed report by id
             SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
@@ -1009,7 +1016,7 @@ public class IlenService {
             //end time.
             specificationValues.add(new SearchCriteria("time", "<=", endDate));
         }
-        if (entryExitFilter.getId() != 0) {
+        if (!StringUtils.isBlank(entryExitFilter.getId())) {
             //id
             specificationValues.add(new SearchCriteria("id", "=", entryExitFilter.getId()));
         }
@@ -1162,7 +1169,7 @@ public class IlenService {
 
             // attendance data
             EntryExitFilter entryExitFilter = new EntryExitFilter();
-            entryExitFilter.setId(0);
+            entryExitFilter.setId("");
             entryExitFilter.setLocation("");
             entryExitFilter.setName("");
             entryExitFilter.setDate(dayStTime);

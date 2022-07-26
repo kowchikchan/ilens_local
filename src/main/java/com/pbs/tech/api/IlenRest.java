@@ -45,7 +45,7 @@ public class IlenRest {
 
     @PostMapping("/dataset")
     public ResponseEntity<?> getEntryExit(@RequestHeader("CLIENT_KEY") String clientKey,
-                                          @RequestBody ChannelData channelData){
+                                          @RequestBody ChannelData channelData) throws Exception {
         ilenService.saveDataSet(channelData);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }

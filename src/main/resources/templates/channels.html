@@ -225,7 +225,7 @@ function filterIp(){
           if(rL.includes(data[i].id.toString())){
             channelList=channelList+'<a href="#" class="tooltipMenu-color">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><span class="channelStart"><span class="fa fa-circle"></span></span><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
 
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 
@@ -656,7 +656,7 @@ $("#channelForm").hide();
           if(rL.includes(data[i].id.toString())){
             channelList=channelList+'<a href="#" class="tooltipMenu-color">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><span class="channelStart"><span class="fa fa-circle"></span></span><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
 
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 
@@ -769,7 +769,7 @@ function startChannel(id){
     var startserver="";
     startserver=startserver+'<a href="#" class="tooltipMenu-color">';
 
-    startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+    startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><span class="channelStart"><span class="fa fa-circle"></span></span><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
 
     startserver=startserver+'<div class="tooltipMenu rightSide">';
 
@@ -810,7 +810,7 @@ function restartchannel(id){
         success: function(data){
           var restartserver="";
           restartserver=restartserver+'<a href="#" class="tooltipMenu-color">';
-          restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+          restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><span class="channelStart"><span class="fa fa-circle"></span></span><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
           restartserver=restartserver+'<div class="tooltipMenu rightSide">';
           restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
           restartserver=restartserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
@@ -922,7 +922,7 @@ $("#channelForm").hide();
           if(rL.includes(data[i].id.toString())){
             channelList=channelList+'<a href="#" class="tooltipMenu-color">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><span class="channelStart"><span class="fa fa-circle"></span></span><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
 
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 

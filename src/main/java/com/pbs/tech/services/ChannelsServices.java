@@ -6,6 +6,7 @@ package com.pbs.tech.services;
 import com.pbs.tech.model.*;
 import com.pbs.tech.repo.*;
 import com.pbs.tech.vo.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -208,22 +209,22 @@ public class ChannelsServices {
                 nprConfigRepo.save(nprConfigObj);
                 //now save Access config
 
-                for(Long id:vo.getConfigsVo().getMembersAdd()){
+                for(String id:vo.getConfigsVo().getMembersAdd()){
                     AccessConfigs accessConfigsObj = new AccessConfigs();
                     accessConfigsObj.setCreatedBy("admin");
                     accessConfigsObj.setCreatedDt(new Date());
                     accessConfigsObj.setUpdatedBy("admin");
                     accessConfigsObj.setUpdatedDt(new Date());
                     //add member
-                    if(id != 0) {
+                    if(!StringUtils.isBlank(id)){
                         accessConfigsObj.setChannelId(vo.getId());
                         accessConfigsObj.setPersonId(id);
                         accessConfigRepo.save(accessConfigsObj);
                     }
                 }
                     //remove member
-                for(Long id:vo.getConfigsVo().getMembersRemove()) {
-                    if(id != 0) {
+                for(String id:vo.getConfigsVo().getMembersRemove()) {
+                    if(!StringUtils.isBlank(id)) {
                         try {
                             AccessConfigs obj = accessConfigRepo.findByChannelIdAndPersonId(vo.getId(), id);
                             accessConfigRepo.delete(obj);
@@ -299,7 +300,7 @@ public class ChannelsServices {
         //Access config values
         try {
             List<AccessConfigs> accessConfigs = accessConfigRepo.findByChannelId(id);
-            List<Long> mappedMembers = new ArrayList<>(accessConfigs.size());
+            List<String> mappedMembers = new ArrayList<>(accessConfigs.size());
             for (AccessConfigs member : accessConfigs) {
                 mappedMembers.add(member.getPersonId());
             }

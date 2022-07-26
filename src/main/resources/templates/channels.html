@@ -539,7 +539,7 @@ function save(){
         },
         error:function(err){
           if(err.responseText.includes("Server count exceed")){
-            setTimeout(function(){ toastr.error("Your license count has exceeded it's limit."); }, 1000);
+            setTimeout(function(){ toastr.error("Your license count has exceeded it's limit. So, you can't activate this channel."); }, 1000);
           }else if(err.responseText.includes("No Licence Found!")){
             setTimeout(function(){ toastr.error("No Licence Found."); }, 1000);
           }else{

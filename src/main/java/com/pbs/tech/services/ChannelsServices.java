@@ -150,6 +150,13 @@ public class ChannelsServices {
     }
 
     public void saveChannel(ChannelVo vo) throws Exception {
+        ArrayList<Long> runningChannels = new ArrayList<>();
+        ChannelFilterVO ch = new ChannelFilterVO();
+        ch.setStatus("true");
+        List<ChannelVo> chList = this.getChannelsList(ch, 0);
+        for(ChannelVo ch1: chList){
+            runningChannels.add(ch1.getId());
+        }
         Licence licence;
         try {
             licence = licenceRepo.findById(1L).get();
@@ -158,7 +165,7 @@ public class ChannelsServices {
         }
 
         LicenceVo licenceVo = isValidLicence(licence.getLicenceStr());
-        if(vo.isStatus() && getPageCount("true") >= Long.parseLong(licenceVo.getServerCount())){
+        if(vo.isStatus() && runningChannels.size() >= Long.parseLong(licenceVo.getServerCount()) && !runningChannels.contains(vo.getId())){
             throw new Exception("Server count exceed");
         }
 

@@ -3,7 +3,9 @@ package com.pbs.tech.repo.big;
 
 import com.pbs.tech.model.big.UnknownEntry;
 import org.springframework.data.cassandra.repository.Query;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
 import java.util.List;
@@ -11,5 +13,9 @@ import java.util.List;
 public interface UnknownEntryRepo extends CrudRepository<UnknownEntry, String> {
 
     @Query("SELECT * FROM UnknownEntries WHERE time >= ?0 AND time < ?1 ALLOW FILTERING")
-    List<UnknownEntry> getUnknownList(Date time1, Date time2);
+    Slice<UnknownEntry> getUnknownList(Date time1, Date time2, Pageable page);
+
+    @Query("SELECT * FROM UnknownEntries WHERE time >= ?0 AND time < ?1 ALLOW FILTERING")
+    List<UnknownEntry> getUnknownCount(Date time1, Date time2);
+
 }

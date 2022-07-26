@@ -45,7 +45,7 @@ public class IlenRest {
 
     @PostMapping("/dataset")
     public ResponseEntity<?> getEntryExit(@RequestHeader("CLIENT_KEY") String clientKey,
-                                          @RequestBody ChannelData channelData){
+                                          @RequestBody ChannelData channelData) throws Exception {
         ilenService.saveDataSet(channelData);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
@@ -122,11 +122,17 @@ public class IlenRest {
             ilenService.unknownSaveDataset(unknownFilterVO);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
-    @PostMapping("/unknown/getList")
+    @PostMapping("/unknown/getList/{pageNumber}")
     public ResponseEntity<?> unknownList(@RequestHeader("CLIENT_KEY") String clientKey,
-                                                @RequestBody UnknownFilterVO unknownFilterVO) throws Exception {
+                                                @RequestBody UnknownFilterVO unknownFilterVO,
+                                         @PathVariable long pageNumber) throws Exception {
 
-        return new ResponseEntity<>(ilenService.unknownList(unknownFilterVO), HttpStatus.OK);
+        return new ResponseEntity<>(ilenService.unknownList(unknownFilterVO, pageNumber), HttpStatus.OK);
+    }
+    @GetMapping("/unknown/count/{date}")
+    public ResponseEntity<?> unknownCount(@RequestHeader("CLIENT_KEY") String clientKey,
+                                         @PathVariable String date) throws Exception {
+        return new ResponseEntity<>(ilenService.unknownCount(date), HttpStatus.OK);
     }
 }
 

@@ -3,15 +3,10 @@ package com.pbs.tech.services;
  *
  */
 
-import com.pbs.tech.model.AccessConfigs;
-import com.pbs.tech.model.Channel;
-import com.pbs.tech.model.FRConfig;
-import com.pbs.tech.model.NprConfig;
-import com.pbs.tech.repo.AccessConfigRepo;
-import com.pbs.tech.repo.ChannelRepo;
-import com.pbs.tech.repo.FRConfigRepo;
-import com.pbs.tech.repo.NprConfigRepo;
+import com.pbs.tech.model.*;
+import com.pbs.tech.repo.*;
 import com.pbs.tech.vo.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.*;
-import java.security.KeyException;
 import java.util.*;
+
+import static com.pbs.tech.config.LicenceValidate.isValidLicence;
 
 @Service
 public class ChannelsServices {
@@ -38,6 +34,9 @@ public class ChannelsServices {
 
     @Autowired
     AccessConfigRepo accessConfigRepo;
+
+    @Autowired
+    LicenceRepo licenceRepo;
 
     Logger log= LoggerFactory.getLogger(ChannelsServices.class);
 
@@ -150,8 +149,26 @@ public class ChannelsServices {
         }
     }
 
-    public void saveChannel(ChannelVo vo){
-        log.info("Channel update now");
+    public void saveChannel(ChannelVo vo) throws Exception {
+        ArrayList<Long> runningChannels = new ArrayList<>();
+        ChannelFilterVO ch = new ChannelFilterVO();
+        ch.setStatus("true");
+        List<ChannelVo> chList = this.getChannelsList(ch, 0);
+        for(ChannelVo ch1: chList){
+            runningChannels.add(ch1.getId());
+        }
+        Licence licence;
+        try {
+            licence = licenceRepo.findById(1L).get();
+        }catch (Exception e){
+           throw new Exception("No Licence Found! " + e.getMessage());
+        }
+
+        LicenceVo licenceVo = isValidLicence(licence.getLicenceStr());
+        if(vo.isStatus() && runningChannels.size() >= Long.parseLong(licenceVo.getServerCount()) && !runningChannels.contains(vo.getId())){
+            throw new Exception("Server count exceed");
+        }
+
         //now save channelConfig
         Channel channel=new Channel();
         channel.setId(vo.getId());
@@ -199,22 +216,22 @@ public class ChannelsServices {
                 nprConfigRepo.save(nprConfigObj);
                 //now save Access config
 
-                for(Long id:vo.getConfigsVo().getMembersAdd()){
+                for(String id:vo.getConfigsVo().getMembersAdd()){
                     AccessConfigs accessConfigsObj = new AccessConfigs();
                     accessConfigsObj.setCreatedBy("admin");
                     accessConfigsObj.setCreatedDt(new Date());
                     accessConfigsObj.setUpdatedBy("admin");
                     accessConfigsObj.setUpdatedDt(new Date());
                     //add member
-                    if(id != 0) {
+                    if(!StringUtils.isBlank(id)){
                         accessConfigsObj.setChannelId(vo.getId());
                         accessConfigsObj.setPersonId(id);
                         accessConfigRepo.save(accessConfigsObj);
                     }
                 }
                     //remove member
-                for(Long id:vo.getConfigsVo().getMembersRemove()) {
-                    if(id != 0) {
+                for(String id:vo.getConfigsVo().getMembersRemove()) {
+                    if(!StringUtils.isBlank(id)) {
                         try {
                             AccessConfigs obj = accessConfigRepo.findByChannelIdAndPersonId(vo.getId(), id);
                             accessConfigRepo.delete(obj);
@@ -225,7 +242,8 @@ public class ChannelsServices {
 
                 }
                 }
-        }
+        log.info("Channel updated.");
+    }
 
     public void deleteChannel(long id){
         try {
@@ -289,7 +307,7 @@ public class ChannelsServices {
         //Access config values
         try {
             List<AccessConfigs> accessConfigs = accessConfigRepo.findByChannelId(id);
-            List<Long> mappedMembers = new ArrayList<>(accessConfigs.size());
+            List<String> mappedMembers = new ArrayList<>(accessConfigs.size());
             for (AccessConfigs member : accessConfigs) {
                 mappedMembers.add(member.getPersonId());
             }

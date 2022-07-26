@@ -2259,8 +2259,8 @@ option:hover{
 
 #user-credentials{
   position: inherit;
-  margin: 0% 12%;
   border-radius: 6px;
+  margin-bottom: 7px;
   display: none;
 }
 #user-credentials1{
@@ -3513,10 +3513,8 @@ span.crop1 {
     top: 30px;
   }
   #user-credentials {
-    margin: 5% 6%;
-    width: 92%;
-    margin-top: 16%;
-    margin-bottom: -6%;
+    margin-top: 2%;
+    margin-bottom: -2%;
   }
   #user-credentials1 {
     margin: 5% 6%;
@@ -3942,7 +3940,6 @@ input#text-date {
     margin: 3% 12% 0;
   }
   .warning-icon {
-    width: 35%;
     font-size: 12px;
   }
   #user-credentials {
@@ -4214,6 +4211,43 @@ background-color: #fff;
   color: #63676a !important;
 }
 
+#userFilter option {
+  background-color: #062e51 !important;
+}
+
+#licence-record{
+  position: relative;
+  top: 175px;
+}
+
+#licence-warn{
+  position: relative;
+  left: 30px;
+  font-size: 14px;
+  }
+
+.channelStart {
+  border: 2px solid #F9C631;
+  height: 24px !important;
+  width: 24px;
+  border-radius: 50%;
+  position: absolute;
+  margin-left: -7.8px;
+  margin-top: -2px;
+  animation-name: rotate;
+  background: transparent;
+  animation-duration: 5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+@keyframes rotate{
+  from{ transform: rotate(-360deg); }
+  to{ transform: rotate(360deg); }
+}
+.channelStart span.fa.fa-circle{
+  font-size: 6px;
+  margin-top: 15px;
+}
 
 
 

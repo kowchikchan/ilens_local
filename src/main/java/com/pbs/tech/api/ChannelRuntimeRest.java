@@ -28,6 +28,8 @@ public class ChannelRuntimeRest {
             ilenService.startRuntime(id);
         } catch (IlensException | JSONException | IOException | InterruptedException e) {
             return new ResponseEntity(e.getLocalizedMessage(),HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return new ResponseEntity(HttpStatus.CREATED);
     }

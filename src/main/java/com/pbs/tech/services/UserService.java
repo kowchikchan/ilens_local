@@ -123,6 +123,7 @@ public class UserService {
             userObj.setUpdatedBy(user.getUpdatedBy());
             userObj.setUpdatedDt(new Date());
             userObj.setDepartment(user.getDepartment());
+            userObj.setRole(ROLES_TYPE.valueOf(user.getRole()));
             userRepo.save(userObj);
         } catch (NoSuchElementException e) {
             throw new IlensException("No object found");

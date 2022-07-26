@@ -217,7 +217,12 @@ function saveUser(){
           setTimeout(function(){ toastr.success("User successfully Saved"); }, 1000);
          },
          error:function(err){
-            setTimeout(function(){ toastr.error("Error found.."); }, 1000); }
+          if(err.responseText.includes("User details already exists")){
+            setTimeout(function(){ toastr.error("User details already exists."); }, 1000);
+          }else{
+            setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+          }
+         }
       });
 };
 var currentPage = 1;

@@ -9,6 +9,6 @@ public interface AccessConfigRepo extends CrudRepository<AccessConfigs,Long> {
 
     List<AccessConfigs> findByChannelId(long channelId);
 
-   AccessConfigs findByChannelIdAndPersonId(long channelId,long PersonId);
+   AccessConfigs findByChannelIdAndPersonId(long channelId,String PersonId);
 
 }

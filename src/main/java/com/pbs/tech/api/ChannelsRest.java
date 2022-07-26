@@ -37,7 +37,7 @@ public class ChannelsRest {
     }
 
     @PostMapping
-    public ResponseEntity<?> save(@RequestHeader("CLIENT_KEY") String clientKey, @RequestBody ChannelVo vo){
+    public ResponseEntity<?> save(@RequestHeader("CLIENT_KEY") String clientKey, @RequestBody ChannelVo vo) throws Exception {
         channelsServices.saveChannel(vo);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

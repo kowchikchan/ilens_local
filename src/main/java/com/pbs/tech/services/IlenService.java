@@ -16,7 +16,6 @@ import com.pbs.tech.vo.runtime.EntryExitVo;
 import com.pbs.tech.vo.EntryViolationByLocationVo;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.data.cassandra.core.query.CassandraPageRequest;
 import org.springframework.data.domain.Slice;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -96,6 +94,9 @@ public class IlenService {
     @Value("${locations.unknown-location}")
     String unknownLocation;
 
+    @Value("${ilens.user.train-data.path}")
+    String trainingImagePath;
+
     @Autowired
     private CassandraOperations cassandraTemplate;
 
@@ -114,8 +115,7 @@ public class IlenService {
     @Autowired
     ConfigurationServices configurationServices;
 
-    @Async
-    public void startRuntime(String id) throws IlensException, JSONException, IOException, InterruptedException {
+    public void startRuntime(String id) throws Exception {
         HashMap<String, String> usersList = new HashMap<>();
         //TODO: check if already running.
         if (isRunning(id)) {
@@ -154,7 +154,7 @@ public class IlenService {
         try {
             List<User> userObj = (List<User>) userRepo.findAll();
             for (User user : userObj) {
-                usersList.put(user.getUsername(), user.getFirstName() + " " + user.getLastName());
+                usersList.put(user.getUsername().toLowerCase(), user.getFirstName() + " " + user.getLastName());
             }
         }catch (NoSuchElementException e){
             throw new NoSuchElementException(e.getMessage());
@@ -202,7 +202,6 @@ public class IlenService {
         configJson.put("executions" , executionsConfigs);
         configJson.put("name", channel.getName().replace(" ", ""));
         configJson.put("tesseract", tesseractLocation);
-        String result = "";
         try {
             //save configurations as json
             String filePath = configsJsonPath + "/" + id + ".json";
@@ -229,21 +228,30 @@ public class IlenService {
         } catch (IOException e) {
             throw new IOException("IO Exception {}" + e.getMessage());
         }
-        String s = null;
-
-        //script executing command.
-        String executeCmd = pythonPath + " " +scriptPath + "/main.py" + " -i " + configsJsonPath + "/" + id + ".json"
+        /*String s = null;
+        script executing command.*/
+        /*String executeCmd = pythonPath + " " +scriptPath + "/main.py" + " -i " + configsJsonPath + "/" + id + ".json"
                 + " -b " + scriptPath + " -d "+ dataLocation;
         log.info("CMD {}", executeCmd);
         Process p = Runtime.getRuntime().exec(executeCmd);
-        log.info("process id {}", p.pid());
+        log.info("process id {}", p.pid());*/
+        long pid = 0;
+        try {
+            ProcessBuilder builder = new ProcessBuilder(pythonPath, scriptPath + "/main.py", "-i", configsJsonPath +
+                    "/" + id + ".json", "-b", scriptPath, "-d", dataLocation);
+            log.info("CMD:"+String.join(" ",builder.command()));
+            Process process = builder.start();
+            pid = process.pid();
+        }catch (Exception e){
+            throw new Exception("Exception " + e.getMessage());
+        }
 
         // add run time.
         ChannelRunTime runTime = new ChannelRunTime(id);
-        runTime.setPid(p.pid());
+        runTime.setPid(pid);
         runtimes.add(runTime);
 
-        // read output.
+        /*// read output.
         BufferedReader in  = new BufferedReader(new InputStreamReader(p.getInputStream()));
         try {
             p.waitFor();
@@ -258,7 +266,7 @@ public class IlenService {
         while ((s = stderr.readLine()) != null) {
             log.error("Error : {}", s);
         }
-        stderr.close();
+        stderr.close();*/
 
 /*        try {
             log.info("Start with {}", configJson);
@@ -351,7 +359,7 @@ public class IlenService {
     SimpleDateFormat dt = new SimpleDateFormat("ddMMyyyyHHmmss");
 
 
-    public void saveDataSet(ChannelData channelData) {
+    public void saveDataSet(ChannelData channelData) throws Exception {
         boolean x = true;
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -377,7 +385,14 @@ public class IlenService {
                 entryExist.setSnapshot(channelData.getSnapshot());
 
                 // save person details, if violated.
-                AccessConfigs accessConfigs = accessConfigRepo.findByChannelIdAndPersonId(channelData.getChannelId(),Long.parseLong(entryExist.getId()));
+                User user = null;
+                try {
+                    user = userRepo.findByUsername(entryExist.getId());
+                }catch (Exception e){
+                    throw new Exception("No user found"+ e.getMessage());
+                }
+                AccessConfigs accessConfigs = accessConfigRepo.findByChannelIdAndPersonId(channelData.getChannelId(),
+                        String.valueOf(user.getId()));
                 if (accessConfigs != null && accessConfigs.isEnabled()) {
                     entryViolation.setTime(now);
                     entryViolation.setType(channelData.getType());
@@ -487,16 +502,13 @@ public class IlenService {
     public  Object getAttendance(@RequestBody EntryExitFilter entryExitFilter, int pageNumber) throws Exception {
         List<EntryExit> entryExits = new ArrayList<>();
 
-        if(entryExitFilter.getId() != 0){
+        if(!StringUtils.isBlank(entryExitFilter.getId())){
 
             // Person detailed report by id
-            GregorianCalendar cal = new GregorianCalendar();
             SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
             IdTraceVO traceVO = new IdTraceVO();
-
-
-            String selectedDate = df.format(entryExitFilter.getDate());
-            String endDate = df.format(this.getDayEndTime(cal.getTime()));
+            String selectedDate = df.format(this.getDayStTime(entryExitFilter.getDate()));
+            String endDate = df.format(this.getDayEndTime(entryExitFilter.getDate()));
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("SELECT * FROM ilens.EntryExit WHERE time >= " + "'" + selectedDate + "'" + " AND time<= "
                     + "'" + endDate + "'" +" AND id=" + "'" + entryExitFilter.getId() +"'" + " ALLOW FILTERING");
@@ -504,17 +516,6 @@ public class IlenService {
             try {
                 List<EntryExitEntity> slice = cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
                 List<IdTraceDetailsVO> idTraceDetailsVOList = new ArrayList<>();
-                /*String name = "----";
-                try {
-                    User userObj = userRepo.findById(entryExitFilter.getId()).get();
-                    name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
-                    traceVO.setName(name);
-                    traceVO.setId(userObj.getUsername());
-                } catch (NoSuchElementException noSuchElementException) {
-                    traceVO.setName(name);
-                    log.info("Error {}", noSuchElementException.getMessage());
-                }*/
-                //traceVO.setId(entryExitFilter.getId());
                 for (EntryExitEntity entryExitEntity : slice) {
                     traceVO.setId(entryExitEntity.getId());
                     traceVO.setName(entryExitEntity.getName());
@@ -608,22 +609,22 @@ public class IlenService {
                     log.info("Generated Query : " + stringBuilder);
                     List<EntryExitEntity> entities = cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
                     for (EntryExitEntity entity : entities) {
-                        //List<ExitView> exitDetails = this.getTodayExit(pageNumber, entity.getId());
                         List<ExitView> exitDetails = this.exitData(entity.getId(), entryExitFilter.getDate());
                         EntryExit entryExit = new EntryExit();
-                        // entryExit.setId(entity.getId());
                         entryExit.setId(entity.getId());
                         entryExit.setName(entity.getName());
-                        /*String name = "----";
                         try {
-                            User userObj = userRepo.findById(Long.parseLong(entity.getId())).get();
-                            name = String.join(" ", userObj.getFirstName(), userObj.getLastName());
-                            entryExit.setName(name);
-                            entryExit.setId(userObj.getUsername());
-                        } catch (NoSuchElementException noSuchElementException) {
-                            entryExit.setName(name);
-                            log.info("Error {}", noSuchElementException.getMessage());
-                        }*/
+                            Channel ch = this.getChannelDetailsById(Long.parseLong(entity.getLocation()));
+                            entity.setLocation(ch.getName());
+
+                            // exit
+                            if(exitDetails.size() > 0){
+                                Channel ch1 = this.getChannelDetailsById(Long.parseLong(exitDetails.get(0).getLocation()));
+                                exitDetails.get(0).setLocation(ch1.getName());
+                            }
+                        }catch (Exception e){
+                            log.info("no channel found");
+                        }
                         entryExit.setEntry_view(entity);
                         entryExit.setExit_view(exitDetails);
                         entryExits.add(entryExit);
@@ -633,6 +634,16 @@ public class IlenService {
                 }
             }
             return entryExits;
+        }
+    }
+
+    public Channel getChannelDetailsById(long id) throws Exception {
+        Channel channel = null;
+        try {
+            channel = channelRepo.findById(id).get();
+            return channel;
+        }catch (Exception e){
+            throw new Exception("no channel found");
         }
     }
 
@@ -941,6 +952,14 @@ public class IlenService {
                     file = new File(dataLocation + "/" + snapshot + ".jpg");
                 }else if(type.equalsIgnoreCase("Unknown")){
                     file = new File(unknownLocation + "/" + snapshot + ".jpg");
+                }else if(type.equalsIgnoreCase("trainingImage")) {
+                    File fileDir = new File(trainingImagePath + "/" + snapshot);
+                    String[] fileNames = fileDir.list();
+                    if (fileNames != null && fileNames.length > 0) {
+                        file = new File(trainingImagePath + "/" + snapshot + "/" + fileNames[0]);
+                    }else{
+                        file = new File(dataLocation + "/noImageAvailable.jpg");
+                    }
                 }
                 encodedString = bs64Conversion(file);
             }catch (FileNotFoundException e){
@@ -997,7 +1016,7 @@ public class IlenService {
             //end time.
             specificationValues.add(new SearchCriteria("time", "<=", endDate));
         }
-        if (entryExitFilter.getId() != 0) {
+        if (!StringUtils.isBlank(entryExitFilter.getId())) {
             //id
             specificationValues.add(new SearchCriteria("id", "=", entryExitFilter.getId()));
         }
@@ -1068,22 +1087,37 @@ public class IlenService {
         }
     }
 
-    public List<IdTraceDetailsVO> unknownList(UnknownFilterVO unknownFilterVO) {
+    public List<IdTraceDetailsVO> unknownList(UnknownFilterVO unknownFilterVO, long pageNumber) {
         List<IdTraceDetailsVO> idTraceDetailsVOs = new ArrayList<>();
+        int currpage = 0;
         if (unknownFilterVO != null) {
             Date selectedDate = this.getDayStTime(unknownFilterVO.getDate());;
             Date endDate = this.getDayEndTime(unknownFilterVO.getDate());
-            List<UnknownEntry> unknownEntries = unknownEntryRepo.getUnknownList(selectedDate, endDate);
-            for (UnknownEntry unknownEntry : unknownEntries) {
-                IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
-                idTraceDetailsVO.setChannelId(unknownEntry.getLocation());
-                idTraceDetailsVO.setTime(unknownEntry.getTime());
-                idTraceDetailsVO.setType(unknownEntry.getType());
-                idTraceDetailsVO.setSnapshot(unknownEntry.getSnapshot());
-                idTraceDetailsVOs.add(idTraceDetailsVO);
+            Slice<UnknownEntry> unknownEntries = unknownEntryRepo.getUnknownList(selectedDate, endDate, CassandraPageRequest.first(10));
+            while(unknownEntries.hasNext() && currpage < pageNumber) {
+                unknownEntries = unknownEntryRepo.getUnknownList(selectedDate, endDate, unknownEntries.nextPageable());
+                currpage++;
             }
-        }
+            for(int i=0; i<unknownEntries.getContent().size(); i++){
+                    IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
+                    idTraceDetailsVO.setChannelId(unknownEntries.getContent().get(i).getLocation());
+                    idTraceDetailsVO.setTime(unknownEntries.getContent().get(i).getTime());
+                    idTraceDetailsVO.setType(unknownEntries.getContent().get(i).getType());
+                    idTraceDetailsVO.setSnapshot(unknownEntries.getContent().get(i).getSnapshot());
+                    idTraceDetailsVOs.add(idTraceDetailsVO);
+                }
+            }
+
         return idTraceDetailsVOs;
+    }
+
+    public long unknownCount(String date) throws ParseException {
+        SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
+        Date date1 = df.parse(date);
+        Date selectedDate = this.getDayStTime(date1);;
+        Date endDate = this.getDayEndTime(date1);
+        List<UnknownEntry> unknownEntries = unknownEntryRepo.getUnknownCount(selectedDate, endDate);
+        return unknownEntries.size();
     }
 
     public Date getDayStTime(Date startDate){
@@ -1150,7 +1184,7 @@ public class IlenService {
 
             // attendance data
             EntryExitFilter entryExitFilter = new EntryExitFilter();
-            entryExitFilter.setId(0);
+            entryExitFilter.setId("");
             entryExitFilter.setLocation("");
             entryExitFilter.setName("");
             entryExitFilter.setDate(dayStTime);

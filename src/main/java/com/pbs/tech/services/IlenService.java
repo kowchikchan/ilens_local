@@ -1087,22 +1087,37 @@ public class IlenService {
         }
     }
 
-    public List<IdTraceDetailsVO> unknownList(UnknownFilterVO unknownFilterVO) {
+    public List<IdTraceDetailsVO> unknownList(UnknownFilterVO unknownFilterVO, long pageNumber) {
         List<IdTraceDetailsVO> idTraceDetailsVOs = new ArrayList<>();
+        int currpage = 0;
         if (unknownFilterVO != null) {
             Date selectedDate = this.getDayStTime(unknownFilterVO.getDate());;
             Date endDate = this.getDayEndTime(unknownFilterVO.getDate());
-            List<UnknownEntry> unknownEntries = unknownEntryRepo.getUnknownList(selectedDate, endDate);
-            for (UnknownEntry unknownEntry : unknownEntries) {
-                IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
-                idTraceDetailsVO.setChannelId(unknownEntry.getLocation());
-                idTraceDetailsVO.setTime(unknownEntry.getTime());
-                idTraceDetailsVO.setType(unknownEntry.getType());
-                idTraceDetailsVO.setSnapshot(unknownEntry.getSnapshot());
-                idTraceDetailsVOs.add(idTraceDetailsVO);
+            Slice<UnknownEntry> unknownEntries = unknownEntryRepo.getUnknownList(selectedDate, endDate, CassandraPageRequest.first(10));
+            while(unknownEntries.hasNext() && currpage < pageNumber) {
+                unknownEntries = unknownEntryRepo.getUnknownList(selectedDate, endDate, unknownEntries.nextPageable());
+                currpage++;
             }
-        }
+            for(int i=0; i<unknownEntries.getContent().size(); i++){
+                    IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
+                    idTraceDetailsVO.setChannelId(unknownEntries.getContent().get(i).getLocation());
+                    idTraceDetailsVO.setTime(unknownEntries.getContent().get(i).getTime());
+                    idTraceDetailsVO.setType(unknownEntries.getContent().get(i).getType());
+                    idTraceDetailsVO.setSnapshot(unknownEntries.getContent().get(i).getSnapshot());
+                    idTraceDetailsVOs.add(idTraceDetailsVO);
+                }
+            }
+
         return idTraceDetailsVOs;
+    }
+
+    public long unknownCount(String date) throws ParseException {
+        SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
+        Date date1 = df.parse(date);
+        Date selectedDate = this.getDayStTime(date1);;
+        Date endDate = this.getDayEndTime(date1);
+        List<UnknownEntry> unknownEntries = unknownEntryRepo.getUnknownCount(selectedDate, endDate);
+        return unknownEntries.size();
     }
 
     public Date getDayStTime(Date startDate){

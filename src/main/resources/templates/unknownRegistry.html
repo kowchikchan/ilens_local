@@ -17,6 +17,12 @@
     <div class="main-table">
     	<div class="col-md-12 pb-10 row m-0">
     		<div class="col-md-12">
+				<div class="navStyle1">
+					<nav aria-label="Page navigation example" class="pagination-nav1">
+						<ul class="pagination" id="unknownPagination">
+						</ul>
+					</nav>
+				</div>
 				<div class="lens_select select_position">
 					<div class="input-group date" id="datepicker">
 						<input type="text" id="text-date" class="form-control">
@@ -31,7 +37,7 @@
     					<tr>
     						<th width="300"> Time </th>
     						<th width="300"> Type </th>
-    						<th width="300"> Place </th>
+    						<th width="300"> Location </th>
     						<th width="300"> Snapshot </th>
     					</tr>
     				</thead>
@@ -53,9 +59,8 @@
 <script>
 	$(document).ready(function(){
 		$("#unknownRegistry").addClass('active');
-		var date=new Date();
-		UnknownRegistry(date);
-		 
+		date=($("#text-date").val())+" 00:00:01";
+		unknownPaging(date);	
 	})
 
 	$("#text-date").datetimepicker({
@@ -69,66 +74,65 @@
        $("#text-date").on("dp.change", function (e) {
 		var date=e.date.format(e.date._f)	
 		var st1=date;
-		var st2="T00:01:01.001Z";
+		var st2=" 00:01:01";
 		var date = st1.concat(st2);     
-		UnknownRegistry(date);
+		unknownPaging(date);
        });
     });
 
-	function UnknownRegistry(date){
+	function UnknownRegistry(pageNumber,date){
+		pageNumber=pageNumber;
 		var reportApi = "[[${session.REPORT_API}]]";
 		var sessionToken = "[[${session.USER.sessionToken}]]";
 		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
-			var apiUrl = urlSlashCheck + "api/v1/ilens/unknown/getList"; 
-			unknownFilterVO={
-							date:date
-							}
+		var apiUrl = urlSlashCheck + "api/v1/ilens/unknown/getList/"+pageNumber;
+		unknownFilterVO={
+			date:date
+		}
 		var ilensApiClientVO  = {
 			api: apiUrl,
 			clientKey: sessionToken,
 			inputVo: unknownFilterVO,
 			method: "POST"
 		}
-		$("#unknownList").empty();
-			$.ajax({
-			contentType: "application/json;charset=UTF-8",
-			url: "api/v1/iLensApiClient",
-			dataType: "json",
-			headers:{'CLIENT_KEY':sessionToken},
-			type: "POST",
-			async: false,
-			data: JSON.stringify(ilensApiClientVO),
-			success: function(data){
-				var unknownList="";
-				for(i=0;i<data.length;i++){
-				var time = moment(data[i].time).format("DD-MM-YYYY hh:mm:ss A");
-				encodedString = getSnapshotString(data[i].snapshot);
-				if(encodedString.toString().length === 0){
-                    encodedString = getSnapshotString("noImageAvailable");
-                }
-				unknownList=unknownList+'<tr>';
-				unknownList=unknownList+'<td>' +time+ '</td>';
-				unknownList=unknownList+'<td>'+data[i].type+'</td>';
-				unknownList=unknownList+'<td>'+data[i].channelId +'</td>';
-				unknownList = unknownList + '<td>';
-				unknownList = unknownList + "<div class='image'>";
-				unknownList = unknownList + "<a href='#' class='open-popup' id='" + encodedString +"' data-id='popup_default' onclick='snapshotShow(this.id)'> <img src='data:image/png;base64," + encodedString + "'></a>";
-				unknownList = unknownList + "</div>";
-				unknownList = unknownList + "</td>";
-				unknownList=unknownList+'</tr>';
-				}
-				if(data==0){
-					$(".records").html("No Records Found").show();
-				}else{
-					$("#unknownList").html(unknownList);
-					$(".records").hide()
-				}
-				},
+	$("#unknownList").empty();
+		$.ajax({
+		contentType: "application/json;charset=UTF-8",
+		url: "api/v1/iLensApiClient",
+		dataType: "json",
+		headers:{'CLIENT_KEY':sessionToken},
+		type: "POST",
+		async: false,
+		data: JSON.stringify(ilensApiClientVO),
+		success: function(data){
+			var unknownList="";
+			for(i=0;i<data.length;i++){
+			var time = moment(data[i].time).format("DD-MM-YYYY hh:mm:ss A");
+			encodedString = getSnapshotString(data[i].snapshot);
+			if(encodedString.toString().length === 0){
+				encodedString = getSnapshotString("noImageAvailable");
+			}
+			unknownList=unknownList+'<tr>';
+			unknownList=unknownList+'<td>' +time+ '</td>';
+			unknownList=unknownList+'<td>'+data[i].type+'</td>';
+			unknownList=unknownList+'<td>'+data[i].channelId +'</td>';
+			unknownList = unknownList + '<td>';
+			unknownList = unknownList + "<div class='image'>";
+			unknownList = unknownList + "<a href='#' class='open-popup' id='" + encodedString +"' data-id='popup_default' onclick='snapshotShow(this.id)'> <img src='data:image/png;base64," + encodedString + "'></a>";
+			unknownList = unknownList + "</div>";
+			unknownList = unknownList + "</td>";
+			unknownList=unknownList+'</tr>';
+			}
+			if(data!=0){
+				$("#unknownList").html(unknownList);
+				$(".records").hide()
+			}
+			},
 
-			error:function(err){
-				console.log(err);
-				}
-			});
+		error:function(err){
+			console.log(err);
+			}
+		});
 	}
 
 	function getSnapshotString(snapshotValue){
@@ -199,6 +203,55 @@
      $('.close-popup').click(function(){
       $('#popup_default').closePopup({ anim: 'fade' });
     });
+
+	var totalPages = 0;
+ 	var totalCount = 0;
+    function unknownPaging(date){
+      itemsPerPage=10;
+      var reportApi = "[[${session.REPORT_API}]]";
+      var sessionToken = "[[${session.USER.sessionToken}]]";
+      var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+      var apiUrl = urlSlashCheck + "api/v1/ilens/unknown/count/"+date;
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
+	  date=(date.split(" ")[0])+"T00:01:01.001Z";
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: "api/v1/iLensApiClient",
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "POST",
+        async: false,
+        data: JSON.stringify(ilensApiClientVO),
+        success:function(data){
+          if(data!=0){
+           totalCount=data;
+           totalPages=Math.ceil(totalCount/itemsPerPage);
+           $('#unknownPagination').empty();
+            $('#unknownPagination').removeData("twbs-pagination");
+            $('#unknownPagination').unbind("page");
+            window.pagObj = $('#unknownPagination').twbsPagination({
+                totalPages: totalPages,
+                visiblePages: 5,
+                next: '&raquo;',
+                last: '',
+                prev: '&laquo;',
+                first:'',
+				onPageClick: function (event, page) {
+                    pageNumber = (page - 1);
+					UnknownRegistry(pageNumber,date);
+				 }
+            }).on("page",function(event,num){});
+          }else{
+			$(".records").html("No Records Found").show();
+			$('.pagination-nav1').hide();
+		  }
+        }
+      });
+    }
 </script>
 
 </div>

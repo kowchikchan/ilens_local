@@ -719,12 +719,8 @@ header .main-menu li.drop:hover > ul.drop-down {
   cursor: pointer;
 }
 .Date-time-div {
-  text-align: center;
-  position: fixed;
-  top: 0;
+  display: none;
   color: white;
-  height: 46px;
-  z-index: 6;
   transition: 1s;
   background-color: #062e51;
 }
@@ -1367,13 +1363,14 @@ input:disabled{
   top: 0;
   transition: 1s;
   z-index: 100;
-  width: 100%;
+  width: calc(100% - 40px);
   height: 45px;
   background-color: #062e51;  
 }
 .top-nav.active{
   margin-left: 200px;
   transition: 1s;
+  width: calc(100% - 200px);
 }
 
 .float-100{
@@ -2259,8 +2256,8 @@ option:hover{
 
 #user-credentials{
   position: inherit;
+  margin: 0% 12%;
   border-radius: 6px;
-  margin-bottom: 7px;
   display: none;
 }
 #user-credentials1{
@@ -3100,7 +3097,7 @@ object {
   width: 35%;
   margin-bottom: 20px;
   height: 35px;
-  margin-left: 10%;
+  margin-left: 84px;
   background-color: #3a5362;
   border: 1px solid #f9c631 !important;
   border: none;
@@ -3113,7 +3110,7 @@ object {
   width: 35%;
   margin-bottom: 10px;
   height: 35px;
-  margin-left: 9.35%;
+  margin-left: 75px;
   background-color: #3a5362;
   border: 1px solid #f9c631 !important;
   border: none;
@@ -3513,8 +3510,15 @@ span.crop1 {
     top: 30px;
   }
   #user-credentials {
-    margin-top: 2%;
-    margin-bottom: -2%;
+    margin: 5% 6%;
+    width: 92%;
+    margin-top: 16%;
+    margin-bottom: -6%;
+  }
+  #modal-color #user-credentials{
+    margin: 5% 6%;
+    width: 92%;
+    margin-bottom: 2%;
   }
   #user-credentials1 {
     margin: 5% 6%;
@@ -3701,10 +3705,11 @@ span.crop1 {
   }
   .dlens_input{
     width: 85%;
+    margin-left: 47px;
   }
   .alens_input{
     width: 85%;
-    margin-left: 9.85%;
+    margin-left: 46px;
   }
   .apisty{
     min-height: 396px;
@@ -3786,6 +3791,7 @@ input#text-date {
   .top-nav.active {
     margin-left: 36px;
     transition: 1s;
+    width: calc(100% - 40px);
   }
   .navbar-vertical.active {
     transition: 1s;
@@ -3800,6 +3806,7 @@ input#text-date {
   }
   .top-nav {
     margin-left: 0px;
+    width: 100%;
   }
   .user.active img {
     margin-left: 5px;
@@ -3888,7 +3895,7 @@ input#text-date {
   }
   input#reportValue{
     width: 85%;
-    margin-left: 9.7%;
+    margin-left: 47px;
   }
   #attendanceList td {
       font-size: 12px;
@@ -3940,7 +3947,11 @@ input#text-date {
     margin: 3% 12% 0;
   }
   .warning-icon {
+    width: 35%;
     font-size: 12px;
+  }
+  #modal-color #warn-icon {
+    width: 100%;
   }
   #user-credentials {
     margin: 0% 11.4%;
@@ -4053,7 +4064,7 @@ tbody#nprList:hover {
   width: 35%;
   margin-bottom:22px;
   height: 35px;
-  margin-left: 8.7%;
+  margin-left: 68px;
   background-color: #3a5362;
   border: 1px solid #f9c631 !important;
   border: none;
@@ -4227,7 +4238,7 @@ background-color: #fff;
   }
 
 .channelStart {
-  border: 2px solid #F9C631;
+  border: 2px solid #f9c631;
   height: 24px !important;
   width: 24px;
   border-radius: 50%;
@@ -4247,6 +4258,28 @@ background-color: #fff;
 .channelStart span.fa.fa-circle{
   font-size: 6px;
   margin-top: 15px;
+}
+.ivProLogo img{
+  height: 32px;
+  background: white;
+  width: 55px;
+  border-radius: 7px;
+} 
+
+@media only screen and (min-width: 501px) and (max-width: 600px) {
+  .dlens_input{
+    width: 100%;
+    margin-left: auto;
+  }
+  .Report_input{
+    width: 100%;
+    margin-left: auto;
+  }
+  .alens_input{
+    width: 100%;
+    margin-left: auto;
+  }
+
 }
 
 

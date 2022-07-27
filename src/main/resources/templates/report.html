@@ -32,7 +32,7 @@
                                 <label class="config_labels">Report recipient Email <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The attendance report will be sent to this email address." ></i></label>
                             </div>
                             <div class="col-md-8">
-                                <input type="text" id="receipt" class="Report_receipt" name="receipt"/>
+                                <input type="text" id="receipt" data-role="tagsinput" value="" class="Report_receipt" name="receipt"/>
                                 <div class="text-warning ml-3 errorDiv"><i class="fas fa-exclamation-triangle"><span id="errorMsg" class="text-white"></span></i></div>
                             </div>
                         </div>      
@@ -62,22 +62,23 @@
         })  
     });
 
- 
-    $('#update').click(function() {  
+
+    $('#update').click(function() {
         var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-        var emailaddressVal = $("#receipt").val();
-        if(emailaddressVal == '') {
-            $("#errorMsg").html('Please enter your email address.');
-            $(".errorDiv").show();
-            return false;
-        }else if(!emailReg.test(emailaddressVal)) {
-            $("#errorMsg").html('Enter a valid email address.');
-            $(".errorDiv").show();
-            return false;
-        }else{
-            $(".errorDiv").hide();
-            save();
-        }
+        var emailaddressVal = ($("#receipt").val()).split(",");
+        for(i=0;i<emailaddressVal.length;i++){
+            if(emailaddressVal[i] == '') {
+                $("#errorMsg").html('Please enter your email address.');
+                $(".errorDiv").show();
+                return false;
+            }else if(!emailReg.test(emailaddressVal[i])) {
+                $("#errorMsg").html('Enter a valid email address.');
+                $(".errorDiv").show();
+                return false;
+            }
+        };
+        $(".errorDiv").hide();
+        save();
     });
 
     function reportlist(){
@@ -93,6 +94,7 @@
                 success: function(data){ 
                     $("#interval").val(data.reportPeriod);
                     $("#receipt").val(data.mail);
+                    $('#receipt').tagsinput('add', data.mail);
 
                 },
                 error: function(err){

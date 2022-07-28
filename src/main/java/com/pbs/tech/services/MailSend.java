@@ -4,10 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.*;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -15,7 +12,13 @@ public class MailSend {
     private static final Logger log = LoggerFactory.getLogger(MailSend.class);
 
     public void mailSend(String host, String port, String userName, String password, String toMail, String subject,
-                         String msgContent, String filePath){
+                         String msgContent, String filePath) throws AddressException {
+
+        String[] recipientList = toMail.split(",");
+        InternetAddress[] recipientAddress = new InternetAddress[recipientList.length];
+        for (int i=0; i<recipientList.length;i++){
+            recipientAddress[i] = new InternetAddress(recipientList[i]);
+        }
 
         // set properties
         Properties properties = new Properties();
@@ -35,7 +38,7 @@ public class MailSend {
         MimeMessage msg = new MimeMessage(session);
         try {
             msg.setFrom(new InternetAddress(userName));
-            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(toMail));
+            msg.setRecipients(Message.RecipientType.TO, recipientAddress);
             msg.setSubject(subject);
 
             Multipart emailContent = new MimeMultipart();

@@ -7,10 +7,13 @@ import com.pbs.tech.vo.UnknownFilterVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.cassandra.core.query.CassandraPageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -18,37 +21,39 @@ import java.util.List;
 public class AccessViolationServices {
     Logger log = LoggerFactory.getLogger(AccessViolationServices.class);
 
+    private static final String dateFormatForDb = "yyyy-MM-dd HH:mm:ss";
     ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     EntryViolationRepo entryViolationRepo;
 
-    public List<EntryViolation> getViolationList(UnknownFilterVO unknownFilterVO){
+    @Autowired
+    IlenService ilenService;
+
+    public List<EntryViolation> getViolationList(UnknownFilterVO unknownFilterVO, int pageNumber) throws Exception {
         List<EntryViolation> entity = new ArrayList<>();
-        Calendar cal = Calendar.getInstance();
+        int currPage = 0;
         if (unknownFilterVO != null) {
-            cal.setTime(unknownFilterVO.getDate());
-
-            //selected date
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 1);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            Date selectedDate = cal.getTime();
-
-            //selected date end time.
-            cal.add(Calendar.HOUR_OF_DAY, 23);
-            cal.add(Calendar.MINUTE, 58);
-            cal.add(Calendar.SECOND, 59);
-            cal.add(Calendar.MILLISECOND, 0);
-            Date endDate = cal.getTime();
-
-            List<EntryViolation> entryViolationList = entryViolationRepo.getViolationList(selectedDate, endDate);
-            for (EntryViolation entryViolation : entryViolationList) {
-                EntryViolation violation = mapper.convertValue(entryViolation, EntryViolation.class);
+            Date selectedDate = ilenService.getDayStTime(unknownFilterVO.getDate());
+            Date endDate = ilenService.getDayEndTime(unknownFilterVO.getDate());
+            Slice<EntryViolation> violations = entryViolationRepo.getViolationList(selectedDate, endDate,
+                    CassandraPageRequest.first(10));
+            while(violations.hasNext() && currPage < pageNumber) {
+                violations = entryViolationRepo.getViolationList(selectedDate, endDate, violations.nextPageable());
+                currPage++;
+            }
+            for (int i=0; i<violations.getContent().size();i++) {
+                EntryViolation violation = mapper.convertValue(violations.getContent().get(i), EntryViolation.class);
                 entity.add(violation);
             }
         }
         return entity;
+    }
+
+    public long violationCount(String date) throws ParseException {
+        SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
+        Date date1 = df.parse(date);
+        return entryViolationRepo.getViolationCount(ilenService.getDayStTime(date1), ilenService.getDayEndTime(date1)).
+                size();
     }
 }

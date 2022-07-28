@@ -19,7 +19,7 @@ public class ImageUploadRest {
     String imagePath;
 
     @PostMapping("/imageUpload/{id}")
-    public ResponseEntity<Object> imageUpload(@RequestHeader("CLIENT_KEY") String clientKey, @PathVariable long id, @RequestParam("File") MultipartFile file) throws IOException {
+    public ResponseEntity<Object> imageUpload(@RequestHeader("CLIENT_KEY") String clientKey, @PathVariable String id, @RequestParam("File") MultipartFile file) throws IOException {
         File myFile1 = new File(imagePath + "/." + id);
         if (!myFile1.exists()) {
             myFile1.mkdirs();

@@ -4326,7 +4326,36 @@ background-color: #fff;
   font-weight: 600;
 }
 
+.bootstrap-tagsinput .tag [data-role="remove"]:after {
+  content: "x";
+  padding: 0px 5px !important;
+  position: relative;
+  top: -1px;
+}
 
+.bootstrap-tagsinput .tag [data-role="remove"] {
+    margin-left: 8px !important;
+    cursor: pointer;
+    background: #062E51;
+    color: white;
+    border-radius: 50%;
+    padding-right: 0px;
+    font-size: 14px;
+    top: -1px;
+    position: relative;
+}
+
+.bootstrap-tagsinput input {
+    width: 100% !important;
+}
+
+.tootipText {
+  color: white;
+  font-weight: 900;
+}
+.tootipText:hover {
+  color: white;
+}
 
 
 

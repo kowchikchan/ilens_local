@@ -20,6 +20,9 @@ public interface EntryViolationRepo extends CrudRepository<EntryViolation,String
     List<EntryViolation> getEntryViolationsByLoc(Date today, String location);
 
     @Query("SELECT * FROM EntryViolation WHERE time >= ?0 AND time < ?1 ALLOW FILTERING")
-    List<EntryViolation> getViolationList(Date time1, Date time2);
+    Slice<EntryViolation> getViolationList(Date time1, Date time2, Pageable pageable);
+
+    @Query("SELECT * FROM EntryViolation WHERE time >= ?0 AND time < ?1 ALLOW FILTERING")
+    List<EntryViolation> getViolationCount(Date time1, Date time2);
 
 }

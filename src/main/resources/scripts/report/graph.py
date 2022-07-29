@@ -1,5 +1,7 @@
 from matplotlib import pyplot as plt
 import os, json, imutils
+plt.rc('xtick', labelsize=20)
+plt.rc('ytick', labelsize=20)
 try:
     f = open(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)) + "/userList.json", "r")
     data = json.loads(f.read())

@@ -671,7 +671,8 @@ public class IlenService {
                 ExitView exitView1 = new ExitView();
                 exitView1.setId(entity.getId());
                 exitView1.setName(entity.getName());
-                exitView1.setLocation(entity.getLocation());
+                Channel ch = this.getChannelDetailsById(Long.parseLong(entity.getLocation()));
+                exitView1.setLocation(ch.getName());
                 exitView1.setSnapshot(entity.getSnapshot());
                 exitView1.setTime(entity.getTime());
                 exitView1.setType(entity.getType());
@@ -1047,6 +1048,8 @@ public class IlenService {
             List<EntryExitEntity> entities = cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
             EntryExit entryExit = new EntryExit();
             for (EntryExitEntity entity : entities) {
+                Channel ch = this.getChannelDetailsById(Long.parseLong(entity.getLocation()));
+                entity.setLocation(ch.getName());
                 List<ExitView> exitDetails = this.exitData(entity.getId(), entryExitFilter.getDate());
                 entryExit.setId(entity.getId());
                 entryExit.setName(entity.getName());

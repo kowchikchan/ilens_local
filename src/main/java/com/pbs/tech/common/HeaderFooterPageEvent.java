@@ -1,9 +1,7 @@
 package com.pbs.tech.common;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.*;
+import com.itextpdf.text.html.WebColors;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -21,14 +19,18 @@ public class HeaderFooterPageEvent extends PdfPageEventHelper {
             rect.setLeft(100);
             String curDate = formatTime.format(new Date());
             String previousDt = formatTime.format(startDate);
-        ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("iLens Report"), 105, 750, 0);
-            ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("From Date : "+ previousDt), 160, 720, 0);
-            ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("To Date : " + curDate), 150, 690, 0);
-            ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("Generated Date: " + curDate), 170, 660, 0);
+            ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("Attendance Report",
+                FontFactory.getFont(FontFactory.HELVETICA_BOLD, 22.2f, WebColors.getRGBColor("#062E51"))), 600, 750, 0);
+            ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("From Date : "+ previousDt,
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12.2f, WebColors.getRGBColor("#062E51"))), 150, 740, 0);
+            ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("To Date : " + curDate,
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12.2f, WebColors.getRGBColor("#062E51"))), 1055, 740, 0);
         }
         public void onEndPage(PdfWriter writer,Document document) {
+            String curDate = formatTime.format(new Date());
             Rectangle rect = writer.getBoxSize("art");
-            ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase(" "), rect.getLeft(), rect.getBottom(), 0);
+            ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("Generated Date: " + curDate,
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10.0f, WebColors.getRGBColor("#062E51"))), 133, 23, 0);
             ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase(" "), rect.getRight(), rect.getBottom(), 0);
         }
 }

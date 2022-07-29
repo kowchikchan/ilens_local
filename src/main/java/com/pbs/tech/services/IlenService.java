@@ -236,15 +236,15 @@ public class IlenService {
         Process p = Runtime.getRuntime().exec(executeCmd);
         log.info("process id {}", p.pid());*/
         long pid = 0;
-        try {
-            ProcessBuilder builder = new ProcessBuilder(pythonPath, scriptPath + "/main.py", "-i", configsJsonPath +
-                    "/" + id + ".json", "-b", scriptPath, "-d", dataLocation);
-            log.info("CMD:"+String.join(" ",builder.command()));
-            Process process = builder.start();
-            pid = process.pid();
-        }catch (Exception e){
+        //try {
+        ProcessBuilder builder = new ProcessBuilder(pythonPath, scriptPath + "/main.py", "-i", configsJsonPath +
+                "/" + id + ".json", "-b", scriptPath, "-d", dataLocation);
+        log.info("CMD:"+String.join(" ",builder.command()));
+        Process process = builder.start();
+        pid = process.pid();
+        /*}catch (Exception e){
             throw new Exception("Exception " + e.getMessage());
-        }
+        }*/
 
         // add run time.
         ChannelRunTime runTime = new ChannelRunTime(id);
@@ -385,15 +385,17 @@ public class IlenService {
                 entryExist.setSnapshot(channelData.getSnapshot());
 
                 // save person details, if violated.
-                User user = null;
+                User user;
+                Channel channel;
                 try {
                     user = userRepo.findByUsername(entryExist.getId());
+                    channel = channelRepo.findById(channelData.getChannelId()).get();
                 }catch (Exception e){
-                    throw new Exception("No user found"+ e.getMessage());
+                    throw new Exception("No user/channel found"+ e.getMessage());
                 }
                 AccessConfigs accessConfigs = accessConfigRepo.findByChannelIdAndPersonId(channelData.getChannelId(),
-                        String.valueOf(user.getId()));
-                if (accessConfigs != null && accessConfigs.isEnabled()) {
+                            String.valueOf(user.getId()));
+                if (accessConfigs == null && channel.isAccessEnabled()) {
                     entryViolation.setTime(now);
                     entryViolation.setType(channelData.getType());
                     entryViolation.setId(entryExit.getId());
@@ -522,7 +524,9 @@ public class IlenService {
                     IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
                     idTraceDetailsVO.setTime(entryExitEntity.getTime());
                     idTraceDetailsVO.setType(entryExitEntity.getType());
-                    idTraceDetailsVO.setChannelId(entryExitEntity.getLocation());
+                    Channel ch = this.getChannelDetailsById(Long.parseLong(entryExitEntity.getLocation()));
+                    idTraceDetailsVO.setChannelId(ch.getName());
+                    //idTraceDetailsVO.setChannelId(entryExitEntity.getLocation());
                     idTraceDetailsVO.setSnapshot(entryExitEntity.getSnapshot());
                     idTraceDetailsVOList.add(idTraceDetailsVO);
                 }
@@ -1074,6 +1078,7 @@ public class IlenService {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
             unknownEntry.setName(unknownFilterVO.getChannelName());
             unknownEntry.setLocation(Long.toString(unknownFilterVO.getChannelId()));
             unknownEntry.setTime(now);
@@ -1087,7 +1092,7 @@ public class IlenService {
         }
     }
 
-    public List<IdTraceDetailsVO> unknownList(UnknownFilterVO unknownFilterVO, long pageNumber) {
+    public List<IdTraceDetailsVO> unknownList(UnknownFilterVO unknownFilterVO, long pageNumber) throws Exception {
         List<IdTraceDetailsVO> idTraceDetailsVOs = new ArrayList<>();
         int currpage = 0;
         if (unknownFilterVO != null) {
@@ -1098,9 +1103,13 @@ public class IlenService {
                 unknownEntries = unknownEntryRepo.getUnknownList(selectedDate, endDate, unknownEntries.nextPageable());
                 currpage++;
             }
+
             for(int i=0; i<unknownEntries.getContent().size(); i++){
                     IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
-                    idTraceDetailsVO.setChannelId(unknownEntries.getContent().get(i).getLocation());
+                System.out.println("unknown location : " + unknownEntries.getContent().get(i).getLocation());
+                    Channel ch = this.getChannelDetailsById(Long.parseLong(unknownEntries.getContent().get(i).getLocation()));
+                    idTraceDetailsVO.setChannelId(ch.getName());
+                    //idTraceDetailsVO.setChannelId(unknownEntries.getContent().get(i).getLocation());
                     idTraceDetailsVO.setTime(unknownEntries.getContent().get(i).getTime());
                     idTraceDetailsVO.setType(unknownEntries.getContent().get(i).getType());
                     idTraceDetailsVO.setSnapshot(unknownEntries.getContent().get(i).getSnapshot());

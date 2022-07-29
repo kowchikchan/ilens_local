@@ -391,7 +391,7 @@ public class IlenService {
                     user = userRepo.findByUsername(entryExist.getId());
                     channel = channelRepo.findById(channelData.getChannelId()).get();
                 }catch (Exception e){
-                    throw new Exception("No user/channel found"+ e.getMessage());
+                    throw new Exception("No user/channel found "+ e.getMessage());
                 }
                 AccessConfigs accessConfigs = accessConfigRepo.findByChannelIdAndPersonId(channelData.getChannelId(),
                             String.valueOf(user.getId()));
@@ -1109,7 +1109,6 @@ public class IlenService {
 
             for(int i=0; i<unknownEntries.getContent().size(); i++){
                     IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
-                System.out.println("unknown location : " + unknownEntries.getContent().get(i).getLocation());
                     Channel ch = this.getChannelDetailsById(Long.parseLong(unknownEntries.getContent().get(i).getLocation()));
                     idTraceDetailsVO.setChannelId(ch.getName());
                     //idTraceDetailsVO.setChannelId(unknownEntries.getContent().get(i).getLocation());

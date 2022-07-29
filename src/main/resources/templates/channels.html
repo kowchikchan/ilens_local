@@ -229,9 +229,9 @@ function filterIp(){
 
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Restart</a></li>';
 
-            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
 
           }else{
             if(data[i].status==false){
@@ -242,7 +242,7 @@ function filterIp(){
           }
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a></td>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Start</a></li></ul></div></li></ul></a></td>';
 
             channelList=channelList+'<td class="personEnteries"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></td>';
             channelList=channelList+'<td><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  href=\'#\'></i></div></td>';
@@ -660,9 +660,9 @@ $("#channelForm").hide();
 
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Restart</a></li>';
 
-            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
 
           }else{
             if(data[i].status==false){
@@ -674,7 +674,7 @@ $("#channelForm").hide();
 
           channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-          channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a></td>';
+          channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Start</a></li></ul></div></li></ul></a></td>';
 
           channelList=channelList+'<td class="personEnteries"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></td>';
           channelList=channelList+'<td><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  href=\'#\'></i></div></td>';
@@ -773,9 +773,9 @@ function startChannel(id){
 
     startserver=startserver+'<div class="tooltipMenu rightSide">';
 
-    startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+    startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Restart</a></li>';
 
-    startserver=startserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+    startserver=startserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
     if ( windowsize < 500 ){
     $("#server1_"+id).html(startserver);
     }else{
@@ -812,8 +812,8 @@ function restartchannel(id){
           restartserver=restartserver+'<a href="#" class="tooltipMenu-color">';
           restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><span class="channelStart"><span class="fa fa-circle"></span></span><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
           restartserver=restartserver+'<div class="tooltipMenu rightSide">';
-          restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
-          restartserver=restartserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+          restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Restart</a></li>';
+          restartserver=restartserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
 
           if ( windowsize < 500 ){
             $("#server1_"+id).html(restartserver);
@@ -848,7 +848,7 @@ function stopChannel(id){
 
     stopserver=stopserver+'<div class="tooltipMenu rightSide">';
 
-    stopserver=stopserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a>';
+    stopserver=stopserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Start</a></li></ul></div></li></ul></a>';
 
     if ( windowsize < 500 ){
       $("#server1_"+id).html(stopserver);
@@ -926,9 +926,9 @@ $("#channelForm").hide();
 
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Restart</a></li>';
 
-            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
 
           }else{
             if(data[i].status==false){
@@ -940,7 +940,7 @@ $("#channelForm").hide();
 
           channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-          channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a></div>';
+          channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color  tootipText\' href=\'#\'>Start</a></li></ul></div></li></ul></a></div>';
 
           channelList=channelList+'<div class="personEnteries"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></div>';
           channelList=channelList+'<div><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  href=\'#\'></i></div></div>';

@@ -240,15 +240,18 @@
                 last: '',
                 prev: '&laquo;',
                 first:'',
-				onPageClick: function (event, page) {
-                    pageNumber = (page - 1);
-					UnknownRegistry(pageNumber,date);
-				 }
+				        onPageClick: function (event, page) {
+                  pageNumber = (page - 1);
+					       UnknownRegistry(pageNumber,date);
+				    }
             }).on("page",function(event,num){});
+            $(".records").hide();
+            $('.pagination-nav1').show();
           }else{
-			$(".records").html("No Records Found").show();
-			$('.pagination-nav1').hide();
-		  }
+              $("#unknownList").empty();
+			       $(".records").html("No Records Found").show();
+			       $('.pagination-nav1').hide();
+		      } 
         }
       });
     }

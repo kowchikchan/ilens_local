@@ -17,6 +17,12 @@
     <div class="main-table">
     	<div class="col-md-12 pb-10 row m-0">
     		<div class="col-md-12">
+          <div class="navStyle1">
+          <nav aria-label="Page navigation example" class="pagination-nav1">
+            <ul class="pagination" id="violationPagination">
+            </ul>
+          </nav>
+        </div>
 				<div class="lens_select select_position">
 					<div class="input-group date" id="datepicker">
 						<input type="text" id="text-date" class="form-control">
@@ -53,35 +59,41 @@
     </div>
 	<div class="records"></div>
 <script>
-	$(document).ready(function(){
-		$("#violation").addClass('active');
-		var date=new Date();
-		UnknownRegistry(date);
-		 
-	})
 
-  $(function() {
-	$("#text-date").datetimepicker({
-		toolbarPlacement: 'bottom',
-		defaultDate: new Date(),
-		format: 'YYYY-MM-DD',
-		maxDate:new Date(),
+$(function() {
+  $("#text-date").datetimepicker({
+    toolbarPlacement: 'bottom',
+    defaultDate: new Date(),
+    format: 'YYYY-MM-DD',
+    maxDate:new Date(),
       });
    
-	  $("#text-date").on("dp.change", function (e) {
-		var date=e.date.format(e.date._f)	
-		var st1=date;
-		var st2="T00:01:01.001Z";
-		var date = st1.concat(st2);    
-		UnknownRegistry(date);
+    $("#text-date").on("dp.change", function (e) {
+    // var date=e.date.format(e.date._f) 
+    // var st1=date;
+    // var st2="T00:01:01.001Z";
+    // var date = st1.concat(st2);    
+
+    var date=e.date.format(e.date._f) 
+    var st1=date;
+    var st2=" 00:01:01";
+    var date = st1.concat(st2); 
+    violationPaging(date);
     });
   });
 
-  function UnknownRegistry(date){
+	$(document).ready(function(){
+		$("#violation").addClass('active');
+		//var date=new Date();
+    date=($("#text-date").val())+" 00:00:01";
+		violationPaging(date);
+		 
+	})
+  function UnknownRegistry(date, pageNumber){
 		var reportApi = "[[${session.REPORT_API}]]";
 		var sessionToken = "[[${session.USER.sessionToken}]]";
 		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
-			var apiUrl = urlSlashCheck + "/api/v1/violation/access/getList"; 
+			var apiUrl = urlSlashCheck + "/api/v1/violation/access/getList/"+pageNumber; 
 			unknownFilterVO={
 							date:date
 							}
@@ -112,8 +124,8 @@
 				violationList=violationList+'<td>' +data[i].id+ '</td>';
 				violationList=violationList+'<td>'+data[i].name+'</td>';
 				violationList=violationList+'<td>'+time +'</td>';
-                violationList=violationList+'<td>'+data[i].location +'</td>';
-                violationList=violationList+'<td>'+data[i].type +'</td>';
+                violationList=violationList+'<td>'+data[i].type+'</td>';
+                violationList=violationList+'<td>'+data[i].location+'</td>';
 				violationList = violationList + '<td>';
 				violationList = violationList + "<div class='image'>";
 				violationList = violationList + "<a href='#' class='open-popup' id='" + encodedString +"' data-id='popup_default' onclick='snapshotShow(this.id)'> <img src='data:image/png;base64," + encodedString + "'></a>";
@@ -204,6 +216,58 @@
      $('.close-popup').click(function(){
       $('#popup_default').closePopup({ anim: 'fade' });
     });
+
+  var totalPages = 0;
+  var totalCount = 0;
+    function violationPaging(date){
+      itemsPerPage=10;
+      var reportApi = "[[${session.REPORT_API}]]";
+      var sessionToken = "[[${session.USER.sessionToken}]]";
+      var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+      var apiUrl = urlSlashCheck + "/api/v1/violation/access/count/"+date;
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
+    date=(date.split(" ")[0])+"T00:01:01.001Z";
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: "api/v1/iLensApiClient",
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "POST",
+        async: false,
+        data: JSON.stringify(ilensApiClientVO),
+        success:function(data){
+          if(data!=0){
+           totalCount=data;
+           totalPages=Math.ceil(totalCount/itemsPerPage);
+           $('#violationPagination').empty();
+            $('#violationPagination').removeData("twbs-pagination");
+            $('#violationPagination').unbind("page");
+            window.pagObj = $('#violationPagination').twbsPagination({
+                totalPages: totalPages,
+                visiblePages: 5,
+                next: '&raquo;',
+                last: '',
+                prev: '&laquo;',
+                first:'',
+                onPageClick: function (event, page) {
+                  pageNumber = (page - 1);
+                 UnknownRegistry(date, pageNumber);
+            }
+            }).on("page",function(event,num){});
+            $(".records").hide();
+            $('.pagination-nav1').show();
+          }else{
+              $("#violationList").empty();
+             $(".records").html("No Records Found").show();
+             $('.pagination-nav1').hide();
+          } 
+        }
+      });
+    }
 
 </script>
 

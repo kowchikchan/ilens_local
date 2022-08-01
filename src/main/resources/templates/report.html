@@ -33,7 +33,12 @@
                             </div>
                             <div class="col-md-8">
                                 <input type="text" id="receipt" data-role="tagsinput" value="" class="Report_receipt" name="receipt"/>
-                                <div class="text-warning ml-3 errorDiv"><i class="fas fa-exclamation-triangle"><span id="errorMsg" class="text-white"></span></i></div>
+                                <div id="mailSendBtn">
+                                    <div class="text-warning ml-3 errorDiv"><i class="fas fa-exclamation-triangle"><span id="errorMsg" class="text-white"></span></i></div>
+                                    <div>
+                                        <button class="emailButton" onclick="reportGenerate()">Report Generate</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>      
                     </div>
@@ -123,6 +128,26 @@
                 async: false,
                 success: function(data){ 
                     setTimeout(function(){ toastr.success("Configuration updated"); }, 1000);
+                },
+                error: function(err){
+                    setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+                }
+            });
+    }
+
+    function reportGenerate(){
+        $(".pre-loading").show();
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/report/generate";  
+        $.ajax({
+                contentType: "application/json;charset=UTF-8",
+                url: apiUrl,
+                headers:{'CLIENT_KEY': sessionToken},
+                type: 'GET',
+                async: true,
+                success: function(data){ 
+                    setTimeout(function(){ $(".pre-loading").hide();}, 2000);
+                    setTimeout(function(){ toastr.success("Report send successfully"); }, 1000);
                 },
                 error: function(err){
                     setTimeout(function(){ toastr.error("Error found.."); }, 1000);

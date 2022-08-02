@@ -11,6 +11,7 @@ import com.pbs.tech.services.ReportServices;
 import com.pbs.tech.vo.ReportVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
@@ -69,6 +70,7 @@ public class ScheduledReportSend {
 
     }
 
+    @Async
     public void getPdf() throws Exception {
         ReportPeriod reportPeriod = reportServices.getList();
 

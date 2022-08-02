@@ -4209,6 +4209,7 @@ span#errorMsg{
 }
 .errorDiv{
   display: none;
+  width: 21%;
 }
 .bootstrap-datetimepicker-widget.dropdown-menu {
   padding: 2px !important;
@@ -4260,9 +4261,8 @@ background-color: #fff;
   margin-top: 15px;
 }
 .ivProLogo img{
-  height: 32px;
-  background: white;
-  width: 55px;
+  height: 52px;
+  width: 338px;
   border-radius: 7px;
 } 
 
@@ -4355,6 +4355,21 @@ background-color: #fff;
 }
 .tootipText:hover {
   color: white;
+}
+.emailButton{
+  width: 150px;
+  position: relative;
+  cursor: pointer;
+  background-color: #1e384800;
+  padding: 4px;
+  color: #fff;
+  border: 1px solid #a08852;
+  border-radius: 6px;
+  text-decoration: none;
+  top: 5px;
+}
+#mailSendBtn{
+ display: flex;
 }
 
 

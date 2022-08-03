@@ -115,6 +115,9 @@ public class IlenService {
     @Autowired
     ConfigurationServices configurationServices;
 
+    @Autowired
+    FirebaseMessagingServices firebaseMessagingServices;
+
     public void startRuntime(String id) throws Exception {
         HashMap<String, String> usersList = new HashMap<>();
         //TODO: check if already running.
@@ -403,6 +406,11 @@ public class IlenService {
                     entryViolation.setLocation(channelData.getChannelName());
                     entryViolation.setSnapshot(channelData.getSnapshot());
                     entryViolationRepo.save(entryViolation);
+                    String body = "["+entryExit.getId()+"] "+entryExit.getName() + " has entered " + channelData.getChannelName();
+                    firebaseMessagingServices.sendNotification("Entry violation",
+                            body,
+                            "ek0SLY4sRCyLCcSY2qMIEm:APA91bENE_SM1tew5DScRZilto-7LQISay3Y2USoIO22Z2aox343xG0_" +
+                                    "fhEWESkzQGkevYqohqUZ6SAjKE1Xgrmoj_EYLuTPIEGmoXfTBaW_nJxYzfMRK7wZHqyNNoVyQUqQWEBtrABi");
                 }
                 entryExitRepo.save(entryExist);
             }

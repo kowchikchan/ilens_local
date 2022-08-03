@@ -95,7 +95,9 @@ $(function() {
 		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
 			var apiUrl = urlSlashCheck + "/api/v1/violation/access/getList/"+pageNumber; 
 			unknownFilterVO={
-							date:date
+							date:date,
+                            location:"",
+                            type:""
 							}
 		var ilensApiClientVO  = {
 			api: apiUrl,

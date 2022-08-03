@@ -1,5 +1,5 @@
 import datetime
-import cv2, json, stomp, base64, argparse, threading, asyncio, numpy as np
+import cv2, json, stomp, base64, argparse, threading, asyncio, numpy as np, time
 from PIL import Image
 from io import BytesIO
 from faceDetection.frMethod import FRMethod
@@ -16,8 +16,8 @@ async def publisher(idOfCamera, cameraUrl, dataApi, vidStatus):
     clientConnection.connect('admin', 'password', wait=True)
     videoCapture = cv2.VideoCapture(cameraUrl)
     # output = cv2.VideoWriter('out.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 20, (400, 400))
+    await asyncio.sleep(0)
     while True:
-        await asyncio.sleep(0)
         ret, frame = videoCapture.read()
         if ret:
             # if vidStatus == 'True':
@@ -31,8 +31,9 @@ async def publisher(idOfCamera, cameraUrl, dataApi, vidStatus):
                 print()
             except Exception as e:
                 continue
-    # time.sleep(2)
-    # clientConnection.disconnect()
+    time.sleep(2)
+    clientConnection.disconnect()
+    await publisher(idOfCamera, cameraUrl, dataApi, vidStatus)
 
 
 async def consumer(appList, idOfCamera, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken, dataApi):

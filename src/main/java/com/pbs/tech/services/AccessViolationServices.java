@@ -38,7 +38,7 @@ public class AccessViolationServices {
         List<EntryViolation> entity = new ArrayList<>();
         String swapType = "";
         String swapName = "";
-        if (!StringUtils.isBlank(unknownFilterVO.getType()) || !StringUtils.isBlank(unknownFilterVO.getLocation())) {
+        if (!StringUtils.isBlank(unknownFilterVO.getId())) {
             List<SearchCriteria> specificationValues = new ArrayList<>();
             if (unknownFilterVO.getDate() != null && !StringUtils.isEmpty(unknownFilterVO.getDate().toString())) {
                 SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
@@ -51,13 +51,9 @@ public class AccessViolationServices {
                 //end time.
                 specificationValues.add(new SearchCriteria("time", "<=", endDate));
             }
-            if (!StringUtils.isBlank(unknownFilterVO.getType())) {
+            if (!StringUtils.isBlank(unknownFilterVO.getId())) {
                 //id
-                specificationValues.add(new SearchCriteria("type", "=", unknownFilterVO.getType()));
-            }
-            if (unknownFilterVO.getLocation() != null && !StringUtils.isEmpty(unknownFilterVO.getLocation())) {
-                //name
-                specificationValues.add(new SearchCriteria("location", "=", unknownFilterVO.getLocation()));
+                specificationValues.add(new SearchCriteria("id", "=", unknownFilterVO.getId()));
             }
             //generate query.
             StringBuilder stringBuilder = new StringBuilder();

@@ -3,24 +3,34 @@ package com.pbs.tech.vo;
 import java.util.List;
 
 public class ReportVO {
-    private long onTime;
-    private long graceTime;
-    private long lateTime;
-    private List<EntryExit> entryExitList;
+    private String totalOnTime;
+    private String totalGraceTime;
+    private String totalBeyondGraceTime;
+    private String onTime;
+    private String graceTime;
+    private List<ReportGen1VO> attendance;
 
-    public long getOnTime() {return onTime;}
+    public String getTotalOnTime() {return totalOnTime;}
 
-    public void setOnTime(long onTime) {this.onTime = onTime;}
+    public void setTotalOnTime(String totalOnTime) {this.totalOnTime = totalOnTime;}
 
-    public long getGraceTime() {return graceTime;}
+    public String getTotalGraceTime() {return totalGraceTime;}
 
-    public void setGraceTime(long graceTime) {this.graceTime = graceTime;}
+    public void setTotalGraceTime(String totalGraceTime) {this.totalGraceTime = totalGraceTime;}
 
-    public long getLateTime() {return lateTime;}
+    public String getTotalBeyondGraceTime() {return totalBeyondGraceTime;}
 
-    public void setLateTime(long lateTime) {this.lateTime = lateTime;}
+    public void setTotalBeyondGraceTime(String totalBeyondGraceTime) {this.totalBeyondGraceTime = totalBeyondGraceTime;}
 
-    public List<EntryExit> getEntryExitList() {return entryExitList;}
+    public String getOnTime() {return onTime;}
 
-    public void setEntryExitList(List<EntryExit> entryExitList) {this.entryExitList = entryExitList;}
+    public void setOnTime(String onTime) {this.onTime = onTime;}
+
+    public String getGraceTime() {return graceTime;}
+
+    public void setGraceTime(String graceTime) {this.graceTime = graceTime;}
+
+    public List<ReportGen1VO> getAttendance() {return attendance;}
+
+    public void setAttendance(List<ReportGen1VO> attendance) {this.attendance = attendance;}
 }

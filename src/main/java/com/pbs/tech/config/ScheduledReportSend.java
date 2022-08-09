@@ -5,9 +5,12 @@ import com.itextpdf.text.html.WebColors;
 import com.itextpdf.text.pdf.*;
 import com.pbs.tech.common.HeaderFooterPageEvent;
 import com.pbs.tech.model.ReportPeriod;
+import com.pbs.tech.services.ChannelRunTime;
 import com.pbs.tech.services.IlenService;
 import com.pbs.tech.services.MailSend;
 import com.pbs.tech.services.ReportServices;
+import com.pbs.tech.vo.ReportGen1VO;
+import com.pbs.tech.vo.ReportGenVO;
 import com.pbs.tech.vo.ReportVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +23,11 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -51,6 +57,9 @@ public class ScheduledReportSend {
     @Value("${mail.port}")
     String port;
 
+    String onTime;
+    String graceTime;
+
     @Scheduled(cron = "0 1 0 * * *")
     public void sendReport() throws Exception {
         log.info("Report Triggered.");
@@ -70,6 +79,90 @@ public class ScheduledReportSend {
 
     }
 
+    @Scheduled(cron = "0 0/30 * * * *")
+    public void scheduleRun() throws Exception {
+        List<ChannelRunTime> runTimes = ilenService.getRuntimes();
+        List<String> arr = new ArrayList<>();
+        for(int i=0; i<runTimes.size();i++){
+            arr.add(runTimes.get(i).getName());
+        }
+        for(int i=0; i<arr.size();i++) {
+            ilenService.stopRunTime(arr.get(i));
+            ilenService.startRuntime(arr.get(i));
+        }
+    }
+
+
+    public PdfPTable tableCreation(String[] header, float[] columnWidth) throws DocumentException {
+        PdfPTable table = null;
+        Font font = null;
+        table = new PdfPTable(header.length);
+        table.setSpacingBefore(5.0f);
+        table.setSpacingAfter(40.0f);
+        table.setWidthPercentage(100);
+        table.setWidths(columnWidth);
+        table.setSpacingBefore(8.0f);
+        font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.WHITE);
+        this.getHeaders(table, font, header);
+        return table;
+    }
+
+    private PdfPTable getHeaders(PdfPTable table, Font font, String[] header) {
+        for (String heading : header) {
+            Paragraph p = new Paragraph(heading, font);
+            p.setLeading(1.5f);
+            p.setKeepTogether(true);
+            PdfPCell cell = new PdfPCell(p);
+            cell.setPaddingLeft(5.0f);
+            cell.setFixedHeight(35f);
+            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            cell.setBorderWidth(2);
+            cell.setBorderColor(new BaseColor(255, 255, 255));
+            cell.setBackgroundColor(new BaseColor(80, 80, 80));
+            table.addCell(cell);
+        }
+        return table;
+    }
+
+    public PdfPTable addCell(String[] overView, PdfPTable table, Font font) {
+        for (int i = 0; i < overView.length; i ++) {
+            Paragraph p = new Paragraph(overView[i], font);
+            p.setLeading(1.5f, 0.5f);
+            p.setKeepTogether(true);
+            PdfPCell cell = new PdfPCell(p);
+            cell.setPaddingLeft(5.0f);
+            cell.setBorderWidth(2);
+            cell.setFixedHeight(35f);
+            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            cell.setBorderColor(new BaseColor(255, 255, 255));
+            cell.setBackgroundColor(new BaseColor(232, 232, 232));
+            if (i == 1) {
+                cell.setBackgroundColor(this.compareTime(onTime, graceTime, overView[i]));
+            }
+            table.addCell(cell);
+        }
+        return table;
+    }
+
+    private BaseColor compareTime(String onTime, String graceTime, String entryTime){
+        try {
+            DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
+            Date parseEntryTime = dateFormat.parse(entryTime);
+            Date parsedGraceTime = dateFormat.parse(graceTime);
+            Date parsedOnTime = dateFormat.parse(onTime);
+            if(parseEntryTime.after(parsedGraceTime)){
+                return new BaseColor(245, 198, 203);
+            }else if(parseEntryTime.after(parsedOnTime)){
+                return new BaseColor(255, 238, 186);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new BaseColor(195, 230, 203);
+    }
+
+
+
     @Async
     public void getPdf() throws Exception {
         ReportPeriod reportPeriod = reportServices.getList();
@@ -80,7 +173,6 @@ public class ScheduledReportSend {
         Document document = new Document(PageSize.A3.rotate(), 60, 35, 140, 60);
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(scriptPath + "/report/report.pdf"));
 
-        BaseColor titleColor = WebColors.getRGBColor("#062E51");
 
         Rectangle rect = new Rectangle(45, 40, 1160, 790);
         rect.enableBorderSide(1);
@@ -95,9 +187,14 @@ public class ScheduledReportSend {
         event.startDate = reportPeriod.getPreviousDate();
         writer.setPageEvent(event);
 
+        BaseColor onTimeColor = WebColors.getRGBColor("#117d2a");
+        BaseColor graceTimeColor = WebColors.getRGBColor("#d0a71a");
+        BaseColor beyondGraceEntry = WebColors.getRGBColor("#c63535");
+
+
         // open document.
         document.open();
-        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.WHITE);
+        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 45, BaseColor.WHITE);
 
         // title
         PdfPTable title1 = new PdfPTable(1);
@@ -112,11 +209,11 @@ public class ScheduledReportSend {
         content1.setHorizontalAlignment(Element.ALIGN_LEFT);
         content1.setWidthPercentage(50 / 5.23f);
 
-        PdfPCell content11 = new PdfPCell(new Phrase(String.valueOf(reportVO.getOnTime()), font));
+        PdfPCell content11 = new PdfPCell(new Phrase(String.valueOf(reportVO.getTotalOnTime()), font));
         content11.setPaddingTop(20);
         content11.setPaddingBottom(20);
         content11.setBorder(0);
-        content11.setBackgroundColor(titleColor);
+        content11.setBackgroundColor(onTimeColor);
         content11.setHorizontalAlignment(Element.ALIGN_CENTER);
 
         content1.addCell(content11);
@@ -133,11 +230,11 @@ public class ScheduledReportSend {
         content2.setHorizontalAlignment(Element.ALIGN_LEFT);
         content2.setWidthPercentage(50 / 5.23f);
 
-        PdfPCell content21 = new PdfPCell(new Phrase(String.valueOf(reportVO.getGraceTime()), font));
+        PdfPCell content21 = new PdfPCell(new Phrase(String.valueOf(reportVO.getTotalGraceTime()), font));
         content21.setPaddingTop(20);
         content21.setPaddingBottom(20);
         content21.setBorder(0);
-        content21.setBackgroundColor(titleColor);
+        content21.setBackgroundColor(graceTimeColor);
         content21.setHorizontalAlignment(Element.ALIGN_CENTER);
         content2.addCell(content21);
 
@@ -153,11 +250,11 @@ public class ScheduledReportSend {
         content3.setHorizontalAlignment(Element.ALIGN_LEFT);
         content3.setWidthPercentage(50 / 5.23f);
 
-        PdfPCell content31 = new PdfPCell(new Phrase(String.valueOf(reportVO.getLateTime()), font));
+        PdfPCell content31 = new PdfPCell(new Phrase(String.valueOf(reportVO.getTotalBeyondGraceTime()), font));
         content31.setPaddingTop(20);
         content31.setPaddingBottom(20);
         content31.setBorder(0);
-        content31.setBackgroundColor(titleColor);
+        content31.setBackgroundColor(beyondGraceEntry);
         content31.setHorizontalAlignment(Element.ALIGN_CENTER);
         content3.addCell(content31);
 
@@ -167,46 +264,6 @@ public class ScheduledReportSend {
         totalEntryTitle.setWidths(columnWidths);
         totalEntryTitle.getDefaultCell().setBorder(0);
 
-        PdfPTable attList = new PdfPTable(5);
-        float[] wdthCls = new float[]{27f, 13f, 22f, 15f, 25f};
-        attList.setWidthPercentage(100);
-        attList.setWidths(wdthCls);
-        attList.setHorizontalAlignment(Element.ALIGN_CENTER);
-
-
-        attList.addCell("Name");
-        attList.addCell("Entry location");
-        attList.addCell("Entry date time");
-        attList.addCell("Exit location");
-        attList.addCell("Exit date time");
-
-        if (reportVO.getEntryExitList().size() != 0) {
-            for (int i = 0; i < reportVO.getEntryExitList().size(); i++) {
-                String name = "----";
-                String inLocation = "----";
-                String inTime = "-----";
-                String outLocation = "----";
-                String outTime = "----";
-
-                if (reportVO.getEntryExitList().get(i).getEntry_view() != null) {
-                    name = reportVO.getEntryExitList().get(i).getName();
-                    inLocation = reportVO.getEntryExitList().get(i).getEntry_view().getLocation();
-                    inTime = formatTime.format(reportVO.getEntryExitList().get(i).getEntry_view().getTime());
-                }
-
-
-                if (reportVO.getEntryExitList().get(i).getExit_view().size() != 0) {
-                    outTime = formatTime.format(reportVO.getEntryExitList().get(i).getExit_view().get(0).getTime());
-                    outLocation = reportVO.getEntryExitList().get(i).getExit_view().get(0).getLocation();
-                }
-
-                attList.addCell(name);
-                attList.addCell(inLocation);
-                attList.addCell(inTime);
-                attList.addCell(outLocation);
-                attList.addCell(outTime);
-            }
-        }
 
         String s = null;
         String executeCmd = pythonPath + " " + scriptPath + "/report/graph.py";
@@ -230,8 +287,8 @@ public class ScheduledReportSend {
         stderr.close();
 
         Image img = Image.getInstance(scriptPath + "/report/reportGraph.png");
-        img.scaleToFit(1210, 660);
-        img.setAbsolutePosition(50, 320);
+        img.scaleToFit(1210, 680);
+        img.setAbsolutePosition(50, 310);
 
 
         Image ilensLogo = Image.getInstance(scriptPath + "/report/logo.png");
@@ -255,14 +312,39 @@ public class ScheduledReportSend {
         document.add(img);
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
-        document.add(attList);
-        document.add(rect);
 
-        PdfContentByte contentByte = writer.getDirectContent();
-        contentByte.rectangle(rect);
+
+        Paragraph paragraph = null;
+        document.add(new Paragraph("Detailed Report", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY)));
+        font.setColor(BaseColor.DARK_GRAY);
+
+        onTime = reportVO.getOnTime();
+        graceTime = reportVO.getGraceTime();
+        List<ReportGen1VO> attendanceList = reportVO.getAttendance();
+        for (int j = 0; j < attendanceList.size(); j++) {
+            PdfContentByte contentByte = writer.getDirectContent();
+            contentByte.rectangle(rect);
+            document.add(rect);
+            paragraph = new Paragraph();
+            paragraph.add(new Chunk("Date: ", new Font(Font.FontFamily.HELVETICA, 17, Font.NORMAL)));
+            paragraph.add(new Chunk(attendanceList.get(j).getDate(), new Font(Font.FontFamily.HELVETICA, 17, Font.BOLD)));
+            paragraph.setSpacingAfter(30f);
+            paragraph.setSpacingBefore(30f);
+            document.add(paragraph);
+            List<ReportGenVO> employeesList = attendanceList.get(j).getEmployees();
+            PdfPTable overAllTable = this.tableCreation(new String[]{"Name", "Entry time", "Entry location", "Exit time", "Exit location"}, new float[]{30, 15, 20, 15, 20});
+            overAllTable.setHeaderRows(1);
+            font = FontFactory.getFont(FontFactory.HELVETICA, 16, BaseColor.DARK_GRAY);
+            for (int i = 0; i < employeesList.size(); i++) {
+                ReportGenVO details = employeesList.get(i);
+                this.addCell(new String[]{details.getName(), details.getEntryTime(), details.getEntryLocation(), details.getExitTime(), details.getExitLocation()}, overAllTable, font);
+            }
+            document.add(overAllTable);
+            if (j != attendanceList.size()-1)
+                document.newPage();
+        }
         document.close();
 
-        //ReportServices reportServices1 = new ReportServices();
         reportServices.putConfigs();
         log.info("Report generated.");
 

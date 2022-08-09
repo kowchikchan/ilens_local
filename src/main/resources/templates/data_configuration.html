@@ -13,50 +13,80 @@
     </div>
     <div class="main-table">  
         <div class="data_api">
-                <div class="apisty">
-                    <div class="row g-0">	
-                        <div class="col-md-12 dFlex">
-                            <div class="col-md-2">
-                            <label class="config_labels">Data retains period <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Data Retains Period keeps the data for the required number of days." ></i></label>
+            <div>
+                <ul class="nav nav-tabs separator-tabs ml-0" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link fs-16 active" id="first-tab" data-toggle="tab" href="#first" role="tab"
+                           aria-controls="first" aria-selected="true">Entry Exit</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link fs-16"  id="second-tab" data-toggle="tab" href="#second" role="tab"
+                           aria-controls="second" aria-selected="false">Data Retains </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane show active" id="first" role="tabpanel" aria-labelledby="first-tab">
+                        <div class="row">
+                            <div class="col-12 col-lg-12 apisty">
+                                <div class="row g-0">	  
+                                    <div class="col-md-12 dFlex pt-3">
+                                        <div class="col-md-2">
+                                            <label class="config_labels">Expected entry time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Depending on this time, display the on-time entry data." ></i></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="text" id="timeSelector" class="expectedEntry" name="timeSelector"/>
+                                        </div>
+                                    </div>      
+                                    <div class="col-md-12 dFlex pt-3">
+                                        <div class="col-md-2">
+                                            <label class="config_labels">Grace Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="This time is used to determine grace entry." ></i></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <select class="retains_sec" id="graceTime" name="graceTime">                  
+                                                <option value=10>10 Mins</option>
+                                                <option value=20>20 Mins</option>
+                                                <option value=30>30 Mins</option>
+                                            </select>
+                                        </div>    
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-8">
-                                <select class="retains_sec" id="dayRetains" name="dayRetains">                  
-                                    <option value="30">30 Days</option>
-                                    <option value="35">35 Days</option>
-                                    <option value="40">40 Days</option>
-                                </select>
-                            </div>
-                        </div>    
-                        <div class="col-md-12 dFlex pt-3">
-                            <div class="col-md-2">
-                                <label class="config_labels">Expected entry time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Depending on this time, display the on-time entry data." ></i></label>
-                            </div>
-                            <div class="col-md-8">
-                                <input type="text" id="timeSelector" class="expectedEntry" name="timeSelector"/>
-                            </div>
-                        </div>      
-                        <div class="col-md-12 dFlex pt-3">
-                            <div class="col-md-2">
-                                <label class="config_labels">Grace Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="This time is used to determine grace entry." ></i></label>
-                            </div>
-                            <div class="col-md-8">
-                                <select class="retains_sec" id="graceTime" name="graceTime">                  
-                                    <option value=10>10 Mins</option>
-                                    <option value=20>20 Mins</option>
-                                    <option value=30>30 Mins</option>
-                                </select>
-                            </div>    
+            
                         </div>
-                        <div class="col-md-12 dFlex pt-3">
-                            <div class="col-md-2">
-                                <label class="config_labels">Video save option <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="If video save option checked, your video will save; otherwise, it won't." ></i></label>
-                            </div>
-                            <div class="col-md-8">
-                                <input type="checkbox" class="save_check" id="saveCheck" name="savecheck">
-                            </div>
-                        </div> 
+
                     </div>
-                 </div>
+                    <div class="tab-pane show" id="second" role="tabpanel" aria-labelledby="second-tab">
+                        <div class="row">
+                            <div class="col-12 col-lg-12 apisty">
+                                <div class="row g-0">	
+                                    <div class="col-md-12 dFlex">
+                                        <div class="col-md-2">
+                                            <label class="config_labels">Data retains period <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Data Retains Period keeps the data for the required number of days." ></i></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <select class="retains_sec" id="dayRetains" name="dayRetains">                  
+                                                <option value="30">30 Days</option>
+                                                <option value="35">35 Days</option>
+                                                <option value="40">40 Days</option>
+                                            </select>
+                                        </div>
+                                    </div>       
+                                    <div class="col-md-12 dFlex pt-3">
+                                        <div class="col-md-2">
+                                            <label class="config_labels">Video save option <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="If video save option checked, your video will save; otherwise, it won't." ></i></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="checkbox" class="save_check" id="saveCheck" name="savecheck">
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         <div>
             <button type="button"  class="api-button" id="update" >Update</button>
         </div>

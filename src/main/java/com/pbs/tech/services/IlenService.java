@@ -1243,6 +1243,9 @@ public class IlenService {
                 attendanceList.setEmployees(lstEmployees);
                 attendance.add(attendanceList);
             }
+            onTimeEntryListByDay.add((long) onTimeEntryData.size());
+            graceTimeEntryListByDay.add((long) graceTimeData.size());
+            beyondGraceEntryListByDay.add((long) lateEntryData.size());
 
             dateList.add(df.format(cal.getTime()));
 

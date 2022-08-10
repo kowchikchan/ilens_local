@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -154,11 +155,13 @@ public class ScheduledReportSend {
                 return new BaseColor(245, 198, 203);
             }else if(parseEntryTime.after(parsedOnTime)){
                 return new BaseColor(255, 238, 186);
+            }else{
+                return new BaseColor(195, 230, 203);
             }
         }catch (Exception e){
-            e.printStackTrace();
+//       e.printStackTrace();
         }
-        return new BaseColor(195, 230, 203);
+        return new BaseColor(232, 232, 232);
     }
 
 
@@ -166,10 +169,13 @@ public class ScheduledReportSend {
     @Async
     public void getPdf() throws Exception {
         ReportPeriod reportPeriod = reportServices.getList();
+        long week = reportPeriod.getReportPeriod();
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.WEEK_OF_MONTH, -(int)week);
 
         ReportVO reportVO = ilenService.totalEntries(reportPeriod.getReportPeriod());
         String scriptPath = System.getProperty("SCRIPT_PATH");
-
+        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 45, BaseColor.WHITE);
         Document document = new Document(PageSize.A3.rotate(), 60, 35, 140, 60);
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(scriptPath + "/report/report.pdf"));
 
@@ -184,7 +190,7 @@ public class ScheduledReportSend {
 
         writer.setBoxSize("art", rect);
         HeaderFooterPageEvent event = new HeaderFooterPageEvent();
-        event.startDate = reportPeriod.getPreviousDate();
+        event.startDate = cal.getTime();
         writer.setPageEvent(event);
 
         BaseColor onTimeColor = WebColors.getRGBColor("#117d2a");
@@ -194,7 +200,12 @@ public class ScheduledReportSend {
 
         // open document.
         document.open();
-        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 45, BaseColor.WHITE);
+        PdfContentByte contentByte = writer.getDirectContent();
+        contentByte.rectangle(rect);
+        document.add(rect);
+        Paragraph pgp = new Paragraph("Summary", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY));
+        pgp.setAlignment(Element.ALIGN_CENTER);
+        document.add(pgp);
 
         // title
         PdfPTable title1 = new PdfPTable(1);
@@ -287,8 +298,8 @@ public class ScheduledReportSend {
         stderr.close();
 
         Image img = Image.getInstance(scriptPath + "/report/reportGraph.png");
-        img.scaleToFit(1210, 680);
-        img.setAbsolutePosition(50, 310);
+        img.scaleToFit(1210, 1210);
+        img.setAbsolutePosition(50, 200);
 
 
         Image ilensLogo = Image.getInstance(scriptPath + "/report/logo.png");
@@ -314,6 +325,7 @@ public class ScheduledReportSend {
         document.add(new Paragraph("\n"));
 
 
+        document.newPage();
         Paragraph paragraph = null;
         document.add(new Paragraph("Detailed Report", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY)));
         font.setColor(BaseColor.DARK_GRAY);
@@ -322,7 +334,6 @@ public class ScheduledReportSend {
         graceTime = reportVO.getGraceTime();
         List<ReportGen1VO> attendanceList = reportVO.getAttendance();
         for (int j = 0; j < attendanceList.size(); j++) {
-            PdfContentByte contentByte = writer.getDirectContent();
             contentByte.rectangle(rect);
             document.add(rect);
             paragraph = new Paragraph();
@@ -338,6 +349,10 @@ public class ScheduledReportSend {
             for (int i = 0; i < employeesList.size(); i++) {
                 ReportGenVO details = employeesList.get(i);
                 this.addCell(new String[]{details.getName(), details.getEntryTime(), details.getEntryLocation(), details.getExitTime(), details.getExitLocation()}, overAllTable, font);
+            }
+            if(employeesList.size() == 0){
+                font = FontFactory.getFont(FontFactory.HELVETICA, 20, BaseColor.DARK_GRAY);
+                this.addCell(new String[]{"","","No Data Found","",""},overAllTable,font);
             }
             document.add(overAllTable);
             if (j != attendanceList.size()-1)

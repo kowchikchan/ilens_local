@@ -7,6 +7,7 @@ import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 public class HeaderFooterPageEvent extends PdfPageEventHelper {
 
@@ -17,8 +18,10 @@ public class HeaderFooterPageEvent extends PdfPageEventHelper {
             Rectangle rect = writer.getBoxSize("art");
             rect.setTop(770);
             rect.setLeft(100);
-            String curDate = formatTime.format(new Date());
             String previousDt = formatTime.format(startDate);
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DAY_OF_MONTH, -1);
+            String curDate = formatTime.format(cal.getTime());
             ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("Attendance Report",
                 FontFactory.getFont(FontFactory.HELVETICA_BOLD, 22.2f, WebColors.getRGBColor("#062E51"))), 600, 750, 0);
             ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("From Date : "+ previousDt +" 00:00 AM",

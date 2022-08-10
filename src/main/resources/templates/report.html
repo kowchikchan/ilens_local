@@ -21,9 +21,11 @@
                             </div>
                             <div class="col-md-8">
                                 <select class="retains_sec" id="interval" name="interval">                  
-                                    <option value="1">1 Week</option>
-                                    <option value="2">2 Week</option>
-                                    <option value="4">1 Month</option>
+                                    <option value="1">1 Day</option>
+                                    <option value="2">2 Days</option>
+                                    <option value="7">1 Week</option>
+                                    <option value="14">2 Weeks</option>
+                                    <option value="30">1 Month</option>
                                 </select>
                             </div>
                         </div>    
@@ -145,7 +147,7 @@
                 async: true,
                 success: function(data){ 
                     setTimeout(function(){ $(".pre-loading").hide();}, 2000);
-                    setTimeout(function(){ toastr.success("Report send successfully"); }, 1000);
+                    setTimeout(function(){ toastr.success("Report sent successfully"); }, 1000);
                 },
                 error: function(err){
                     setTimeout(function(){ toastr.error("Error found.."); }, 1000);

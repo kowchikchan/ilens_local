@@ -3367,6 +3367,7 @@ span#text {
 button.btn.btn-outline-warning {
   padding: 5px;
   margin-bottom: -2px;
+  margin-top: 10px;
   width: 86px;
 }
 .pre-loading2 {

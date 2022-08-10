@@ -277,9 +277,9 @@ function usersPaging(){
             totalPages: totalPages,
             visiblePages: 5,
             next: '&raquo;',
-            last: '',
+            last: 'Last',
             prev: '&laquo;',
-            first:'',
+            first:'First',
             initiateStartPageClick: false,
             onPageClick: function (event, page) {
                 pageNumber = (page - 1);
@@ -381,7 +381,7 @@ function updateUser(){
       success:function(data){
         usersPaging();
         cancelForm2();
-        setTimeout(function(){ toastr.info("User successfully upadted"); }, 1000);
+        setTimeout(function(){ toastr.info("User successfully updated"); }, 1000);
        },
        error:function(err){
           setTimeout(function(){ toastr.error("Error found.."); }, 1000);          }

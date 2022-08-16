@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os, json
-plt.rc('xtick', labelsize=20)
+plt.rc('xtick', labelsize=16)
 plt.rc('ytick', labelsize=20)
 
 angle = 0

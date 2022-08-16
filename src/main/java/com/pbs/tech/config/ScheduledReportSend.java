@@ -65,19 +65,12 @@ public class ScheduledReportSend {
     public void sendReport() throws Exception {
         log.info("Report Triggered.");
         ReportPeriod reportPeriod = reportServices.getList();
-        long rptPeriod = 7;
-        if (reportPeriod.getReportPeriod() == 2) {
-            rptPeriod = 14;
-        } else if (reportPeriod.getReportPeriod() == 4) {
-            rptPeriod = 28;
-        }
-        long diff = new Date().getTime() - reportPeriod.getPreviousDate().getTime();
-        long diffDays = TimeUnit.MILLISECONDS.toDays(diff) % 365;
-
-        if (diffDays == rptPeriod) {
+        Date curDtTime = new Date();
+        long diff = curDtTime.getTime() - reportPeriod.getPreviousDate().getTime();
+        long differenceBetweenDts = diff / 1000 / 60 / 60 / 24;
+        if (differenceBetweenDts == reportPeriod.getReportPeriod()){
             this.getPdf();
         }
-
     }
 
     @Scheduled(cron = "0 0/30 * * * *")

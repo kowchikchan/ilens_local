@@ -1164,7 +1164,7 @@ public class IlenService {
         List<ReportGen1VO> attendance = new ArrayList<>();
         ReportVO reportVO = new ReportVO();
 
-        String dateFormat = "dd MMMM yyyy";
+        String dateFormat = "dd MMMM yyyy-EEEE";
         String timeFormat = "hh:mm a";
         Calendar cal = Calendar.getInstance();
         days -= 1;

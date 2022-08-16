@@ -1160,16 +1160,17 @@ public class IlenService {
         return cal.getTime();
     }
 
-    public ReportVO totalEntries(long week) throws Exception {
+    public ReportVO totalEntries(long days) throws Exception {
         List<ReportGen1VO> attendance = new ArrayList<>();
         ReportVO reportVO = new ReportVO();
 
         String dateFormat = "dd MMMM yyyy";
         String timeFormat = "hh:mm a";
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.WEEK_OF_MONTH, -(int)week);
-        int repeatValue = 7;
-        if(week == 2){ repeatValue = 14; }else if(week == 4){repeatValue = 28;}
+        days -= 1;
+        cal.add(Calendar.DATE, -(int)days);
+        //int repeatValue = 7;
+        //if(week == 2){ repeatValue = 14; }else if(week == 4){repeatValue = 28;}
         long onTimeCount = 0;
         long graceTimeCount = 0;
         long lateEntryCount = 0;
@@ -1182,7 +1183,7 @@ public class IlenService {
         Configurations configuration = configurationServices.getList();
         String[] graceTimeList = configuration.getGraceTime().split(" ")[0].split(":");
         String[] onTimeList = configuration.getOnTime().split(" ")[0].split(":");
-        for(int i=0; i<repeatValue; i++){
+        for(int i=0; i<=days; i++){
             ReportGenVO attList;
             List<ReportGenVO> lstEmployees = new ArrayList<>();
             ReportGen1VO attendanceList = new ReportGen1VO();
@@ -1209,7 +1210,7 @@ public class IlenService {
 
             List<EntryExitEntity> onTimeEntryData = entryExitRepo.getTodayAttendanceCount(dayStTime, onTime);
             List<EntryExitEntity> graceTimeData = entryExitRepo.getTodayAttendanceCount(onTime, graceTime);
-            List<EntryExitEntity> lateEntryData = entryExitRepo.getLateEntry(graceTime, dayEdTime);
+            List<EntryExitEntity> lateEntryData = entryExitRepo.getTodayAttendanceCount(graceTime, dayEdTime);
 
             // attendance data
             EntryExitFilter entryExitFilter = new EntryExitFilter();

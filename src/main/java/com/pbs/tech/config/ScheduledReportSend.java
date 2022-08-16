@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 public class ScheduledReportSend {
     private static final Logger log = LoggerFactory.getLogger(ScheduledReportSend.class);
 
-    private static final SimpleDateFormat formatTime = new SimpleDateFormat("dd-MM-yyyy hh.mm aa");
+    private static final SimpleDateFormat formatTime = new SimpleDateFormat("dd MMMM yyyy hh.mm aa");
 
     @Autowired
     ReportServices reportServices;
@@ -169,15 +169,19 @@ public class ScheduledReportSend {
     @Async
     public void getPdf() throws Exception {
         ReportPeriod reportPeriod = reportServices.getList();
-        long week = reportPeriod.getReportPeriod();
+        long days = reportPeriod.getReportPeriod();
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.WEEK_OF_MONTH, -(int)week);
+        days -= 1;
+        cal.add(Calendar.DATE, -(int)days);
+
+        String dateFormat = "dd MMMM yyyy";
+        SimpleDateFormat df = new SimpleDateFormat(dateFormat);
 
         ReportVO reportVO = ilenService.totalEntries(reportPeriod.getReportPeriod());
         String scriptPath = System.getProperty("SCRIPT_PATH");
         Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 45, BaseColor.WHITE);
         Document document = new Document(PageSize.A3.rotate(), 60, 35, 140, 60);
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(scriptPath + "/report/report.pdf"));
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(scriptPath + "/report/iLens Report - "+df.format(new Date())+".pdf"));
 
 
         Rectangle rect = new Rectangle(45, 40, 1160, 790);
@@ -364,11 +368,11 @@ public class ScheduledReportSend {
         log.info("Report generated.");
 
         String subject = " iLens automated attendance report.";
-        String msgContent = "<strong>Hi, " + "<br></strong>Please find the attached report for the period from <strong>" +formatTime.format(reportPeriod.getPreviousDate()) + "</strong> to <strong>" + formatTime.format(new Date()) + "</strong>."
+        String msgContent = "<strong>Hi, " + "<br></strong>Please find the attached report for the period from <strong>" +df.format(cal.getTime()) +" 00:00 AM" + "</strong> to <strong>" + formatTime.format(new Date()) + "</strong>."
                 + "<br>Report generated date time: <strong>"+formatTime.format(new Date())+ "</strong>."
                 + "<br>Thanks,"
                 +"<br><strong>Note: </strong>This is system generated mail and report, for any clarification please reach out to admin@logicfocus.net.";
         MailSend mailSend = new MailSend();
-        mailSend.mailSend(host, port, username, password, reportPeriod.getMail(), subject, msgContent, scriptPath + "/report/report.pdf");
+        mailSend.mailSend(host, port, username, password, reportPeriod.getMail(), subject, msgContent, scriptPath + "/report/iLens Report - "+df.format(new Date())+".pdf");
     }
 }

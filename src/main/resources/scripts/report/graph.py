@@ -4,6 +4,7 @@ import os, json
 plt.rc('xtick', labelsize=20)
 plt.rc('ytick', labelsize=20)
 
+angle = 0
 barWidth = 0.25
 plt.figure(figsize=(38, 16))
 
@@ -18,6 +19,7 @@ onTime = data['onTimeList']
 graceTime = data['graceTimeList']
 beyondGraceTime = data['lateTimeList']
 dt = data['dateList']
+if len(onTime) > 2: angle = 30
 
 br1 = np.arange(len(onTime))
 br2 = [x + barWidth for x in br1]
@@ -27,15 +29,16 @@ onTimePlot = plt.bar(br1, onTime, color='#76b083', width=barWidth, edgecolor='#7
 graceTimePlot = plt.bar(br2, graceTime, color='#d0a71a', width=barWidth, edgecolor='#d0a71a', label='grace time entry')
 beyondTimePlot = plt.bar(br3, beyondGraceTime, color='#c63535', width=barWidth, edgecolor="#c63535",
                          label='beyond grace time')
-
 plt.xlabel('Date', fontweight='bold', fontsize=22)
 plt.ylabel('Entries', fontweight='bold', fontsize=22)
-plt.xticks([r + barWidth for r in range(len(onTime))], [x for x in dt])
+plt.xticks([r + barWidth for r in range(len(onTime))], [x for x in dt], rotation=angle, ha='right')
 plt.yticks([f for f in range(1, len(onTime))])
 
+# legend.
 plt.legend()
 plt.legend(prop={'size': 15})
 
+# chart values.
 plt.bar_label(onTimePlot, padding=3, fontsize=22)
 plt.bar_label(graceTimePlot, padding=3, fontsize=22)
 plt.bar_label(beyondTimePlot, padding=3, fontsize=22)

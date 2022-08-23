@@ -34,7 +34,7 @@ public class ReportPeriodRest {
 
     @GetMapping("/generate")
     public ResponseEntity<Object> report(@RequestHeader("CLIENT_KEY") String clientKey) throws Exception {
-        scheduledReportSend.getPdf();
+        scheduledReportSend.getPdf(null);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

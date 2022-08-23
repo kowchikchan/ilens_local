@@ -34,8 +34,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ScheduledReportSend {
     private static final Logger log = LoggerFactory.getLogger(ScheduledReportSend.class);
+    private static final SimpleDateFormat dayFormatWithTime = new SimpleDateFormat("dd MMMM yyyy hh.mm aa");
+    private static final SimpleDateFormat dayFormat = new SimpleDateFormat("dd MMMM yyyy");
 
-    private static final SimpleDateFormat formatTime = new SimpleDateFormat("dd MMMM yyyy hh.mm aa");
 
     @Autowired
     ReportServices reportServices;
@@ -69,7 +70,7 @@ public class ScheduledReportSend {
         long diff = curDtTime.getTime() - reportPeriod.getPreviousDate().getTime();
         long differenceBetweenDts = diff / 1000 / 60 / 60 / 24;
         if (differenceBetweenDts == reportPeriod.getReportPeriod()){
-            this.getPdf();
+            this.getPdf("automate");
         }
     }
 
@@ -157,26 +158,48 @@ public class ScheduledReportSend {
         return new BaseColor(232, 232, 232);
     }
 
+    public PdfPCell totalCountPdfCell(String text, Font font, BaseColor color){
+        PdfPCell content = new PdfPCell(new Phrase(String.valueOf(text), font));
+        content.setPaddingTop(20);
+        content.setPaddingBottom(20);
+        content.setBorder(0);
+        content.setBackgroundColor(color);
+        content.setHorizontalAlignment(Element.ALIGN_CENTER);
+        return content;
+    }
+
+    public PdfPTable totalCountPdfTable(float[] colWidth, String text) throws DocumentException {
+        PdfPTable title1 = new PdfPTable(1);
+        title1.setHorizontalAlignment(Element.ALIGN_LEFT);
+        title1.setWidthPercentage(160 / 5.23f);
+        title1.getDefaultCell().setBorder(0);
+        title1.setWidths(colWidth);
+        title1.addCell(text);
+        return title1;
+    }
+
+    public PdfPTable totalCountTable(){
+        PdfPTable content = new PdfPTable(1);
+        content.setHorizontalAlignment(Element.ALIGN_LEFT);
+        content.setWidthPercentage(50 / 5.23f);
+        return content;
+    }
+
 
 
     @Async
-    public void getPdf() throws Exception {
-        ReportPeriod reportPeriod = reportServices.getList();
-        long days = reportPeriod.getReportPeriod();
-        Calendar cal = Calendar.getInstance();
-        days -= 1;
-        cal.add(Calendar.DATE, -(int)days);
+    public void getPdf(String type) throws Exception {
 
-        String dateFormat = "dd MMMM yyyy";
-        SimpleDateFormat df = new SimpleDateFormat(dateFormat);
+        // cell widths.
+        float[] titleClWidths = new float[]{2f};
+        //float[] columnWidths = new float[]{20f};
 
-        ReportVO reportVO = ilenService.totalEntries(reportPeriod.getReportPeriod());
-        String scriptPath = System.getProperty("SCRIPT_PATH");
-        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 45, BaseColor.WHITE);
-        Document document = new Document(PageSize.A3.rotate(), 60, 35, 140, 60);
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(scriptPath + "/report/iLens Report - "+df.format(new Date())+".pdf"));
+        // red, green, yellow.
+        BaseColor onTimeColor = WebColors.getRGBColor("#117d2a");
+        BaseColor graceTimeColor = WebColors.getRGBColor("#d0a71a");
+        BaseColor beyondGraceEntry = WebColors.getRGBColor("#c63535");
 
-
+        // border rectangle.
         Rectangle rect = new Rectangle(45, 40, 1160, 790);
         rect.enableBorderSide(1);
         rect.enableBorderSide(2);
@@ -185,14 +208,27 @@ public class ScheduledReportSend {
         rect.setBorderColor(BaseColor.BLACK);
         rect.setBorderWidth(1);
 
+        ReportPeriod reportPeriod = reportServices.getList();
+        long days = reportPeriod.getReportPeriod();
+        Calendar cal = Calendar.getInstance();
+        if(type == null){
+            days-= 1;
+        }
+        cal.add(Calendar.DATE, -(int)days);
+
+        ReportVO reportVO = ilenService.totalEntries(reportPeriod.getReportPeriod(), type);
+        String scriptPath = System.getProperty("SCRIPT_PATH");
+
+        // initialize document.
+        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 45, BaseColor.WHITE);
+        Document document = new Document(PageSize.A3.rotate(), 60, 35, 140, 60);
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(scriptPath + "/report/iLens Report - "+dayFormat.format(new Date())+".pdf"));
+
+        // header and footer.
         writer.setBoxSize("art", rect);
         HeaderFooterPageEvent event = new HeaderFooterPageEvent();
         event.startDate = cal.getTime();
         writer.setPageEvent(event);
-
-        BaseColor onTimeColor = WebColors.getRGBColor("#117d2a");
-        BaseColor graceTimeColor = WebColors.getRGBColor("#d0a71a");
-        BaseColor beyondGraceEntry = WebColors.getRGBColor("#c63535");
 
 
         // open document.
@@ -204,75 +240,17 @@ public class ScheduledReportSend {
         pgp.setAlignment(Element.ALIGN_CENTER);
         document.add(pgp);
 
-        // title
-        PdfPTable title1 = new PdfPTable(1);
-        title1.setHorizontalAlignment(Element.ALIGN_LEFT);
-        title1.setWidthPercentage(160 / 5.23f);
-        float[] titleClWidths = new float[]{2f};
-        title1.getDefaultCell().setBorder(0);
-        title1.setWidths(titleClWidths);
-        title1.addCell("Total on time entry");
+        PdfPTable content1 = totalCountTable();
+        content1.addCell(totalCountPdfCell(String.valueOf(reportVO.getTotalOnTime()), font, onTimeColor));
 
-        PdfPTable content1 = new PdfPTable(1);
-        content1.setHorizontalAlignment(Element.ALIGN_LEFT);
-        content1.setWidthPercentage(50 / 5.23f);
+        PdfPTable content2 = totalCountTable();
+        content2.addCell(totalCountPdfCell(String.valueOf(reportVO.getTotalGraceTime()), font, graceTimeColor));
 
-        PdfPCell content11 = new PdfPCell(new Phrase(String.valueOf(reportVO.getTotalOnTime()), font));
-        content11.setPaddingTop(20);
-        content11.setPaddingBottom(20);
-        content11.setBorder(0);
-        content11.setBackgroundColor(onTimeColor);
-        content11.setHorizontalAlignment(Element.ALIGN_CENTER);
-
-        content1.addCell(content11);
-
-        PdfPTable title2 = new PdfPTable(1);
-        title2.setHorizontalAlignment(Element.ALIGN_LEFT);
-        title2.setWidthPercentage(160 / 5.23f);
-        title2.getDefaultCell().setBorder(0);
-        title2.setWidths(titleClWidths);
-        title2.addCell("Total grace entry");
+        PdfPTable content3 = totalCountTable();
+        content3.addCell(totalCountPdfCell(String.valueOf(reportVO.getTotalBeyondGraceTime()), font, beyondGraceEntry));
 
 
-        PdfPTable content2 = new PdfPTable(1);
-        content2.setHorizontalAlignment(Element.ALIGN_LEFT);
-        content2.setWidthPercentage(50 / 5.23f);
-
-        PdfPCell content21 = new PdfPCell(new Phrase(String.valueOf(reportVO.getTotalGraceTime()), font));
-        content21.setPaddingTop(20);
-        content21.setPaddingBottom(20);
-        content21.setBorder(0);
-        content21.setBackgroundColor(graceTimeColor);
-        content21.setHorizontalAlignment(Element.ALIGN_CENTER);
-        content2.addCell(content21);
-
-        PdfPTable title3 = new PdfPTable(1);
-        title3.setHorizontalAlignment(Element.ALIGN_LEFT);
-        title3.setWidthPercentage(160 / 5.23f);
-        title3.getDefaultCell().setBorder(0);
-        title3.setWidths(titleClWidths);
-        title3.addCell("Beyond grace entry");
-
-
-        PdfPTable content3 = new PdfPTable(1);
-        content3.setHorizontalAlignment(Element.ALIGN_LEFT);
-        content3.setWidthPercentage(50 / 5.23f);
-
-        PdfPCell content31 = new PdfPCell(new Phrase(String.valueOf(reportVO.getTotalBeyondGraceTime()), font));
-        content31.setPaddingTop(20);
-        content31.setPaddingBottom(20);
-        content31.setBorder(0);
-        content31.setBackgroundColor(beyondGraceEntry);
-        content31.setHorizontalAlignment(Element.ALIGN_CENTER);
-        content3.addCell(content31);
-
-
-        PdfPTable totalEntryTitle = new PdfPTable(1);
-        float[] columnWidths = new float[]{20f};
-        totalEntryTitle.setWidths(columnWidths);
-        totalEntryTitle.getDefaultCell().setBorder(0);
-
-
+        // Python scripts for generating graphs.
         String s = null;
         String executeCmd = pythonPath + " " + scriptPath + "/report/graph.py";
         Process p = Runtime.getRuntime().exec(executeCmd);
@@ -303,17 +281,21 @@ public class ScheduledReportSend {
         ilensLogo.scaleToFit(100, 100);
         ilensLogo.setAbsolutePosition(55, 790);
 
+        Image performanceGraph = Image.getInstance(scriptPath + "/report/performanceGraph.png");
+        performanceGraph.scaleToFit(1200, 1210);
+        performanceGraph.setAbsolutePosition(26, 130);
+
         document.add(ilensLogo);
         document.add(new Paragraph("\n"));
-        document.add(title1);
+        document.add(totalCountPdfTable(titleClWidths, "Total on time entry"));
         document.add(new Paragraph("\n"));
         document.add(content1);
         document.add(new Paragraph("\n"));
-        document.add(title2);
+        document.add(totalCountPdfTable(titleClWidths, "Total grace entry"));
         document.add(new Paragraph("\n"));
         document.add(content2);
         document.add(new Paragraph("\n"));
-        document.add(title3);
+        document.add(totalCountPdfTable(titleClWidths, "Beyond grace entry"));
         document.add(new Paragraph("\n"));
         document.add(content3);
         document.add(new Paragraph("\n"));
@@ -321,12 +303,24 @@ public class ScheduledReportSend {
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
 
+        document.newPage();
+        document.add(ilensLogo);
+        contentByte.rectangle(rect);
+        document.add(rect);
+        document.add(new Paragraph("User performance report", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY)));
+        document.add(new Paragraph("\n"));
+        document.add(new Paragraph("Total hours: " + String.valueOf(reportPeriod.getReportPeriod() * 8), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY)));
+        Paragraph totTimeHrs = new Paragraph("Spent time\n(Hrs.)", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY));
+        totTimeHrs.setAlignment(Element.ALIGN_RIGHT);
+        document.add(totTimeHrs);
+        document.add(performanceGraph);
+
 
         document.newPage();
+        document.add(ilensLogo);
         Paragraph paragraph = null;
         document.add(new Paragraph("Detailed Report", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY)));
         font.setColor(BaseColor.DARK_GRAY);
-
         onTime = reportVO.getOnTime();
         graceTime = reportVO.getGraceTime();
         List<ReportGen1VO> attendanceList = reportVO.getAttendance();
@@ -334,6 +328,7 @@ public class ScheduledReportSend {
             contentByte.rectangle(rect);
             document.add(rect);
             paragraph = new Paragraph();
+            document.add(ilensLogo);
             paragraph.add(new Chunk("Date: ", new Font(Font.FontFamily.HELVETICA, 17, Font.NORMAL)));
             paragraph.add(new Chunk(attendanceList.get(j).getDate(), new Font(Font.FontFamily.HELVETICA, 17, Font.BOLD)));
             paragraph.setSpacingAfter(30f);
@@ -354,6 +349,7 @@ public class ScheduledReportSend {
             document.add(overAllTable);
             if (j != attendanceList.size()-1)
                 document.newPage();
+            document.add(ilensLogo);
         }
         document.close();
 
@@ -361,11 +357,11 @@ public class ScheduledReportSend {
         log.info("Report generated.");
 
         String subject = " iLens automated attendance report.";
-        String msgContent = "<strong>Hi, " + "<br></strong>Please find the attached report for the period from <strong>" +df.format(cal.getTime()) +" 00:00 AM" + "</strong> to <strong>" + formatTime.format(new Date()) + "</strong>."
-                + "<br>Report generated date time: <strong>"+formatTime.format(new Date())+ "</strong>."
+        String msgContent = "<strong>Hi, " + "<br></strong>Please find the attached report for the period from <strong>" +dayFormat.format(cal.getTime()) +" 00:00 AM" + "</strong> to <strong>" + dayFormatWithTime.format(new Date()) + "</strong>."
+                + "<br>Report generated date time: <strong>"+dayFormatWithTime.format(new Date())+ "</strong>."
                 + "<br>Thanks,"
                 +"<br><strong>Note: </strong>This is system generated mail and report, for any clarification please reach out to admin@logicfocus.net.";
         MailSend mailSend = new MailSend();
-        mailSend.mailSend(host, port, username, password, reportPeriod.getMail(), subject, msgContent, scriptPath + "/report/iLens Report - "+df.format(new Date())+".pdf");
+        mailSend.mailSend(host, port, username, password, reportPeriod.getMail(), subject, msgContent, scriptPath + "/report/iLens Report - "+dayFormat.format(new Date())+".pdf");
     }
 }

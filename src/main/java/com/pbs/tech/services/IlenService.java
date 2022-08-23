@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class IlenService {
@@ -41,6 +42,8 @@ public class IlenService {
 
     static List<ChannelRunTime> runtimes = new ArrayList<>();
     private static final String dateFormatForDb = "yyyy-MM-dd HH:mm:ss";
+    private static final SimpleDateFormat dateWithDayFormat = new SimpleDateFormat("dd MMMM yyyy-EEEE");
+    private static final SimpleDateFormat timeFormatOnly = new SimpleDateFormat("hh:mm a");
     private static final String os = System.getProperty("os.name");
 
     @Autowired
@@ -407,10 +410,8 @@ public class IlenService {
                     entryViolation.setSnapshot(channelData.getSnapshot());
                     entryViolationRepo.save(entryViolation);
                     String body = "["+entryExit.getId()+"] "+entryExit.getName() + " has entered " + channelData.getChannelName();
-                    firebaseMessagingServices.sendNotification("Entry violation",
-                            body,
-                            "ek0SLY4sRCyLCcSY2qMIEm:APA91bENE_SM1tew5DScRZilto-7LQISay3Y2USoIO22Z2aox343xG0_" +
-                                    "fhEWESkzQGkevYqohqUZ6SAjKE1Xgrmoj_EYLuTPIEGmoXfTBaW_nJxYzfMRK7wZHqyNNoVyQUqQWEBtrABi");
+                    firebaseMessagingServices.sendNotification("Violation", body,
+                            "dsWwKEq9T5aR_uiuJlRXaW:APA91bE8fCkLtydbxdPr0u4-5Yy7wGiHkPaX7nMsNyi7L3bPw-KXUsTw76M1SUEV7z1TlmvAEf3uPxY6fEe8BKqpx_ZnYwE1FbdFx2bd9g8mxatlJ23eGpE5GldgaAoRG5Y0MjKqmnBV");
                 }
                 entryExitRepo.save(entryExist);
             }
@@ -1160,17 +1161,17 @@ public class IlenService {
         return cal.getTime();
     }
 
-    public ReportVO totalEntries(long days) throws Exception {
+    public ReportVO totalEntries(long days, String type) throws Exception {
+        HashMap<String, Integer> map = new HashMap<>();
         List<ReportGen1VO> attendance = new ArrayList<>();
         ReportVO reportVO = new ReportVO();
 
-        String dateFormat = "dd MMMM yyyy-EEEE";
-        String timeFormat = "hh:mm a";
+        long repeatDt = days - 1;
+        if(type == null){
+            days-= 1;
+        }
         Calendar cal = Calendar.getInstance();
-        days -= 1;
         cal.add(Calendar.DATE, -(int)days);
-        //int repeatValue = 7;
-        //if(week == 2){ repeatValue = 14; }else if(week == 4){repeatValue = 28;}
         long onTimeCount = 0;
         long graceTimeCount = 0;
         long lateEntryCount = 0;
@@ -1183,12 +1184,10 @@ public class IlenService {
         Configurations configuration = configurationServices.getList();
         String[] graceTimeList = configuration.getGraceTime().split(" ")[0].split(":");
         String[] onTimeList = configuration.getOnTime().split(" ")[0].split(":");
-        for(int i=0; i<=days; i++){
+        for(int i=-1; i<repeatDt; i++){
             ReportGenVO attList;
             List<ReportGenVO> lstEmployees = new ArrayList<>();
             ReportGen1VO attendanceList = new ReportGen1VO();
-            SimpleDateFormat df = new SimpleDateFormat(dateFormat);
-            SimpleDateFormat tf = new SimpleDateFormat(timeFormat);
 
             // day timings.
             Date dayStTime = this.getDayStTime(cal.getTime());
@@ -1224,23 +1223,23 @@ public class IlenService {
                 for (int l=0;l<entryExit.size();l++) {
                     attList = new ReportGenVO();
                     attList.setName(entryExit.get(l).getEntry_view().getName());
-                    attList.setEntryTime(tf.format(entryExit.get(l).getEntry_view().getTime()));
+                    attList.setEntryTime(timeFormatOnly.format(entryExit.get(l).getEntry_view().getTime()));
                     attList.setEntryLocation(entryExit.get(l).getEntry_view().getLocation());
                     String exitTime = "----";
                     String exitLocation = "----";
                     if(entryExit.get(l).getExit_view().size() > 0){
-                        exitTime = tf.format(entryExit.get(l).getExit_view().get(0).getTime());
+                        exitTime = timeFormatOnly.format(entryExit.get(l).getExit_view().get(0).getTime());
                         exitLocation = entryExit.get(l).getExit_view().get(0).getLocation();
                     }
                     attList.setExitTime(exitTime);
                     attList.setExitLocation(exitLocation);
                     lstEmployees.add(attList);
                 }
-                attendanceList.setDate(df.format(cal.getTime()));
+                attendanceList.setDate(dateWithDayFormat.format(cal.getTime()));
                 attendanceList.setEmployees(lstEmployees);
                 attendance.add(attendanceList);
             }else {
-                attendanceList.setDate(df.format(cal.getTime()));
+                attendanceList.setDate(dateWithDayFormat.format(cal.getTime()));
                 attendanceList.setEmployees(lstEmployees);
                 attendance.add(attendanceList);
             }
@@ -1248,12 +1247,51 @@ public class IlenService {
             graceTimeEntryListByDay.add((long) graceTimeData.size());
             beyondGraceEntryListByDay.add((long) lateEntryData.size());
 
-            dateList.add(df.format(cal.getTime()));
+            dateList.add(dateWithDayFormat.format(cal.getTime()));
 
             onTimeCount += onTimeEntryData.size();
             graceTimeCount += graceTimeData.size();
             lateEntryCount += lateEntryData.size();
 
+            // users list.
+            List<UserVo> userVos = userRepo.findByAll();
+            for(UserVo userVo:userVos) {
+                if (!Objects.equals(userVo.getUserId(), "Admin")) {
+                    // input for getAttendance method.
+                    entryExitFilter.setId(userVo.getUserId());
+                    entryExitFilter.setLocation("");
+                    entryExitFilter.setName("");
+                    entryExitFilter.setDate(dayStTime);
+                    String swapType = "";
+                    Date prevTime = null;
+                    long totCount = 0;
+                    IdTraceVO traceList = (IdTraceVO) this.getAttendance(entryExitFilter, 0);
+                    for (int k = 0; k < traceList.getTrace().size(); k++) {
+                        if (k == 0) {
+                            prevTime = traceList.getTrace().get(k).getTime();
+                            swapType = traceList.getTrace().get(k).getType();
+                        } else if (!Objects.equals(swapType, traceList.getTrace().get(k).getType())) {
+                            if (Objects.equals(traceList.getTrace().get(k).getType(), "entry")) {
+                                prevTime = traceList.getTrace().get(k).getTime();
+                            } else if (Objects.equals(traceList.getTrace().get(k).getType(), "exit")) {
+                                Date curDt = traceList.getTrace().get(k).getTime();
+                                long diff = Math.abs(curDt.getTime() - prevTime.getTime());
+                                long inMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
+                                totCount += inMinutes;
+                                prevTime = null;
+                            }
+
+                            swapType = traceList.getTrace().get(k).getType();
+                        }
+                    }
+                    if (map.containsKey(userVo.getFirstName()+" " +userVo.getLastName() +"["+userVo.getUserId()+"]")) {
+                        Integer newVal = map.get(userVo.getFirstName()+" " +userVo.getLastName() +"["+userVo.getUserId()+"]") + (int) totCount;
+                        map.put(userVo.getFirstName()+" " +userVo.getLastName() +"["+userVo.getUserId()+"]", newVal);
+                    } else {
+                        map.put(userVo.getFirstName()+" " +userVo.getLastName() +"["+userVo.getUserId()+"]", (int) totCount);
+                    }
+                }
+            }
             cal.add(Calendar.DATE, 1);
         }
 
@@ -1262,6 +1300,7 @@ public class IlenService {
         reportGraphData.put("graceTimeList", graceTimeEntryListByDay);
         reportGraphData.put("lateTimeList",  beyondGraceEntryListByDay);
         reportGraphData.put("dateList", dateList);
+        reportGraphData.put("performance", map);
 
         try {
             FileWriter userList = new FileWriter(configsJsonPath + "/userList.json");
@@ -1278,9 +1317,7 @@ public class IlenService {
         reportVO.setOnTime(configuration.getOnTime());
         reportVO.setGraceTime(configuration.getGraceTime());
         reportVO.setAttendance(attendance);
-
         return reportVO;
     }
-
 
 }

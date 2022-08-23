@@ -91,29 +91,20 @@ public class AccessViolationServices {
             }
 
         } else {
-            int currPage = 0;
-            Slice<EntryViolation> violations = null;
-            Date selectedDate = ilenService.getDayStTime(unknownFilterVO.getDate());
-            Date endDate = ilenService.getDayEndTime(unknownFilterVO.getDate());
-            violations = entryViolationRepo.getViolationListByPageable(selectedDate, endDate,
-                    CassandraPageRequest.first(10));
-            while (violations.hasNext() && currPage < pageNumber) {
-                violations = entryViolationRepo.getViolationListByPageable(selectedDate, endDate, violations.nextPageable());
-                currPage++;
-            }
-            for (int i = 0; i < violations.getContent().size(); i++) {
-                if (i == 0) {
-                    EntryViolation violation = mapper.convertValue(violations.getContent().get(i), EntryViolation.class);
-                    entity.add(violation);
-                    swapType = violations.getContent().get(i).getType();
-                    swapName = violations.getContent().get(i).getName();
-                } else if (!Objects.equals(swapType, violations.getContent().get(i).getType()) ||
-                        !Objects.equals(swapName, violations.getContent().get(i).getName())) {
-                    EntryViolation violation = mapper.convertValue(violations.getContent().get(i), EntryViolation.class);
-                    entity.add(violation);
-                    swapType = violations.getContent().get(i).getType();
-                    swapName = violations.getContent().get(i).getName();
+            int itemsPerPage = 10;
+            int perPage = Integer.parseInt(String.valueOf(pageNumber) + "0");
+            List<EntryViolation> violations = null;
+            violations = this.violationList(unknownFilterVO);
+            int sizeOfList = violations.size();
+            try {
+                if (perPage > sizeOfList) {
+                    entity = violations.subList((perPage - itemsPerPage), sizeOfList);
+                } else {
+                    entity = violations.subList((perPage - itemsPerPage), perPage);
                 }
+            }catch (Exception e){
+                e.printStackTrace();
+                return entity;
             }
         }
         return entity;

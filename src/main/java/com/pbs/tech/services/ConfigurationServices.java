@@ -30,6 +30,9 @@ public class ConfigurationServices {
             configurations1.setOnTime(configurations.getOnTime());
             configurations1.setGraceTime(configurations.getGraceTime());
             configurations1.setGracePeriod(configurations.getGracePeriod());
+            configurations1.setExitOnTime(configurations.getExitOnTime());
+            configurations1.setExitGraceTime(configurations.getExitGraceTime());
+            configurations1.setExitGracePeriod(configurations.getExitGracePeriod());
             configurations1.setUpdatedBy(userId.toString());
             configurations1.setUpdatedDt(new Date());
             configurationsRepo.save(configurations1);

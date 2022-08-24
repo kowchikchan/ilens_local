@@ -3,24 +3,50 @@ package com.pbs.tech.vo;
 import java.util.List;
 
 public class ReportVO {
-    private long onTime;
-    private long graceTime;
-    private long lateTime;
-    private List<EntryExit> entryExitList;
+    private String totalOnTime;
+    private String totalGraceTime;
+    private String totalBeyondGraceTime;
+    private String onTime;
+    private String graceTime;
+    private String exitOnTime;
+    private String exitGraceTime;
+    private long weekDaysCount;
 
-    public long getOnTime() {return onTime;}
+    private List<ReportGen1VO> attendance;
 
-    public void setOnTime(long onTime) {this.onTime = onTime;}
+    public String getTotalOnTime() {return totalOnTime;}
 
-    public long getGraceTime() {return graceTime;}
+    public void setTotalOnTime(String totalOnTime) {this.totalOnTime = totalOnTime;}
 
-    public void setGraceTime(long graceTime) {this.graceTime = graceTime;}
+    public String getTotalGraceTime() {return totalGraceTime;}
 
-    public long getLateTime() {return lateTime;}
+    public void setTotalGraceTime(String totalGraceTime) {this.totalGraceTime = totalGraceTime;}
 
-    public void setLateTime(long lateTime) {this.lateTime = lateTime;}
+    public String getTotalBeyondGraceTime() {return totalBeyondGraceTime;}
 
-    public List<EntryExit> getEntryExitList() {return entryExitList;}
+    public void setTotalBeyondGraceTime(String totalBeyondGraceTime) {this.totalBeyondGraceTime = totalBeyondGraceTime;}
 
-    public void setEntryExitList(List<EntryExit> entryExitList) {this.entryExitList = entryExitList;}
+    public String getOnTime() {return onTime;}
+
+    public void setOnTime(String onTime) {this.onTime = onTime;}
+
+    public String getGraceTime() {return graceTime;}
+
+    public void setGraceTime(String graceTime) {this.graceTime = graceTime;}
+
+    public List<ReportGen1VO> getAttendance() {return attendance;}
+
+    public void setAttendance(List<ReportGen1VO> attendance) {this.attendance = attendance;}
+
+    public String getExitOnTime() {return exitOnTime;}
+
+    public void setExitOnTime(String exitOnTime) {this.exitOnTime = exitOnTime;}
+
+    public String getExitGraceTime() {return exitGraceTime;}
+
+    public void setExitGraceTime(String exitGraceTime) {this.exitGraceTime = exitGraceTime;}
+
+    public long getWeekDaysCount() {return weekDaysCount;}
+
+    public void setWeekDaysCount(long weekDaysCount) {this.weekDaysCount = weekDaysCount;}
 }

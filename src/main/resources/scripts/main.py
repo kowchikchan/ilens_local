@@ -1,5 +1,5 @@
 import datetime
-import cv2, json, stomp, base64, argparse, threading, asyncio, numpy as np
+import cv2, json, stomp, base64, argparse, threading, asyncio, numpy as np, time, cvlib as cv
 from PIL import Image
 from io import BytesIO
 from faceDetection.frMethod import FRMethod
@@ -16,23 +16,27 @@ async def publisher(idOfCamera, cameraUrl, dataApi, vidStatus):
     clientConnection.connect('admin', 'password', wait=True)
     videoCapture = cv2.VideoCapture(cameraUrl)
     # output = cv2.VideoWriter('out.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 20, (400, 400))
+    await asyncio.sleep(0)
     while True:
-        await asyncio.sleep(0)
         ret, frame = videoCapture.read()
         if ret:
             # if vidStatus == 'True':
             #    resizedWindow = cv2.resize(frame, (400, 400), fx=0, fy=0, interpolation=cv2.INTER_CUBIC)
             #    output.write(resizedWindow)
-            _, buffer = cv2.imencode('.jpg', frame)
-            try:
-                encodedData = base64.b64encode(buffer)
-                clientConnection.send(body=encodedData, destination='/queue/' + idOfCamera,
-                                      headers={'persistent': 'true'})
-                print()
-            except Exception as e:
-                continue
-    # time.sleep(2)
-    # clientConnection.disconnect()
+            resizedWindow = cv2.resize(frame, (700, 400))
+            faces, confidences = cv.detect_face(resizedWindow)
+            if confidences >= [0.5]:
+                _, buffer = cv2.imencode('.jpg', frame)
+                try:
+                    encodedData = base64.b64encode(buffer)
+                    clientConnection.send(body=encodedData, destination='/queue/' + idOfCamera,
+                                          headers={'persistent': 'true'})
+                    print()
+                except Exception as e:
+                    continue
+    time.sleep(2)
+    clientConnection.disconnect()
+    # await publisher(idOfCamera, cameraUrl, dataApi, vidStatus)
 
 
 async def consumer(appList, idOfCamera, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken, dataApi):
@@ -50,9 +54,9 @@ async def consumer(appList, idOfCamera, basePath, channelName, frConfigs, postUr
             decodedFrame = Image.open(BytesIO(base64.b64decode(frameInBytes)))
             finalDecodedImage = np.array(decodedFrame)
             if frConfigs == 'entry':
-                finalDecodedImage = finalDecodedImage[18:18 + 1060, 378:378 + 711]
-            if frConfigs == 'exit':
-                finalDecodedImage = finalDecodedImage[262:262 + 798, 898:898 + 683]
+                finalDecodedImage = finalDecodedImage[10:10 + 1060, 154:154 + 1266]
+            # if frConfigs == 'exit':
+            #    finalDecodedImage = finalDecodedImage[262:262 + 798, 898:898 + 683]
             if "fr" in appList:
                 frObject = FRMethod(finalDecodedImage, basePath, idOfCamera, channelName, frConfigs, postUrl,
                                     dataLocation, apiToken, startTime)

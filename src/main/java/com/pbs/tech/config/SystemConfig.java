@@ -1,13 +1,7 @@
 package com.pbs.tech.config;
 
-import com.pbs.tech.model.Configurations;
-import com.pbs.tech.model.DataApi;
-import com.pbs.tech.model.MenuStatus;
-import com.pbs.tech.model.ReportPeriod;
-import com.pbs.tech.repo.ConfigurationsRepo;
-import com.pbs.tech.repo.DataApiRepo;
-import com.pbs.tech.repo.MenuStatusRepo;
-import com.pbs.tech.repo.ReportPeriodRepo;
+import com.pbs.tech.model.*;
+import com.pbs.tech.repo.*;
 import com.pbs.tech.services.UserService;
 import com.pbs.tech.vo.UserVo;
 import org.slf4j.Logger;
@@ -44,6 +38,9 @@ public class SystemConfig {
 
     @Autowired
     MenuStatusRepo menuStatusRepo;
+
+    @Autowired
+    WeekDaysRepo weekDaysRepo;
 
     @Value("${ilens.python.path}")
     String pythonPath;
@@ -106,6 +103,9 @@ public class SystemConfig {
             configurations.setOnTime("9:0 AM");
             configurations.setGraceTime("9:10 AM");
             configurations.setGracePeriod(10);
+            configurations.setExitOnTime("6:0 PM");
+            configurations.setExitGraceTime("5:50 PM");
+            configurations.setExitGracePeriod(10);
             configurations.setCreatedBy(user);
             configurations.setCreatedDt(new Date());
             configurationsRepo.save(configurations);
@@ -123,7 +123,7 @@ public class SystemConfig {
             reportPeriod.setPreviousDate(new Date());
             reportPeriod.setCreatedBy(user);
             reportPeriod.setCreatedDt(new Date());
-            reportPeriod.setCreatedBy(user);
+            reportPeriod.setUpdatedBy(user);
             reportPeriod.setUpdatedDt(new Date());
             reportPeriodRepo.save(reportPeriod);
         }
@@ -137,6 +137,21 @@ public class SystemConfig {
             menuStatus.setId(1L);
             menuStatus.setStatus(false);
             menuStatusRepo.save(menuStatus);
+        }
+
+        // save weekdays
+        WeekDays weekDays;
+        try {
+            weekDays = weekDaysRepo.findById(1L).get();
+        }catch (NoSuchElementException e){
+            weekDays = new WeekDays();
+            weekDays.setId(1L);
+            weekDays.setWeekDays("monday,tuesday,wednesday,thursday,friday");
+            weekDays.setCreatedBy(user);
+            weekDays.setCreatedDt(new Date());
+            weekDays.setUpdatedBy(user);
+            weekDays.setUpdatedDt(new Date());
+            weekDaysRepo.save(weekDays);
         }
 
         // Start RTSP Server.

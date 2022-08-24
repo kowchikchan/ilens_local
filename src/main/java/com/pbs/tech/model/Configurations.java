@@ -13,10 +13,12 @@ public class Configurations extends Audit{
     private long retainsPeriod;
     @Column(columnDefinition = "boolean default false")
     private boolean videoStatus;
-
     private String onTime;
     private String graceTime;
     private long gracePeriod;
+    private String exitOnTime;
+    private String exitGraceTime;
+    private long exitGracePeriod;
 
     public long getId() {return id;}
 
@@ -41,4 +43,16 @@ public class Configurations extends Audit{
     public long getGracePeriod() {return gracePeriod;}
 
     public void setGracePeriod(long gracePeriod) {this.gracePeriod = gracePeriod;}
+
+    public String getExitOnTime() {return exitOnTime;}
+
+    public void setExitOnTime(String exitOnTime) {this.exitOnTime = exitOnTime;}
+
+    public String getExitGraceTime() {return exitGraceTime;}
+
+    public void setExitGraceTime(String exitGraceTime) {this.exitGraceTime = exitGraceTime;}
+
+    public long getExitGracePeriod() {return exitGracePeriod;}
+
+    public void setExitGracePeriod(long exitGracePeriod) {this.exitGracePeriod = exitGracePeriod;}
 }

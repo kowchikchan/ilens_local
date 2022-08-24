@@ -25,11 +25,8 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class ScheduledReportSend {
@@ -59,8 +56,13 @@ public class ScheduledReportSend {
     @Value("${mail.port}")
     String port;
 
-    String onTime;
-    String graceTime;
+    String entryOnTime;
+
+    String entryGraceTime;
+
+    String exitOnTime;
+
+    String exitGraceTime;
 
     @Scheduled(cron = "0 1 0 * * *")
     public void sendReport() throws Exception {
@@ -132,25 +134,38 @@ public class ScheduledReportSend {
             cell.setBorderColor(new BaseColor(255, 255, 255));
             cell.setBackgroundColor(new BaseColor(232, 232, 232));
             if (i == 1) {
-                cell.setBackgroundColor(this.compareTime(onTime, graceTime, overView[i]));
+                cell.setBackgroundColor(this.compareTime(entryOnTime, entryGraceTime, overView[i], "entry"));
+            } else if (i == 3) {
+                cell.setBackgroundColor(this.compareTime(exitOnTime, exitGraceTime, overView[i], "exit"));
             }
             table.addCell(cell);
         }
         return table;
     }
 
-    private BaseColor compareTime(String onTime, String graceTime, String entryTime){
+    private BaseColor compareTime(String onTime, String graceTime, String entryTime, String type){
         try {
             DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
             Date parseEntryTime = dateFormat.parse(entryTime);
             Date parsedGraceTime = dateFormat.parse(graceTime);
             Date parsedOnTime = dateFormat.parse(onTime);
-            if(parseEntryTime.after(parsedGraceTime)){
-                return new BaseColor(245, 198, 203);
-            }else if(parseEntryTime.after(parsedOnTime)){
-                return new BaseColor(255, 238, 186);
-            }else{
-                return new BaseColor(195, 230, 203);
+            if(Objects.equals(type, "entry")) {
+                if (parseEntryTime.after(parsedGraceTime)) {
+                    return new BaseColor(245, 198, 203);
+                } else if (parseEntryTime.after(parsedOnTime)) {
+                    return new BaseColor(255, 238, 186);
+                } else {
+                    return new BaseColor(195, 230, 203);
+                }
+            }else if(Objects.equals(type, "exit")){
+                if(parseEntryTime.after(parsedGraceTime)){
+                    return new BaseColor(195, 230, 203);
+                }else if(parseEntryTime.after(parsedOnTime)){
+                    return new BaseColor(255, 238, 186);
+                }else{
+                    return new BaseColor(245, 198, 203);
+
+                }
             }
         }catch (Exception e){
 //       e.printStackTrace();
@@ -309,7 +324,7 @@ public class ScheduledReportSend {
         document.add(rect);
         document.add(new Paragraph("User performance report", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY)));
         document.add(new Paragraph("\n"));
-        document.add(new Paragraph("Total hours: " + String.valueOf(reportPeriod.getReportPeriod() * 8), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY)));
+        document.add(new Paragraph("Total hours: " + String.valueOf(reportVO.getWeekDaysCount() * 8), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY)));
         Paragraph totTimeHrs = new Paragraph("Spent time\n(Hrs.)", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY));
         totTimeHrs.setAlignment(Element.ALIGN_RIGHT);
         document.add(totTimeHrs);
@@ -321,8 +336,10 @@ public class ScheduledReportSend {
         Paragraph paragraph = null;
         document.add(new Paragraph("Detailed Report", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY)));
         font.setColor(BaseColor.DARK_GRAY);
-        onTime = reportVO.getOnTime();
-        graceTime = reportVO.getGraceTime();
+        entryOnTime = reportVO.getOnTime();
+        entryGraceTime = reportVO.getGraceTime();
+        exitOnTime = reportVO.getExitOnTime();
+        exitGraceTime  = reportVO.getExitGraceTime();
         List<ReportGen1VO> attendanceList = reportVO.getAttendance();
         for (int j = 0; j < attendanceList.size(); j++) {
             contentByte.rectangle(rect);

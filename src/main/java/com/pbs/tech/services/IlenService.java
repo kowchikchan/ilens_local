@@ -121,6 +121,9 @@ public class IlenService {
     @Autowired
     FirebaseMessagingServices firebaseMessagingServices;
 
+    @Autowired
+    WeekDayServices weekDayServices;
+
     public void startRuntime(String id) throws Exception {
         HashMap<String, String> usersList = new HashMap<>();
         //TODO: check if already running.
@@ -1162,6 +1165,8 @@ public class IlenService {
     }
 
     public ReportVO totalEntries(long days, String type) throws Exception {
+        List<String> day = new ArrayList<>(Arrays.asList("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"));
+
         HashMap<String, Integer> map = new HashMap<>();
         List<ReportGen1VO> attendance = new ArrayList<>();
         ReportVO reportVO = new ReportVO();
@@ -1172,126 +1177,130 @@ public class IlenService {
         }
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -(int)days);
-        long onTimeCount = 0;
-        long graceTimeCount = 0;
-        long lateEntryCount = 0;
 
         List<Long> onTimeEntryListByDay = new ArrayList<>();
         List<Long> graceTimeEntryListByDay = new ArrayList<>();
         List<Long> beyondGraceEntryListByDay = new ArrayList<>();
         List<String> dateList = new ArrayList<>();
 
+        WeekDays weekDays = weekDayServices.getList();
+        List<String> storedWeekDays = new ArrayList<>(Arrays.asList(weekDays.getWeekDays().split(",")));
         Configurations configuration = configurationServices.getList();
         String[] graceTimeList = configuration.getGraceTime().split(" ")[0].split(":");
         String[] onTimeList = configuration.getOnTime().split(" ")[0].split(":");
-        for(int i=-1; i<repeatDt; i++){
-            ReportGenVO attList;
-            List<ReportGenVO> lstEmployees = new ArrayList<>();
-            ReportGen1VO attendanceList = new ReportGen1VO();
+        for(int i=-1; i<repeatDt; i++) {
+            if (storedWeekDays.contains(day.get(cal.get(Calendar.DAY_OF_WEEK)-1))) {
+                int onTimeCount = 0;
+                int graceTimeCount = 0;
+                int lateTimeCount = 0;
 
-            // day timings.
-            Date dayStTime = this.getDayStTime(cal.getTime());
-            Date dayEdTime = this.getDayEndTime(cal.getTime());
+                ReportGenVO attList;
+                List<ReportGenVO> lstEmployees = new ArrayList<>();
+                ReportGen1VO attendanceList = new ReportGen1VO();
 
-            // set on time
-            cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onTimeList[0]));
-            cal.set(Calendar.MINUTE,Integer.parseInt(onTimeList[1]));
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            Date onTime = cal.getTime();
+                // day timings.
+                Date dayStTime = this.getDayStTime(cal.getTime());
+                Date dayEdTime = this.getDayEndTime(cal.getTime());
 
-            // set grace time.
-            cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(graceTimeList[0]));
-            cal.set(Calendar.MINUTE, Integer.parseInt(graceTimeList[1]));
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            Date graceTime = cal.getTime();
+                // set on time
+                cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onTimeList[0]));
+                cal.set(Calendar.MINUTE, Integer.parseInt(onTimeList[1]));
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                Date onTime = cal.getTime();
 
-            List<EntryExitEntity> onTimeEntryData = entryExitRepo.getTodayAttendanceCount(dayStTime, onTime);
-            List<EntryExitEntity> graceTimeData = entryExitRepo.getTodayAttendanceCount(onTime, graceTime);
-            List<EntryExitEntity> lateEntryData = entryExitRepo.getTodayAttendanceCount(graceTime, dayEdTime);
+                // set grace time.
+                cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(graceTimeList[0]));
+                cal.set(Calendar.MINUTE, Integer.parseInt(graceTimeList[1]));
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                Date graceTime = cal.getTime();
 
-            // attendance data
-            EntryExitFilter entryExitFilter = new EntryExitFilter();
-            entryExitFilter.setId("");
-            entryExitFilter.setLocation("");
-            entryExitFilter.setName("");
-            entryExitFilter.setDate(dayStTime);
+                // attendance data
+                EntryExitFilter entryExitFilter = new EntryExitFilter();
+                entryExitFilter.setId("");
+                entryExitFilter.setLocation("");
+                entryExitFilter.setName("");
+                entryExitFilter.setDate(dayStTime);
 
-            List<EntryExit> entryExit = (List<EntryExit>) this.getAttendance(entryExitFilter, 0);
-            if(entryExit.size() > 0) {
-                for (int l=0;l<entryExit.size();l++) {
-                    attList = new ReportGenVO();
-                    attList.setName(entryExit.get(l).getEntry_view().getName());
-                    attList.setEntryTime(timeFormatOnly.format(entryExit.get(l).getEntry_view().getTime()));
-                    attList.setEntryLocation(entryExit.get(l).getEntry_view().getLocation());
-                    String exitTime = "----";
-                    String exitLocation = "----";
-                    if(entryExit.get(l).getExit_view().size() > 0){
-                        exitTime = timeFormatOnly.format(entryExit.get(l).getExit_view().get(0).getTime());
-                        exitLocation = entryExit.get(l).getExit_view().get(0).getLocation();
+                List<EntryExit> entryExit = (List<EntryExit>) this.getAttendance(entryExitFilter, 0);
+                if (entryExit.size() > 0) {
+                    for (int l = 0; l < entryExit.size(); l++) {
+                        attList = new ReportGenVO();
+                        attList.setName(entryExit.get(l).getEntry_view().getName());
+                        Date curTime = entryExit.get(l).getEntry_view().getTime();
+                        if (curTime.after(onTime) && curTime.before(graceTime)) {
+                            graceTimeCount += 1;
+                        } else if (curTime.after(onTime) && curTime.after(graceTime)) {
+                            lateTimeCount += 1;
+                        } else if (curTime.after(dayStTime) && curTime.before(onTime)) {
+                            onTimeCount += 1;
+                        }
+                        attList.setEntryTime(timeFormatOnly.format(entryExit.get(l).getEntry_view().getTime()));
+                        attList.setEntryLocation(entryExit.get(l).getEntry_view().getLocation());
+                        String exitTime = "----";
+                        String exitLocation = "----";
+                        if (entryExit.get(l).getExit_view().size() > 0) {
+                            exitTime = timeFormatOnly.format(entryExit.get(l).getExit_view().get(0).getTime());
+                            exitLocation = entryExit.get(l).getExit_view().get(0).getLocation();
+                        }
+                        attList.setExitTime(exitTime);
+                        attList.setExitLocation(exitLocation);
+                        lstEmployees.add(attList);
                     }
-                    attList.setExitTime(exitTime);
-                    attList.setExitLocation(exitLocation);
-                    lstEmployees.add(attList);
+                    attendanceList.setDate(dateWithDayFormat.format(cal.getTime()));
+                    attendanceList.setEmployees(lstEmployees);
+                    attendance.add(attendanceList);
+                } else {
+                    attendanceList.setDate(dateWithDayFormat.format(cal.getTime()));
+                    attendanceList.setEmployees(lstEmployees);
+                    attendance.add(attendanceList);
                 }
-                attendanceList.setDate(dateWithDayFormat.format(cal.getTime()));
-                attendanceList.setEmployees(lstEmployees);
-                attendance.add(attendanceList);
-            }else {
-                attendanceList.setDate(dateWithDayFormat.format(cal.getTime()));
-                attendanceList.setEmployees(lstEmployees);
-                attendance.add(attendanceList);
-            }
-            onTimeEntryListByDay.add((long) onTimeEntryData.size());
-            graceTimeEntryListByDay.add((long) graceTimeData.size());
-            beyondGraceEntryListByDay.add((long) lateEntryData.size());
+                onTimeEntryListByDay.add((long) onTimeCount);
+                graceTimeEntryListByDay.add((long) graceTimeCount);
+                beyondGraceEntryListByDay.add((long) lateTimeCount);
 
-            dateList.add(dateWithDayFormat.format(cal.getTime()));
-
-            onTimeCount += onTimeEntryData.size();
-            graceTimeCount += graceTimeData.size();
-            lateEntryCount += lateEntryData.size();
-
-            // users list.
-            List<UserVo> userVos = userRepo.findByAll();
-            for(UserVo userVo:userVos) {
-                if (!Objects.equals(userVo.getUserId(), "Admin")) {
-                    // input for getAttendance method.
-                    entryExitFilter.setId(userVo.getUserId());
-                    entryExitFilter.setLocation("");
-                    entryExitFilter.setName("");
-                    entryExitFilter.setDate(dayStTime);
-                    String swapType = "";
-                    Date prevTime = null;
-                    long totCount = 0;
-                    IdTraceVO traceList = (IdTraceVO) this.getAttendance(entryExitFilter, 0);
-                    for (int k = 0; k < traceList.getTrace().size(); k++) {
-                        if (k == 0) {
-                            prevTime = traceList.getTrace().get(k).getTime();
-                            swapType = traceList.getTrace().get(k).getType();
-                        } else if (!Objects.equals(swapType, traceList.getTrace().get(k).getType())) {
-                            if (Objects.equals(traceList.getTrace().get(k).getType(), "entry")) {
+                dateList.add(dateWithDayFormat.format(cal.getTime()));
+                // users list.
+                List<UserVo> userVos = userRepo.findByAll();
+                for (UserVo userVo : userVos) {
+                    if (!Objects.equals(userVo.getUserId(), "Admin")) {
+                        // input for getAttendance method.
+                        entryExitFilter.setId(userVo.getUserId());
+                        entryExitFilter.setLocation("");
+                        entryExitFilter.setName("");
+                        entryExitFilter.setDate(dayStTime);
+                        String swapType = "";
+                        Date prevTime = null;
+                        long totCount = 0;
+                        IdTraceVO traceList = (IdTraceVO) this.getAttendance(entryExitFilter, 0);
+                        for (int k = 0; k < traceList.getTrace().size(); k++) {
+                            if (k == 0) {
                                 prevTime = traceList.getTrace().get(k).getTime();
-                            } else if (Objects.equals(traceList.getTrace().get(k).getType(), "exit")) {
-                                Date curDt = traceList.getTrace().get(k).getTime();
-                                long diff = Math.abs(curDt.getTime() - prevTime.getTime());
-                                long inMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
-                                totCount += inMinutes;
-                                prevTime = null;
-                            }
+                                swapType = traceList.getTrace().get(k).getType();
+                            } else if (!Objects.equals(swapType, traceList.getTrace().get(k).getType())) {
+                                if (Objects.equals(traceList.getTrace().get(k).getType(), "entry")) {
+                                    prevTime = traceList.getTrace().get(k).getTime();
+                                } else if (Objects.equals(traceList.getTrace().get(k).getType(), "exit")) {
+                                    Date curDt = traceList.getTrace().get(k).getTime();
+                                    long diff = Math.abs(curDt.getTime() - prevTime.getTime());
+                                    long inMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
+                                    totCount += inMinutes;
+                                    prevTime = null;
+                                }
 
-                            swapType = traceList.getTrace().get(k).getType();
+                                swapType = traceList.getTrace().get(k).getType();
+                            }
+                        }
+                        if (map.containsKey(userVo.getFirstName() + " " + userVo.getLastName() + "[" + userVo.getUserId() + "]")) {
+                            Integer newVal = map.get(userVo.getFirstName() + " " + userVo.getLastName() + "[" + userVo.getUserId() + "]") + (int) totCount;
+                            map.put(userVo.getFirstName() + " " + userVo.getLastName() + "[" + userVo.getUserId() + "]", newVal);
+                        } else {
+                            map.put(userVo.getFirstName() + " " + userVo.getLastName() + "[" + userVo.getUserId() + "]", (int) totCount);
                         }
                     }
-                    if (map.containsKey(userVo.getFirstName()+" " +userVo.getLastName() +"["+userVo.getUserId()+"]")) {
-                        Integer newVal = map.get(userVo.getFirstName()+" " +userVo.getLastName() +"["+userVo.getUserId()+"]") + (int) totCount;
-                        map.put(userVo.getFirstName()+" " +userVo.getLastName() +"["+userVo.getUserId()+"]", newVal);
-                    } else {
-                        map.put(userVo.getFirstName()+" " +userVo.getLastName() +"["+userVo.getUserId()+"]", (int) totCount);
-                    }
                 }
-            }
+        }
             cal.add(Calendar.DATE, 1);
         }
 
@@ -1310,12 +1319,14 @@ public class IlenService {
             throw new Exception("Exception" + exception.getMessage());
         }
 
-        reportVO.setTotalOnTime(String.valueOf(onTimeCount));
-        reportVO.setTotalGraceTime(String.valueOf(graceTimeCount));
-        reportVO.setTotalBeyondGraceTime(String.valueOf(lateEntryCount));
-
+        reportVO.setTotalOnTime(String.valueOf(onTimeEntryListByDay.stream().mapToInt(Long::intValue).sum()));
+        reportVO.setTotalGraceTime(String.valueOf(graceTimeEntryListByDay.stream().mapToInt(Long::intValue).sum()));
+        reportVO.setTotalBeyondGraceTime(String.valueOf(beyondGraceEntryListByDay.stream().mapToInt(Long::intValue).sum()));
         reportVO.setOnTime(configuration.getOnTime());
         reportVO.setGraceTime(configuration.getGraceTime());
+        reportVO.setExitOnTime(configuration.getExitOnTime());
+        reportVO.setExitGraceTime(configuration.getExitGraceTime());
+        reportVO.setWeekDaysCount(onTimeEntryListByDay.size());
         reportVO.setAttendance(attendance);
         return reportVO;
     }

@@ -8,6 +8,10 @@ public class ReportVO {
     private String totalBeyondGraceTime;
     private String onTime;
     private String graceTime;
+    private String exitOnTime;
+    private String exitGraceTime;
+    private long weekDaysCount;
+
     private List<ReportGen1VO> attendance;
 
     public String getTotalOnTime() {return totalOnTime;}
@@ -33,4 +37,16 @@ public class ReportVO {
     public List<ReportGen1VO> getAttendance() {return attendance;}
 
     public void setAttendance(List<ReportGen1VO> attendance) {this.attendance = attendance;}
+
+    public String getExitOnTime() {return exitOnTime;}
+
+    public void setExitOnTime(String exitOnTime) {this.exitOnTime = exitOnTime;}
+
+    public String getExitGraceTime() {return exitGraceTime;}
+
+    public void setExitGraceTime(String exitGraceTime) {this.exitGraceTime = exitGraceTime;}
+
+    public long getWeekDaysCount() {return weekDaysCount;}
+
+    public void setWeekDaysCount(long weekDaysCount) {this.weekDaysCount = weekDaysCount;}
 }

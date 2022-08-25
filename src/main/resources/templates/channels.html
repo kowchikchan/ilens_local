@@ -441,8 +441,10 @@ function configName(accessConfig){
       var userName= "";
       for(j=0;j<data.length;j++){
         if(data[j].id==accessConfig){
-         userName=userName='<option value='+data[j].id+'>'+data[j].firstName+'</option>'; 
-        }  
+          if(data[j].id!=1){
+            userName +='<option value='+data[j].id+'>'+data[j].id+' ['+data[j].firstName+" "+data[j].lastName+']</option>';
+          } 
+          }
       }
       $("#select2").append(userName);
     }

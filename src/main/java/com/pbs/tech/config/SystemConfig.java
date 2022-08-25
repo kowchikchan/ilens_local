@@ -39,9 +39,6 @@ public class SystemConfig {
     @Autowired
     MenuStatusRepo menuStatusRepo;
 
-    @Autowired
-    WeekDaysRepo weekDaysRepo;
-
     @Value("${ilens.python.path}")
     String pythonPath;
 
@@ -121,6 +118,7 @@ public class SystemConfig {
             reportPeriod.setReportPeriod(1);
             reportPeriod.setMail("ilens.logicfocus@logicfocus.com");
             reportPeriod.setPreviousDate(new Date());
+            reportPeriod.setWeekDays("monday,tuesday,wednesday,thursday,friday");
             reportPeriod.setCreatedBy(user);
             reportPeriod.setCreatedDt(new Date());
             reportPeriod.setUpdatedBy(user);
@@ -137,21 +135,6 @@ public class SystemConfig {
             menuStatus.setId(1L);
             menuStatus.setStatus(false);
             menuStatusRepo.save(menuStatus);
-        }
-
-        // save weekdays
-        WeekDays weekDays;
-        try {
-            weekDays = weekDaysRepo.findById(1L).get();
-        }catch (NoSuchElementException e){
-            weekDays = new WeekDays();
-            weekDays.setId(1L);
-            weekDays.setWeekDays("monday,tuesday,wednesday,thursday,friday");
-            weekDays.setCreatedBy(user);
-            weekDays.setCreatedDt(new Date());
-            weekDays.setUpdatedBy(user);
-            weekDays.setUpdatedDt(new Date());
-            weekDaysRepo.save(weekDays);
         }
 
         // Start RTSP Server.

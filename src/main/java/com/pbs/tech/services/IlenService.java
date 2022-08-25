@@ -122,7 +122,7 @@ public class IlenService {
     FirebaseMessagingServices firebaseMessagingServices;
 
     @Autowired
-    WeekDayServices weekDayServices;
+    ReportServices reportServices;
 
     public void startRuntime(String id) throws Exception {
         HashMap<String, String> usersList = new HashMap<>();
@@ -1183,8 +1183,8 @@ public class IlenService {
         List<Long> beyondGraceEntryListByDay = new ArrayList<>();
         List<String> dateList = new ArrayList<>();
 
-        WeekDays weekDays = weekDayServices.getList();
-        List<String> storedWeekDays = new ArrayList<>(Arrays.asList(weekDays.getWeekDays().split(",")));
+        ReportPeriod reportPeriod = reportServices.getList();
+        List<String> storedWeekDays = new ArrayList<>(Arrays.asList(reportPeriod.getWeekDays().split(",")));
         Configurations configuration = configurationServices.getList();
         String[] graceTimeList = configuration.getGraceTime().split(" ")[0].split(":");
         String[] onTimeList = configuration.getOnTime().split(" ")[0].split(":");

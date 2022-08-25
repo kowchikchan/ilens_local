@@ -369,8 +369,9 @@ public class ScheduledReportSend {
             document.add(ilensLogo);
         }
         document.close();
-
-        reportServices.putConfigs();
+        if(type != null) {
+            reportServices.putConfigs();
+        }
         log.info("Report generated.");
 
         String subject = " iLens automated attendance report.";

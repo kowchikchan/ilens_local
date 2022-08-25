@@ -18,6 +18,8 @@ public class ReportPeriod extends Audit{
 
     private Date previousDate;
 
+    private String weekDays;
+
     public long getId() {return id;}
 
     public void setId(long id) {this.id = id;}
@@ -33,4 +35,8 @@ public class ReportPeriod extends Audit{
     public Date getPreviousDate() {return previousDate;}
 
     public void setPreviousDate(Date previousDate) {this.previousDate = previousDate;}
+
+    public String getWeekDays() {return weekDays;}
+
+    public void setWeekDays(String weekDays) {this.weekDays = weekDays;}
 }

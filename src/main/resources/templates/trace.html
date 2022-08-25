@@ -49,6 +49,10 @@
 <script>
   var dateString=null;
 	$(document).ready(function(){
+    $(".pre-loading").show();
+    $(window).on('load', function() {
+    $(".pre-loading").hide();
+  });  
     $("#attendance").addClass('active');
 
 		var pageNumber = 0;

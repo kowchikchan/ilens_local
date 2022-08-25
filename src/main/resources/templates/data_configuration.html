@@ -29,27 +29,52 @@
                     <div class="tab-pane show active" id="first" role="tabpanel" aria-labelledby="first-tab">
                         <div class="row">
                             <div class="col-12 col-lg-12 apisty">
-                                <div class="row g-0">	  
-                                    <div class="col-md-12 dFlex pt-3">
-                                        <div class="col-md-2">
-                                            <label class="config_labels">Expected entry time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Depending on this time, display the on-time entry data." ></i></label>
+                                <div class="row g-0">
+                                    <div class="col-md-4 border-right">
+                                        <div class="col-md-12 dFlex pt-3">
+                                            <div class="col-md-5">
+                                                <label class="config_labels">Expected Entry Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Depending on this time, display the on-time entry data." ></i></label>
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" id="timeSelector" class="expectedEntry" name="timeSelector"/>
+                                            </div>
+                                        </div>      
+                                        <div class="col-md-12 dFlex pt-3">
+                                            <div class="col-md-5">
+                                                <label class="config_labels"> Entry Grace Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="This time is used to determine grace entry." ></i></label>
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select class="retains_sec" id="graceTime" name="graceTime">                  
+                                                    <option value=10>10 Mins</option>
+                                                    <option value=20>20 Mins</option>
+                                                    <option value=30>30 Mins</option>
+                                                </select>
+                                            </div>    
                                         </div>
-                                        <div class="col-md-8">
-                                            <input type="text" id="timeSelector" class="expectedEntry" name="timeSelector"/>
+                                    </div>	
+                                    <div class="col-md-6">
+                                        <div class="col-md-12 dFlex pt-3">
+                                            <div class="col-md-3">
+                                                <label class="config_labels">Expected Exit Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Depending on this time, display the on-time exit data." ></i></label>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <input type="text" id="exitTimeSelector" class="expectedEntry" name="exitTimeSelector"/>
+                                            </div>
+                                        </div>      
+                                        <div class="col-md-12 dFlex pt-3">
+                                            <div class="col-md-3">
+                                                <label class="config_labels"> Exit Grace Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="This time is used to determine grace exit." ></i></label>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <select class="retains_sec" id="exitgraceTime" name="exitgraceTime">                  
+                                                    <option value=10>10 Mins</option>
+                                                    <option value=20>20 Mins</option>
+                                                    <option value=30>30 Mins</option>
+                                                </select>
+                                            </div>    
                                         </div>
-                                    </div>      
-                                    <div class="col-md-12 dFlex pt-3">
-                                        <div class="col-md-2">
-                                            <label class="config_labels">Grace Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="This time is used to determine grace entry." ></i></label>
-                                        </div>
-                                        <div class="col-md-8">
-                                            <select class="retains_sec" id="graceTime" name="graceTime">                  
-                                                <option value=10>10 Mins</option>
-                                                <option value=20>20 Mins</option>
-                                                <option value=30>30 Mins</option>
-                                            </select>
-                                        </div>    
-                                    </div>
+                                    </div>  
+
                                 </div>
                             </div>
             
@@ -101,6 +126,12 @@
         toolbarPlacement: 'bottom',
         showClose:true
       });
+      $('#exitTimeSelector').datetimepicker({
+        format: 'LT',
+        showClear:true,
+        toolbarPlacement: 'bottom',
+        showClose:true
+      });
     //   var dates= moment().format("MM/DD/YYYY");
     //   var datetime = moment(dates+" "+$('#timeSelector').val()).add(30, 'minutes');
     //   console.log(moment(datetime).add(30, 'minutes').format("DD/MM/YYYY HH:mm a"));
@@ -125,6 +156,9 @@
     var videoStatus=$("#saveCheck").is(':checked') ? true : false;
     var graceTime=$("#graceTime").val();
     var onTime=$("#timeSelector").val();
+    var exitGracePeriod=$("#exitgraceTime").val();
+    var exitOnTime=$("#exitTimeSelector").val();
+    var exitOnTimeMIn=($("#exitTimeSelector").val()).split(":");
     var onTimeMin=($("#timeSelector").val()).split(":");
     var graceTime1=parseInt((onTimeMin[1]).split(" ")[0])+parseInt(graceTime);
     if(graceTime1 > 59){
@@ -136,10 +170,27 @@
     if(onTimeMin[1].charAt(0) == '0'){
         onTime = onTimeMin[0]+":"+onTimeMin[1].replace('0','');
     }
+    if(exitOnTimeMIn[1].charAt(0)=="0"){
+        exitOnTime = exitOnTimeMIn[0]+":"+exitOnTimeMIn[1].replace('0',''); 
+    }
     var gracePeriod=$("#graceTime").val();
+    var exitGraceTime=(moment().format("YYYY-MM-DD")) +" "+ ($("#exitTimeSelector").val());
+    var exitGraceTiMin = moment(exitGraceTime).subtract(exitGracePeriod, 'minutes').format('hh:mm A');
+    exitGraceTiMin=exitGraceTiMin.split(":")
+    if(exitGraceTiMin[0].charAt(0) == '0'){
+         exitGraceTiMin[0]=exitGraceTiMin[0].replace('0',"");
+    }
+    if(exitGraceTiMin[1].charAt(0) == '0'){
+        exitGraceTiMin[1]=exitGraceTiMin[1].replace('0',"");
+    }
+    var exitGraceTime= exitGraceTiMin[0]+":"+exitGraceTiMin[1];
+
     var id=0;
       var data={
         retainsPeriod:retainsPeriod,
+        exitGracePeriod:exitGracePeriod,
+        exitOnTime:exitOnTime,
+        exitGraceTime,exitGraceTime,
         onTime:onTime,
         videoStatus:videoStatus,
         graceTime:graceTime,
@@ -177,8 +228,10 @@
             success: function(data){ 
                     $("#dayRetains").val(data.retainsPeriod);
                     $("#timeSelector").val(data.onTime);
+                    $("#exitTimeSelector").val(data.exitOnTime);
                     // var graceTime=((data.graceTime+"").split(":")[1]).split(" ")[0];
                     $("#graceTime").val(data.gracePeriod);
+                    $("#exitgraceTime").val(data.exitGracePeriod);
                     if(data.videoStatus == true){
                         $("#saveCheck").prop( "checked", true )
                     }

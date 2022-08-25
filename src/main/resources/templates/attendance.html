@@ -304,8 +304,8 @@ $("#clearIcon").on("click",function(){
             var attendanceList="";
           	for(i=0;i<data.length;i++){
               var entryTime = moment(data[i].entry_view.time).format("DD-MM-YYYY hh:mm:ss A");
-          	  attendanceList=attendanceList+'<tr>';
-          	  attendanceList=attendanceList+"<td> <button id='idTraceButton' type='button' class='btn btn-primary' onclick='getTraceMethod(this.value)' value= "+ data[i].entry_view.id +'_'+ entryExitFilter.date +" >"+data[i].id+"</button></td>";
+          	  attendanceList=attendanceList+"<tr onclick='getTraceMethod(\""+data[i].entry_view.id+"\",\""+entryExitFilter.date +"\")'>";
+          	  attendanceList=attendanceList+"<td> <button id='idTraceButton' type='button' class='btn btn-primary'>"+data[i].id+"</button></td>";
               attendanceList=attendanceList+'<td>'+data[i].name+'</td>';
               attendanceList=attendanceList+'<td class="width">'+ entryTime +'</td>';
               attendanceList=attendanceList+'<td>'+data[i].entry_view.location+'</td>';
@@ -350,12 +350,12 @@ $("#clearIcon").on("click",function(){
   });
 }
 
-  function getTraceMethod(clickedValue){
-      const myArray = clickedValue.toString().split("_");
+  function getTraceMethod(id,date){
+      // const myArray = clickedValue.toString().split("_");
 
       // convert human readable date into epoch.
-      var dateInEpoch = Math.round(new Date(myArray[1])/1000.0);
-      location.href = '/attendanceById?id='+myArray[0] +'&date='+dateInEpoch;
+      var dateInEpoch = Math.round(new Date(date)/1000.0);
+      location.href = '/attendanceById?id='+id +'&date='+dateInEpoch;
   }
 
 	function attendanceList(entryExitFilter, pageNumber){
@@ -381,8 +381,8 @@ $("#clearIcon").on("click",function(){
           	var attendanceList="";
           	for(i=0;i<data.length;i++){
               var entryTime = moment(data[i].entry_view.time).format("DD-MM-YYYY hh:mm:ss A");
-          	  attendanceList=attendanceList+'<tr>';
-          	  attendanceList=attendanceList+"<td> <button id='idTraceButton' type='button' class='btn btn-primary' onclick='getTraceMethod(this.value)' value= "+ data[i].entry_view.id +'_'+ entryExitFilter.date +" >"+data[i].id+"</button></td>";
+          	  attendanceList=attendanceList+"<tr onclick='getTraceMethod(\""+data[i].entry_view.id+"\",\""+entryExitFilter.date +"\")'>";
+          	  attendanceList=attendanceList+"<td> <button id='idTraceButton' type='button' class='btn btn-primary' >"+data[i].id+"</button></td>";
               attendanceList=attendanceList+'<td>'+data[i].name+'</td>';
               attendanceList=attendanceList+'<td class="width">'+ entryTime +'</td>';
               attendanceList=attendanceList+'<td>'+data[i].entry_view.location+'</td>';
@@ -463,8 +463,8 @@ $(window).resize(function() {
           	for(i=0;i<data.length;i++){
               var entryTime = moment(data[i].entry_view.time).format("DD-MM-YYYY hh:mm:ss A");
           	  attendanceList=attendanceList+'<div class="userHead1">';
-                attendanceList=attendanceList+'<div class="col-12 colSplit">';
-          	  attendanceList=attendanceList+"<div class='col-4'><span class='ctext2'>ID: </span> <button id='idTraceButton' type='button' class='btn btn-primary' onclick='getTraceMethod(this.value)' value= "+ data[i].id +'_'+ entryExitFilter.date +" >"+data[i].id+"</button></div>";
+              attendanceList=attendanceList+"<div class='col-12 colSplit' onclick='getTraceMethod(\""+data[i].entry_view.id+"\",\""+entryExitFilter.date +"\")'>";
+          	  attendanceList=attendanceList+"<div class='col-4'><span class='ctext2'>ID: </span> <button id='idTraceButton' type='button' class='btn btn-primary'>"+data[i].id+"</button></div>";
               attendanceList=attendanceList+'<div class="col-8 ctext3"><span class="ctext2">Name: '+'</span>'+data[i].name+'</div>';
               attendanceList=attendanceList+'</div>';
               attendanceList=attendanceList+'<div class="col-12 colSplit">';

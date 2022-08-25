@@ -1766,6 +1766,7 @@ option{
   padding: 4px 10px 4px 10px;
   border-color: #f9c631;
   color: #f9c631;
+  background: #062e51;
 }
 
 option:hover{
@@ -2668,6 +2669,12 @@ fa-warning:before, .fa-exclamation-triangle:before {
   #home-height{
     height: 195px;
   }
+  .bootstrap-tagsinput .tag [data-role="remove"] {
+    font-size: 10px !important;
+  }
+  .bootstrap-tagsinput {
+    font-size: 12px;
+  }
 }
 th.datepicker-switch {
   color: #f9c631;
@@ -3391,11 +3398,13 @@ button.btn.btn-outline-warning {
 }
 
 @media (min-width: 768px){
-.col-md-2 {
-    -ms-flex: 0 0 16.666667%;
-    flex: 0 0 19.666667%;
-    max-width: 19.666667%;
-}}
+  .col-md-2 {
+      -ms-flex: 0 0 16.666667%;
+      flex: 0 0 19.666667%;
+      max-width: 19.666667%;
+  }
+
+}
 .datepicker.datepicker-dropdown.dropdown-menu.datepicker-orient-left.datepicker-orient-bottom {
   top: 90.383px !important;
 }
@@ -3425,6 +3434,7 @@ ul.aircomplete-list {
   border: 1px solid;
   border-radius: 5px;
   display: none;
+  text-align: left;
 }
 li.aircomplete-list-item {
   height: 41px;
@@ -4444,4 +4454,14 @@ background-color: #fff;
 .nav-tabs .nav-link:hover {
   border: 1px solid transparent;
   color: #eabd33;
+}
+.reportCheck span {
+  color: white;
+  margin-left: 10px;
+}
+.reportCheck input[type="checkbox"] {
+  margin-left: 7px;
+}
+.border-right{
+  border-right: 1px solid #f9c631 !important;
 }

@@ -4465,3 +4465,32 @@ background-color: #fff;
 .border-right{
   border-right: 1px solid #f9c631 !important;
 }
+.entryDiv{
+width: 560px;
+}
+.hrLine{
+  width: 132px;
+}
+.cfLable{
+  width: 200px;
+}
+@media only screen and (max-width: 760px) {
+  .cfLable{
+    width: 100%;
+  }
+  .border-right {
+    border-right: 1px solid #062e51 !important;
+  }
+}
+#attendanceList tr {
+    cursor: pointer;
+}
+
+@media only screen and (min-width: 501px) and (max-width: 1500px) {
+  .entryDiv {
+    width: 430px !important;
+  }
+  .hrLine {
+    width: 40px !important;
+  }
+}

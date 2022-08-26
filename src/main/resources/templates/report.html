@@ -46,13 +46,13 @@
                                 <label class="config_labels">Week Days <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Choose working days to customise the outcome." ></i></label>
                             </div>
                             <div class="col-md-8 reportCheck">
-                                <input type="checkbox" name="checkbox" id="checkbox1" class="save_check" value="sunday"><span>Sun</span>
-                                <input type="checkbox" name="checkbox" id="checkbox2" class="save_check" value="monday"><span>Mon</span>
-                                <input type="checkbox" name="checkbox" id="checkbox3" class="save_check" value="tuesday"><span>Tues</span>
-                                <input type="checkbox" name="checkbox" id="checkbox4" class="save_check" value="wednesday"><span>Wed</span>
-                                <input type="checkbox" name="checkbox" id="checkbox5" class="save_check" value="thursday"><span>Thu</span>
-                                <input type="checkbox" name="checkbox" id="checkbox6" class="save_check" value="friday"><span>Fri</span>
-                                <input type="checkbox" name="checkbox" id="checkbox7" class="save_check" value="saturday"><span>Sat</span>
+                                <input type="checkbox" name="checkbox" id="sunday" class="save_check" value="sunday"><span>Sun</span>
+                                <input type="checkbox" name="checkbox" id="monday" class="save_check" value="monday"><span>Mon</span>
+                                <input type="checkbox" name="checkbox" id="tuesday" class="save_check" value="tuesday"><span>Tues</span>
+                                <input type="checkbox" name="checkbox" id="wednesday" class="save_check" value="wednesday"><span>Wed</span>
+                                <input type="checkbox" name="checkbox" id="thursday" class="save_check" value="thursday"><span>Thu</span>
+                                <input type="checkbox" name="checkbox" id="friday" class="save_check" value="friday"><span>Fri</span>
+                                <input type="checkbox" name="checkbox" id="saturday" class="save_check" value="saturday"><span>Sat</span>
                             </div>
                         </div>     
                     </div>
@@ -101,6 +101,7 @@
     });
 
     function reportlist(){
+        var days = [];
         var sessionToken = "[[${session.API_TOKEN}]]";
         var apiUrl = "api/v1/report/list";  
         $.ajax({
@@ -114,7 +115,11 @@
                     $("#interval").val(data.reportPeriod);
                     $("#receipt").val(data.mail);
                     $('#receipt').tagsinput('add', data.mail);
-
+                    days = data.weekDays.split(",");
+                    for(var i=0; i<days.length; i++){
+                        $("#"+days[i]).prop("checked", true);
+                    }
+                    /*
                     if(data.weekDays.includes("sunday")){
                         $("#checkbox1").prop("checked", true);
                     }
@@ -135,7 +140,7 @@
                     }
                     if(data.weekDays.includes("saturday")){
                         $("#checkbox7").prop("checked", true);
-                    }
+                    }*/
 
                 },
                 error: function(err){

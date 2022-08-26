@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.NoSuchElementException;
 
@@ -28,6 +29,7 @@ public class ReportServices {
             reportPeriod1.setReportPeriod(reportPeriod.getReportPeriod());
             reportPeriod1.setMail(reportPeriod.getMail());
             reportPeriod1.setPreviousDate(reportPeriod1.getPreviousDate());
+            reportPeriod1.setWeekDays(reportPeriod.getWeekDays());
             reportPeriod1.setUpdatedBy(userId.toString());
             reportPeriod1.setUpdatedDt(new Date());
             reportPeriodRepo.save(reportPeriod1);
@@ -48,10 +50,12 @@ public class ReportServices {
 
     public void putConfigs() throws Exception {
         try {
-            ReportPeriod rprtPeriod = reportPeriodRepo.findById(Long.valueOf(1)).get();
-            rprtPeriod.setPreviousDate(new Date());
-            rprtPeriod.setUpdatedDt(new Date());
-            reportPeriodRepo.save(rprtPeriod);
+            Calendar calendar = Calendar.getInstance();
+            ReportPeriod rptPeriod = reportPeriodRepo.findById(Long.valueOf(1)).get();
+            calendar.add(Calendar.MINUTE, 11);
+            rptPeriod.setPreviousDate(calendar.getTime());
+            rptPeriod.setUpdatedDt(new Date());
+            reportPeriodRepo.save(rptPeriod);
         }catch (Exception e){
             throw new Exception("Configurations Not saved " + e.getMessage());
         }

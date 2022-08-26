@@ -48,11 +48,9 @@
     </div>
 <script>
   var dateString=null;
+  $(".pre-loading").show();
 	$(document).ready(function(){
-    $(".pre-loading").show();
-    $(window).on('load', function() {
     $(".pre-loading").hide();
-  });  
     $("#attendance").addClass('active');
 
 		var pageNumber = 0;

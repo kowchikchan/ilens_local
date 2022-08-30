@@ -37,7 +37,6 @@
                                 <input type="text" id="receipt" data-role="tagsinput" value="" class="Report_receipt" name="receipt"/>
                                 <div id="mailSendBtn">
                                     <div class="text-warning ml-3 errorDiv"><i class="fas fa-exclamation-triangle"><span id="errorMsg" class="text-white"></span></i></div>
-                                    <button class="emailButton" onclick="reportGenerate()">Report Generate</button>
                                 </div>
                             </div>
                         </div>   
@@ -53,6 +52,7 @@
                                 <input type="checkbox" name="checkbox" id="thursday" class="save_check" value="thursday"><span>Thu</span>
                                 <input type="checkbox" name="checkbox" id="friday" class="save_check" value="friday"><span>Fri</span>
                                 <input type="checkbox" name="checkbox" id="saturday" class="save_check" value="saturday"><span>Sat</span>
+                                <div class="pt-2"><button class="emailButton" onclick="reportGenerate()">Generate Now</button></div>
                             </div>
                         </div>     
                     </div>

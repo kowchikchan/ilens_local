@@ -71,6 +71,7 @@ function onLoadMenu(){
   $(".move-chart").toggleClass("active");
   $(".move-chart-1").toggleClass("active");
   $(".gp-text").toggleClass("active");
+  $("#Adms").toggleClass("active");
 };
 
 

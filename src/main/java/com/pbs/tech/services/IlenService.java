@@ -45,6 +45,7 @@ public class IlenService {
     private static final SimpleDateFormat dateWithDayFormat = new SimpleDateFormat("dd MMMM yyyy-EEEE");
     private static final SimpleDateFormat timeFormatOnly = new SimpleDateFormat("hh:mm a");
     private static final String os = System.getProperty("os.name");
+    private static final double PER_PAGES = 10;
 
     @Autowired
     EntryExitRepo entryExitRepo;
@@ -623,8 +624,46 @@ public class IlenService {
                 }
                 try {
                     log.info("Generated Query : " + stringBuilder);
-                    List<EntryExitEntity> entities = cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
-                    for (EntryExitEntity entity : entities) {
+                    List<EntryExitEntity> filteredData = null;
+                    List<EntryExitEntity> entities =  cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
+                    int totalPages = (int)Math.ceil(entities.size()/PER_PAGES);
+                    if (pageNumber <= totalPages) {
+                        int endIndex = Integer.parseInt(String.valueOf(pageNumber)+0);
+                        int startIndex = (int)(endIndex - PER_PAGES);
+                        try {
+                            if (endIndex > entities.size()) {
+                                filteredData = entities.subList(startIndex, entities.size());
+                            } else {
+                                filteredData = entities.subList(startIndex, endIndex);
+                            }
+                            for (EntryExitEntity entity : filteredData) {
+                                List<ExitView> exitDetails = this.exitData(entity.getId(), entryExitFilter.getDate());
+                                EntryExit entryExit = new EntryExit();
+                                entryExit.setId(entity.getId());
+                                entryExit.setName(entity.getName());
+                                try {
+                                    Channel ch = this.getChannelDetailsById(Long.parseLong(entity.getLocation()));
+                                    entity.setLocation(ch.getName());
+                                    // exit
+                                    if(exitDetails.size() > 0){
+                                        Channel ch1 = this.getChannelDetailsById(Long.parseLong(exitDetails.get(0).getLocation()));
+                                        exitDetails.get(0).setLocation(ch1.getName());
+                                    }
+                                }catch (Exception e){
+                                    log.info("no channel found");
+                                }
+                                entryExit.setEntry_view(entity);
+                                entryExit.setExit_view(exitDetails);
+                                entryExits.add(entryExit);
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            filteredData = new ArrayList<>();
+                            return entryExits;
+                        }
+                    }
+                    //System.out.println("size of list :" + sizeOfAttendance);
+                    /*for (EntryExitEntity entity : entities) {
                         List<ExitView> exitDetails = this.exitData(entity.getId(), entryExitFilter.getDate());
                         EntryExit entryExit = new EntryExit();
                         entryExit.setId(entity.getId());
@@ -644,7 +683,7 @@ public class IlenService {
                         entryExit.setEntry_view(entity);
                         entryExit.setExit_view(exitDetails);
                         entryExits.add(entryExit);
-                    }
+                    }*/
                 } catch (Exception e) {
                     throw new Exception(e.getMessage());
                 }
@@ -980,7 +1019,10 @@ public class IlenService {
                 }
                 encodedString = bs64Conversion(file);
             }catch (FileNotFoundException e){
-                throw new FileNotFoundException("File Not Found Exception " + e.getMessage());
+                file = new File(dataLocation + "/noImageAvailable.jpg");
+                encodedString = bs64Conversion(file);
+                e.printStackTrace();
+                //throw new FileNotFoundException("File Not Found Exception " + e.getMessage());
             }
             val.add(encodedString);
             return val;

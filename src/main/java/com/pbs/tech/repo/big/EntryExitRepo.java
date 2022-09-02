@@ -18,7 +18,7 @@ public interface EntryExitRepo extends CrudRepository<EntryExitEntity,String> {
     @Query("SELECT * FROM EntryExit WHERE time >= ?0 group by id ALLOW FILTERING")
     Slice<EntryExitEntity> getTodayAttendance(Date today, Pageable page);
 
-    @Query("SELECT * FROM EntryExit WHERE time > ?0 AND time <= ?1  AND type='entry' group by id ALLOW FILTERING")
+    @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time < ?1  AND type='entry' group by id ALLOW FILTERING")
     List<EntryExitEntity> getTodayAttendanceCount(Date startDate, Date endDate);
 
     @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time <= ?1 group by id ALLOW FILTERING")

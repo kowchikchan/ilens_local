@@ -118,7 +118,7 @@
         name:""
     }
   }
-    var pageNumber = 0;
+    var pageNumber = 1;
     if ( windowsize < 500 ){
       mobileAttendance(entryExitFilter, pageNumber);
     }else{
@@ -131,7 +131,7 @@
 		var st2="T00:01:01.001Z";
 		var selected1 = st1.concat(st2);
 
-    var pageNumber = 0;
+    var pageNumber = 1;
     entryExitFilter={
       date:selected1, 
       id:"",
@@ -202,7 +202,7 @@ $("#usersFilter").keyup(function(data){
         var date1=$("#text-date").val();
         var date2="T00:01:01.001Z";        
         var date=date1.concat(date2);
-        var pageNumber=0;
+        var pageNumber=1;
         var entryExitFilter= {date:date,
                              id:"",
                             location:"",
@@ -227,7 +227,7 @@ $("#clearIcon").on("click",function(){
   var date1=$("#text-date").val();
         var date2="T00:01:01.001Z";
         var date=date1.concat(date2);
-        var pageNumber=0;
+        var pageNumber=1;
         var entryExitFilter= {date:date,
                              id:"",
                             location:"",

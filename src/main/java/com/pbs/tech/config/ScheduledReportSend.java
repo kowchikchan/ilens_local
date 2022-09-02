@@ -302,15 +302,15 @@ public class ScheduledReportSend {
 
         document.add(ilensLogo);
         document.add(new Paragraph("\n"));
-        document.add(totalCountPdfTable(titleClWidths, "Total on time entry"));
+        document.add(totalCountPdfTable(titleClWidths, "Total on time entries"));
         document.add(new Paragraph("\n"));
         document.add(content1);
         document.add(new Paragraph("\n"));
-        document.add(totalCountPdfTable(titleClWidths, "Total grace entry"));
+        document.add(totalCountPdfTable(titleClWidths, "Total grace entries"));
         document.add(new Paragraph("\n"));
         document.add(content2);
         document.add(new Paragraph("\n"));
-        document.add(totalCountPdfTable(titleClWidths, "Beyond grace entry"));
+        document.add(totalCountPdfTable(titleClWidths, "Total late entries"));
         document.add(new Paragraph("\n"));
         document.add(content3);
         document.add(new Paragraph("\n"));

@@ -28,10 +28,10 @@ public class HeaderFooterPageEvent extends PdfPageEventHelper {
                     FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12.2f, WebColors.getRGBColor("#062E51"))), 1055, 740, 0);
         }
         public void onEndPage(PdfWriter writer,Document document) {
-            String curDate = stTimeFormat.format(new Date());
+            String curDate = toDtFormat.format(new Date());
             Rectangle rect = writer.getBoxSize("art");
             ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("Generated Date: " + curDate,
-                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10.0f, WebColors.getRGBColor("#062E51"))), 133, 23, 0);
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10.0f, WebColors.getRGBColor("#062E51"))), 140, 23, 0);
             ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase(" "), rect.getRight(), rect.getBottom(), 0);
         }
 }

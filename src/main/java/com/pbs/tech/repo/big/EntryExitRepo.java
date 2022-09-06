@@ -18,17 +18,17 @@ public interface EntryExitRepo extends CrudRepository<EntryExitEntity,String> {
     @Query("SELECT * FROM EntryExit WHERE time >= ?0 group by id ALLOW FILTERING")
     Slice<EntryExitEntity> getTodayAttendance(Date today, Pageable page);
 
-    @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time < ?1  AND type='entry' group by id ALLOW FILTERING")
-    List<EntryExitEntity> getTodayAttendanceCount(Date startDate, Date endDate);
+    @Query("SELECT * FROM EntryExit WHERE time > ?0 AND time <= ?1  AND type='entry' group by id ALLOW FILTERING")
+    List<EntryExitEntity> findAllByFromAndToTime(Date startDate, Date endDate);
 
     @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time <= ?1 group by id ALLOW FILTERING")
     Iterable<EntryExitEntity> getLastHourEntryOrOnTimeEntry(Date pastOneHourOrToday, Date PresentHourOrOnTime);
 
-    @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time < ?1 group by id ALLOW FILTERING")
+/*    @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time < ?1 group by id ALLOW FILTERING")
     Iterable<EntryExitEntity> getEveryTenMinutes(Date pastOneHourOrToday, Date PresentHourOrOnTime);
 
     @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time < ?1 AND type='entry' group by id ALLOW FILTERING")
-    List<EntryExitEntity> getLateEntry(Date stTime, Date endTime);
+    List<EntryExitEntity> getLateEntry(Date stTime, Date endTime);*/
 
     // @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time <= ?1 group by id ALLOW FILTERING")
     // Iterable<EntryExitEntity> getGraceTime(Date onTime,Date graceTime);

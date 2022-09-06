@@ -125,6 +125,20 @@ public class IlenService {
     @Autowired
     ReportServices reportServices;
 
+    public static class UnknownEntriesSort implements Comparator<UnknownEntry> {
+        @Override
+        public int compare(UnknownEntry o1, UnknownEntry o2) {
+            return o1.getTime().compareTo(o2.getTime());
+        }
+    }
+
+    public static class AttendanceSort implements Comparator<EntryExitEntity> {
+        @Override
+        public int compare(EntryExitEntity o1, EntryExitEntity o2) {
+            return o1.getTime().compareTo(o2.getTime());
+        }
+    }
+
     public void startRuntime(String id) throws Exception {
         HashMap<String, String> usersList = new HashMap<>();
         //TODO: check if already running.
@@ -511,7 +525,7 @@ public class IlenService {
         Calendar date = new GregorianCalendar();
         Date startDate = this.getDayStTime(date.getTime());
         Date endDate = this.getDayEndTime(date.getTime());
-        return entryExitRepo.getTodayAttendanceCount(startDate, endDate).size();
+        return entryExitRepo.findAllByFromAndToTime(startDate, endDate).size();
     }
 
     public  Object getAttendance(@RequestBody EntryExitFilter entryExitFilter, int pageNumber) throws Exception {
@@ -626,6 +640,7 @@ public class IlenService {
                     log.info("Generated Query : " + stringBuilder);
                     List<EntryExitEntity> filteredData = null;
                     List<EntryExitEntity> entities =  cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
+                    Collections.sort(entities, new AttendanceSort());
                     int totalPages = (int)Math.ceil(entities.size()/PER_PAGES);
                     if (pageNumber <= totalPages) {
                         int endIndex = Integer.parseInt(String.valueOf(pageNumber)+0);
@@ -760,33 +775,31 @@ public class IlenService {
         //get past time
         date.add(Calendar.HOUR_OF_DAY,-1);
         Date pastOneHourTime = date.getTime();
-        Iterable slice = entryExitRepo.getLastHourEntryOrOnTimeEntry(pastOneHourTime,currentTime);
-
-        return IterableUtils.size(slice);
+        return (entryExitRepo.findAllByFromAndToTime(pastOneHourTime, currentTime).size());
     }
 
     public long getOnTimeEntry() {
         Calendar date = new GregorianCalendar();
+
+        // get configurations.
         Configurations configuration = configurationServices.getList();
         String[] onTimeList = configuration.getOnTime().split(" ")[0].split(":");
 
-        // reset hour, minutes, seconds and millis
-        date.set(Calendar.HOUR_OF_DAY, 0);
-        date.set(Calendar.MINUTE, 0);
-        date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
-        Date today = date.getTime();
-        //set limit on 8'o clock.
+        //set start time.
+        Date today = this.getDayStTime(date.getTime());
+
+        //set on time.
         date.set(Calendar.HOUR_OF_DAY, Integer.parseInt(onTimeList[0]));
         date.set(Calendar.MINUTE, Integer.parseInt(onTimeList[1]));
         Date onTime = date.getTime();
-        Iterable slice = entryExitRepo.getLastHourEntryOrOnTimeEntry(today,onTime);
 
-        return IterableUtils.size(slice);
+        return (entryExitRepo.findAllByFromAndToTime(today, onTime).size());
     }
 
     public long getGraceTimeEntry() {
         Calendar date = new GregorianCalendar();
+
+        // get configurations.
         Configurations configuration = configurationServices.getList();
         String[] onTimeList = configuration.getOnTime().split(" ")[0].split(":");
         String[] graceTimeList = configuration.getGraceTime().split(" ")[0].split(":");
@@ -798,15 +811,14 @@ public class IlenService {
         date.set(Calendar.MILLISECOND, 0);
         Date onTime = date.getTime();
 
-        //Set graceTime.
+        //set graceTime.
         date.set(Calendar.HOUR_OF_DAY, Integer.parseInt(graceTimeList[0]));
         date.set(Calendar.MINUTE,Integer.parseInt(graceTimeList[1]));
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
-
         Date graceTime = date.getTime();
-        Iterable slice = entryExitRepo.getLastHourEntryOrOnTimeEntry(onTime,graceTime);
-        return IterableUtils.size(slice);
+
+        return (entryExitRepo.findAllByFromAndToTime(onTime,graceTime).size());
     }
 
     public float getAverageOnTillDate() {
@@ -848,24 +860,25 @@ public class IlenService {
     }
 
     public List<EveryTenMinutesVo> getEveryTenMinutes() {
+        EveryTenMinutesVo everyTenMinutesVo = null;
         Calendar date = new GregorianCalendar();
-        ArrayList<EveryTenMinutesVo> barChartValues = new ArrayList<>();
-        //Every Ten minutes data..
+        ArrayList<EveryTenMinutesVo> everyTenMinutesVos = new ArrayList<>();
+
+        //Every Ten minutes data.
         date.add(Calendar.HOUR_OF_DAY, -1);
-        Date pastOneHourTime = date.getTime();
+        Date fromTime = date.getTime();
         for (int i = 0; i <= 5; i++) {
-            EveryTenMinutesVo everyTenMinutesVo = new EveryTenMinutesVo();
+            everyTenMinutesVo = new EveryTenMinutesVo();
             date.add(Calendar.MINUTE, 10);
-            Date addTenMinutesWithPastOneHour = date.getTime();
-            Iterable firstTenMinutes = entryExitRepo.getEveryTenMinutes(pastOneHourTime, addTenMinutesWithPastOneHour);
-            //swap values.
-            pastOneHourTime = addTenMinutesWithPastOneHour;
-            //set values to the VO.
-            everyTenMinutesVo.setTime(addTenMinutesWithPastOneHour);
-            everyTenMinutesVo.setCount(IterableUtils.size(firstTenMinutes));
-            barChartValues.add(everyTenMinutesVo);
+            Date toTime = date.getTime();
+            everyTenMinutesVo.setTime(toTime);
+            everyTenMinutesVo.setCount(entryExitRepo.findAllByFromAndToTime(fromTime, toTime).size());
+            everyTenMinutesVos.add(everyTenMinutesVo);
+
+            //swap timings.
+            fromTime = toTime;
         }
-        return barChartValues;
+        return everyTenMinutesVos;
     }
 
     public List<SixMonthAverageVo> getAverageOnSixMonth() {
@@ -922,7 +935,7 @@ public class IlenService {
         return totalSixMonthAverage;
     }
 
-    public List<EntryViolationByLocationVo> getEntryViolationsByLocation() {
+/*    public List<EntryViolationByLocationVo> getEntryViolationsByLocation() {
         ArrayList<EntryViolationByLocationVo> totalEntryViolationValues = new ArrayList<>();
         Map<String, Integer> locationWithCount = new HashMap<>();
         int count = 0;
@@ -945,7 +958,7 @@ public class IlenService {
         }
         return totalEntryViolationValues;
 
-    }
+    }*/
 
     public List<EntryViolationByLocationVo> getEntryViolationsByLoc() {
         ArrayList<EntryViolationByLocationVo> totalEntryViolationValues = new ArrayList<>();
@@ -980,7 +993,6 @@ public class IlenService {
     //Total count of Entry Violation.
     public long getEntryViolationsCount() {
         List<EntryViolation> val = getEntryViolations();
-
         return val.size();
     }
 
@@ -1029,32 +1041,23 @@ public class IlenService {
     }
 
     public long getLateEntry() throws Exception {
-        long count = 0;
+        GregorianCalendar calendar = new GregorianCalendar();
 
         // Configurations.
         Configurations configuration = configurationServices.getList();
         String[] graceTimeList = configuration.getGraceTime().split(" ")[0].split(":");
 
-        GregorianCalendar date = new GregorianCalendar();
-        EntryExitFilter entryExitFilter=new EntryExitFilter();
+        // start and end time.
+        Date startTime = this.getDayStTime(calendar.getTime());
+        Date endTime = this.getDayEndTime(calendar.getTime());
 
-        // current dt.
-        date.set(Calendar.HOUR_OF_DAY, 0);
-        date.set(Calendar.MINUTE, 1);
-        date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
-        entryExitFilter.setDate(date.getTime());
+        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(graceTimeList[0]));
+        calendar.set(Calendar.MINUTE, Integer.parseInt(graceTimeList[1]));
 
-        // on time.
-        date.set(Calendar.HOUR_OF_DAY, Integer.parseInt(graceTimeList[0]));
-        date.set(Calendar.MINUTE, Integer.parseInt(graceTimeList[1]));
-        date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
-        Date compareDate = date.getTime();
-        List<EntryExit> val = (List<EntryExit>) this.getAttendance(entryExitFilter, 0);
-
-        for(EntryExit entryExit: val){
-            if(entryExit.getEntry_view().getTime().after(compareDate)){
+        int count = 0;
+        List<EntryExitEntity> entities = entryExitRepo.findAllByFromAndToTime(startTime, endTime);
+        for(EntryExitEntity entity: entities){
+            if(entity.getTime().after(calendar.getTime())){
                 count += 1;
             }
         }
@@ -1149,28 +1152,36 @@ public class IlenService {
         }
     }
 
-    public List<IdTraceDetailsVO> unknownList(UnknownFilterVO unknownFilterVO, long pageNumber) throws Exception {
+    public List<UnknownEntry> getAllUnknowns(Date from, Date to){
+        List<UnknownEntry> unknownEntries = unknownEntryRepo.getUnknownCount(from, to);
+        Collections.sort(unknownEntries, new UnknownEntriesSort());
+        return unknownEntries;
+    }
+
+    public List<IdTraceDetailsVO> unknownListByPageNumber(UnknownFilterVO unknownFilterVO, long pageNumber) throws Exception {
         List<IdTraceDetailsVO> idTraceDetailsVOs = new ArrayList<>();
-        int currpage = 0;
         if (unknownFilterVO != null) {
             Date selectedDate = this.getDayStTime(unknownFilterVO.getDate());;
             Date endDate = this.getDayEndTime(unknownFilterVO.getDate());
-            Slice<UnknownEntry> unknownEntries = unknownEntryRepo.getUnknownList(selectedDate, endDate, CassandraPageRequest.first(10));
-            while(unknownEntries.hasNext() && currpage < pageNumber) {
-                unknownEntries = unknownEntryRepo.getUnknownList(selectedDate, endDate, unknownEntries.nextPageable());
-                currpage++;
+            List<UnknownEntry> unknownEntries = this.getAllUnknowns(selectedDate, endDate);
+            int endIndex = Integer.parseInt(String.valueOf(pageNumber)+0);
+            int startIndex = (int)(endIndex - PER_PAGES);
+            if (endIndex > unknownEntries.size()) {
+                unknownEntries = unknownEntries.subList(startIndex, unknownEntries.size());
+            } else {
+                unknownEntries = unknownEntries.subList(startIndex, endIndex);
             }
 
-            for(int i=0; i<unknownEntries.getContent().size(); i++){
-                    IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
-                    Channel ch = this.getChannelDetailsById(Long.parseLong(unknownEntries.getContent().get(i).getLocation()));
-                    idTraceDetailsVO.setChannelId(ch.getName());
-                    //idTraceDetailsVO.setChannelId(unknownEntries.getContent().get(i).getLocation());
-                    idTraceDetailsVO.setTime(unknownEntries.getContent().get(i).getTime());
-                    idTraceDetailsVO.setType(unknownEntries.getContent().get(i).getType());
-                    idTraceDetailsVO.setSnapshot(unknownEntries.getContent().get(i).getSnapshot());
-                    idTraceDetailsVOs.add(idTraceDetailsVO);
-                }
+            for (UnknownEntry unknownEntry : unknownEntries) {
+                IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
+                Channel ch = this.getChannelDetailsById(Long.parseLong(unknownEntry.getLocation()));
+                idTraceDetailsVO.setChannelId(ch.getName());
+                //idTraceDetailsVO.setChannelId(unknownEntries.getContent().get(i).getLocation());
+                idTraceDetailsVO.setTime(unknownEntry.getTime());
+                idTraceDetailsVO.setType(unknownEntry.getType());
+                idTraceDetailsVO.setSnapshot(unknownEntry.getSnapshot());
+                idTraceDetailsVOs.add(idTraceDetailsVO);
+            }
             }
 
         return idTraceDetailsVOs;

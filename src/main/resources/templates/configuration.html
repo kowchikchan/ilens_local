@@ -449,7 +449,7 @@ function userName(){
         userName= "";
         if (jQuery.inArray(data[i].id, access) === -1) { 
           if(data[i].id!=1){
-            userName +='<option value='+data[i].id+'>'+data[i].id+' ['+data[i].firstName+" "+data[i].lastName+']</option>';
+            userName +='<option value='+data[i].id+'>'+data[i].userId+' ['+data[i].firstName+" "+data[i].lastName+']</option>';
           $("#select1").append(userName);
           }
         }

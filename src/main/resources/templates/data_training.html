@@ -165,10 +165,17 @@ function takepicture(count) {
 }
 
 function stop() {
-  $(".training_process").hide();
-  $("#finished_trainData").show();
-  localStream.getVideoTracks()[0].stop();
+  video.pause();
   video.src = '';
+  localStream.getVideoTracks()[0].stop();
+  clearTimeout(timeout1);
+  clearTimeout(timeout2);
+  clearTimeout(timeout3);
+  clearTimeout(timeout4);
+  $(".training_process").hide();
+  $("#scanFace").hide();
+  $(".mobile-progress-div").hide();
+  $(".dashboard").hide();
 }
 
 function base64ToBlob(base64, mime) {
@@ -233,6 +240,7 @@ function trainingId(id){
       success: function(data){
         if(data != 0){
           $(".pre-loading").hide();
+          $("#finished_trainData").show();
           setTimeout(function(){ toastr.success("Train data finished.."); }, 1000);
           setTimeout(function(){ cancelModal();},2000);
         }else{
@@ -250,7 +258,7 @@ var counter=0;
 function faceDetaction(){
   /*front side*/
   startup();
-  setTimeout(function(){
+  timeout1=setTimeout(function(){
     $("#scanFace").show();
     if ( windowsize < 500 ){
       $(".mobile-progress-div").show();
@@ -269,7 +277,7 @@ function faceDetaction(){
     },1000)
   },2000)
     /*leftside*/
-    setTimeout(function(){
+    timeout2=setTimeout(function(){
       $("#finished_trainData").hide();
       $(".renlian").css({"background": "url('/web/images/left-side.gif') no-repeat","background-size":"100% 100%"});
       $(".fcDetactText").html("Turn left side");
@@ -289,7 +297,7 @@ function faceDetaction(){
       },2000);
     },8000);
     /*look up*/
-    setTimeout(function(){
+    timeout3=setTimeout(function(){
       $("#finished_trainData").hide();
       $(".renlian").css({"background": "url('/web/images/right-side.gif') no-repeat","background-size":"100% 100%"});
       $(".fcDetactText").html("Turn right side");
@@ -308,7 +316,7 @@ function faceDetaction(){
       },2000);
     },20000); 
     /*rightside*/
-    setTimeout(function(){
+    timeout4=setTimeout(function(){
       $("#finished_trainData").hide();
       $(".renlian").css({"background": "url('/web/images/front.gif') no-repeat","background-size":"100% 100%"});
       $(".fcDetactText").html("Look up");
@@ -319,7 +327,9 @@ function faceDetaction(){
           if(counter==100){
               stop();
               clearInterval(intervel3);
-              $("#finished_trainData").show();
+              $("#scanFace").hide();
+              $(".mobile-progress-div").hide();
+              $(".dashboard").hide();
               trainingId($("#trainId").val());
           }else{
           counter+=5;

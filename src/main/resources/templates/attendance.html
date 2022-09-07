@@ -73,8 +73,6 @@
             $(".pre-loading").hide();
           }, 2000);
       });
-      var date=moment().format("YYYY-MM-DD hh:mm:ss");
-      attendancePaging(date);
       userFilter();
 	});
   $(window).on('load', function() {
@@ -119,12 +117,8 @@
         name:""
     }
   }
-    var pageNumber = 1;
-    if ( windowsize < 500 ){
-      mobileAttendance(entryExitFilter, pageNumber);
-    }else{
-    attendanceList(entryExitFilter, pageNumber);
-    }
+    var date=moment().format("YYYY-MM-DD hh:mm:ss");
+    attendancePaging(date,entryExitFilter);
 
     $("#text-date").on("dp.change", function (e) {
 		var date=e.date.format(e.date._f)	
@@ -189,6 +183,14 @@
                     }
                 }
             }).on("page",function(event,num){});
+          }else{
+            if ( windowsize < 500 ){
+                 $("#mobileList").hide();
+              }else{
+               $("#attendanceList").hide();
+              }
+               $(".records").html("No Records Found").show();
+               $('.pagination-nav1').hide();
           }
         }
       });
@@ -394,15 +396,7 @@ $("#clearIcon").on("click",function(){
               }
           		attendanceList=attendanceList+'</tr>';
           	}
-            if(data == 0){
-              if ( windowsize < 500 ){
-                 $("#mobileList").hide();
-              }else{
-               $("#attendanceList").hide();
-              }
-               $(".records").html("No Records Found").show();
-               $('.pagination-nav1').hide();
-            }else{
+            if(data != 0){
               if ( windowsize < 500 ){
                  $("#mobileList").empty();
                  $("#mobileList").html(attendanceList).show(); 

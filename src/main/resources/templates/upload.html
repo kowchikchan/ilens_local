@@ -43,7 +43,8 @@
   $("#finished_trainData").hide();
   $(".pre-loading").hide();
   $("#trainUserId").html($("#trainId").val());
-  $("#trainUserName").html($("#trainName").val());
+  var name=($("#trainName").val()+" "+$("#trainLastname").val());
+  $("#trainUserName").html(name);
 });
 
 // $(function(){

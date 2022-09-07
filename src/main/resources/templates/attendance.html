@@ -73,7 +73,8 @@
             $(".pre-loading").hide();
           }, 2000);
       });
-      attendancePaging();
+      var date=moment().format("YYYY-MM-DD hh:mm:ss");
+      attendancePaging(date);
       userFilter();
 	});
   $(window).on('load', function() {
@@ -127,9 +128,7 @@
 
     $("#text-date").on("dp.change", function (e) {
 		var date=e.date.format(e.date._f)	
-		var st1=date;
-		var st2="T00:01:01.001Z";
-		var selected1 = st1.concat(st2);
+		var selected1=date+"T00:01:01.001Z";
 
     var pageNumber = 1;
     entryExitFilter={
@@ -138,11 +137,8 @@
       location:"",
       name:""
     }
-    if ( windowsize < 500 ){
-        mobileAttendance(entryExitFilter, pageNumber);
-      }else{
-      attendanceList(entryExitFilter, pageNumber);
-      }
+    var date=date+" "+"00:00:01";
+    attendancePaging(date,entryExitFilter);
      });
   });
 
@@ -150,12 +146,12 @@
 
   var totalPages = 0;
   var totalCount = 0;
-    function attendancePaging(){
+    function attendancePaging(date,entryExitFilter){
       itemsPerPage=10;
       var reportApi = "[[${session.REPORT_API}]]";
       var sessionToken = "[[${session.USER.sessionToken}]]";
       var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
-      var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/count"; 
+      var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/count/"+date; 
       var ilensApiClientVO  = {
         api: apiUrl,
         clientKey: sessionToken,
@@ -184,13 +180,12 @@
                 last: 'Last',
                 prev: '&laquo;',
                 first:'First',
-                initiateStartPageClick: false,
+               // initiateStartPageClick: false,
                 onPageClick: function (event, page) {
-                    pageNumber = (page - 1);
                     if ( windowsize < 500 ){
-                      mobileAttendance(pageNumber);
+                      mobileAttendance(entryExitFilter,page);
                     }else{
-                    attendanceList(pageNumber);
+                    attendanceList(entryExitFilter,page);
                     }
                 }
             }).on("page",function(event,num){});

@@ -66,7 +66,8 @@ $(document).ready(function(){
   $(".training_process").hide();
   $("#finished_trainData").hide();
   $("#trainUserId").html($("#trainId").val());
-  $("#trainUserName").html($("#trainName").val());
+  var name=($("#trainName").val()+" "+$("#trainLastname").val());
+  $("#trainUserName").html(name);
 });
 var width = 750;    // We will scale the photo width to this
 var height = 1000;   // This will be computed based on the input stream
@@ -220,6 +221,7 @@ function startTraining(image){
 
 
 function trainingId(id){
+  stop();
   $(".pre-loading").show();
   var sessionToken = "[[${session.USER.sessionToken}]]";
     $.ajax({
@@ -229,9 +231,14 @@ function trainingId(id){
       type: "PUT",
       async: true,
       success: function(data){
-        $(".pre-loading").hide();
-        setTimeout(function(){ toastr.success("Train data finished.."); }, 1000);
-        setTimeout(function(){ cancelModal();},2000);
+        if(data != 0){
+          $(".pre-loading").hide();
+          setTimeout(function(){ toastr.success("Train data finished.."); }, 1000);
+          setTimeout(function(){ cancelModal();},2000);
+        }else{
+          $(".pre-loading").hide();
+          setTimeout(function(){ toastr.error("Error found.."); }, 1000); 
+        }
       },
       error:function(){
         setTimeout(function(){ toastr.error("Error found.."); }, 1000); 

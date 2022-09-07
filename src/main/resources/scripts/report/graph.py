@@ -2,7 +2,7 @@ import os, json, operator, numpy as np, matplotlib.pyplot as plt
 import matplotlib.pyplot as plt1
 import matplotlib.patches as mpatches
 
-plt.rc('xtick', labelsize=16)
+plt.rc('xtick', labelsize=23)
 plt.rc('ytick', labelsize=20)
 
 angle = 0
@@ -35,7 +35,7 @@ def reportGraph():
     graceTime = data['graceTimeList']
     beyondGraceTime = data['lateTimeList']
     dt = data['dateList']
-    if len(onTime) > 2: angle = 30
+    if len(onTime) > 2: angle = 16
 
     br1 = np.arange(len(onTime))
     br2 = [x + barWidth for x in br1]
@@ -46,7 +46,7 @@ def reportGraph():
                             label='grace time entry')
     beyondTimePlot = plt.bar(br3, beyondGraceTime, color='#c63535', width=barWidth, edgecolor="#c63535",
                              label='beyond grace time')
-    plt.xlabel('Date', fontweight='bold', fontsize=22)
+    # plt.xlabel('Date', fontweight='bold', fontsize=32)
     plt.ylabel('Entries', fontweight='bold', fontsize=22)
     plt.xticks([r + barWidth for r in range(len(onTime))], [x for x in dt], rotation=angle, ha='right')
     plt.yticks([f for f in range(1, len(onTime))])
@@ -81,9 +81,11 @@ def performanceGraph():
             per = round(performanceData.get(val) / 60, 2)
         else:
             per = float(str(0) + "." + str(performanceData.get(val)))
-
-        percentage.append(round((per / totalHours) * 100, 2))
-        hours.append(per)
+        roundedPercentage = round((per / totalHours) * 100, 2)
+        if roundedPercentage > 100:
+            roundedPercentage = 100
+        percentage.append(roundedPercentage)
+        hours.append(round(per))
 
     profit_color = [{p < 50: '#d6423a', 50 <= p <= 90: '#ccb350', p > 90: '#1d470a'}[True] for p in percentage]
 

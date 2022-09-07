@@ -245,7 +245,7 @@
                 prev: '&laquo;',
                 first:'First',
 				        onPageClick: function (event, page) {
-                  pageNumber = (page - 1);
+                var pageNumber = (page);
 					       UnknownRegistry(pageNumber,date);
 				    }
             }).on("page",function(event,num){});

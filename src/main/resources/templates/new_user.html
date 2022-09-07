@@ -89,10 +89,10 @@ if($.trim($('#UserID').val()) == ""){
     $("#warn-icon").show();
     $('#validInput').html("First Name should not be 0");
     return false;
-  }else if($.trim($('#firstName').val()).length < 5){
+  }else if($.trim($('#firstName').val()).length < 2){
     $("#user-credentials").show();
     $("#warn-icon").show();
-    $('#validInput').html("First Name should be atleast 5 characters");
+    $('#validInput').html("First Name should be atleast 2 characters");
     return false;
   }else if($.trim($('#firstName').val()).length > 15){
     $("#user-credentials").show();

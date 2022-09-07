@@ -82,9 +82,7 @@ public class SystemConfig {
             dataApi = new DataApi();
             dataApi.setDataApi("http://127.0.0.1:61613");
             dataApi.setReportApi("https://127.0.0.1:8088");
-            dataApi.setApiToken("ilens ~ org.springframework.security" +
-                    ".authentication.UsernamePasswordAuthenticationToken@fc1b0f20:" +
-                    " Principal: Admin; Credentials: [PROTECTED]");
+            dataApi.setApiToken("PIXw7I9ErRjWsiKmt71fLUJvmZVKiypYXgEDbKJYG7MsjC96p2dWK0A5QbY5Q/IUDo6AIrbEer7zl8IIkrJZSZ");
             dataApiRepo.save(dataApi);
         }
 

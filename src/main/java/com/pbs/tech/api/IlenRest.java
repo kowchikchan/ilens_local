@@ -127,7 +127,7 @@ public class IlenRest {
                                                 @RequestBody UnknownFilterVO unknownFilterVO,
                                          @PathVariable long pageNumber) throws Exception {
 
-        return new ResponseEntity<>(ilenService.unknownList(unknownFilterVO, pageNumber), HttpStatus.OK);
+        return new ResponseEntity<>(ilenService.unknownListByPageNumber(unknownFilterVO, pageNumber), HttpStatus.OK);
     }
     @GetMapping("/unknown/count/{date}")
     public ResponseEntity<?> unknownCount(@RequestHeader("CLIENT_KEY") String clientKey,

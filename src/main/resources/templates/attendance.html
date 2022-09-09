@@ -117,7 +117,7 @@
         name:""
     }
   }
-    var date=moment().format("YYYY-MM-DD hh:mm:ss");
+    var date=moment(entryExitFilter.date).format("YYYY-MM-DD hh:mm:ss");
     attendancePaging(date,entryExitFilter);
 
     $("#text-date").on("dp.change", function (e) {

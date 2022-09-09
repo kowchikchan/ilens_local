@@ -20,7 +20,7 @@
                         <div class="display-panal h-100 ">
                             <span class="dp-head">Last 1 Hour Entry</span>
                             <div class="big-data notcenter m-left"><span id="lastHour_Entry" class="single"></span></div>
-                            <canvas id="mine-bar" class="move-chart" width="120" height="50"></canvas>
+                            <div class="move-chart"><canvas id="mine-bar"></canvas></div>
                             <span class="dp-head gp-text">Group by every 10 mins</span>
 
                         </div>
@@ -95,7 +95,7 @@
                             <div class="display-panal h-100">
                                 <span class="dp-head">Access Violations by location</span>
                                 <div class="big-data notcenter"><span id="totalViolation_count" class="single digits"></span></div>
-                                <canvas id="violation-in" class="move-chart-1" width="150" height="28"></canvas>
+                                <div class="move-chart-1"><canvas id="violation-in"></canvas></div>
                                 <span class="dp-head gp-text fs-15">Group by location</span>
                             </div>
                         </div>
@@ -358,7 +358,7 @@ function everyTenMins_refreshData(){
               xAxes: [{
                 datasets:{
                 categoryPercentage: 0.9,
-                barPercentage: 0.9, 
+                barPercentage: 0.9,
                 },
                 gridLines: { 
                     display: false,
@@ -580,9 +580,11 @@ function entryViolation_byLocation(){
                     lineWidth: 1
                  },
                  ticks: {
-                  display: false,
-                  fontColor: '#ffff',
-                  fontSize:10
+                  display: true,
+                  fontColor: '#131313',
+                  fontSize:15,
+                  fontStyle: "bold",
+                  fontFamily:"Montserrat"
                   } 
                 }],
               

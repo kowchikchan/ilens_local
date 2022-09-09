@@ -831,23 +831,23 @@ header .main-menu li.drop:hover > ul.drop-down {
   left: -4px;
 }
 .move-chart{
-  position: absolute;
-  top: 38px;
-  height: 115px !important;
+  height: 50%;
+  top: -40px;
+  width: 100%;
+  position: relative;
 }
 .move-chart-1{
-  position: absolute;
-  top: 35px;
-  height: 119px !important;
+  height: 75%;
+  width: 100%;
 }
-.move-chart.active{
+/* .move-chart.active{
   position: absolute;
   top: 37px;
-}
+} 
 .move-chart-1.active{
-  position: absolute;
-  top: 33px;
-}
+  height: 75%;
+  width: 100%;
+} */
 
 .traffic-board{
   display: flex;
@@ -3965,7 +3965,7 @@ input#text-date {
     width: 117px;
   }
   .move-chart {
-    top: 36px;
+    top: -66px;
   }
   .col-md-5.userList {
     left: 6%;
@@ -3984,11 +3984,9 @@ input#text-date {
     width: 28%;
   }
   .move-chart-1 {
-    top: 30px;
+   height: 70% !important;
   }
-  .move-chart-1.active {
-    top: 28px;
-  }
+
   .loader1 {
     width: 66px !important;
     height: 62px !important;
@@ -4000,8 +3998,10 @@ input#text-date {
   }
 }
 
-@media only screen and (min-width: 501px) and (max-width: 991px) {
-
+@media only screen and (min-width: 501px) and (max-width: 991px) {  
+  .move-chart {
+    top: -65px;
+  }
   .Login_panal {
     width: 32vw;
     margin: 3% 12% 0;
@@ -4021,6 +4021,16 @@ input#text-date {
   }
   .bg-out {
     width: 550px;
+  }
+}
+@media only screen and (min-width: 501px) and (max-width: 770px) { 
+  .contant{
+    width: 90% !important;
+  }
+}
+@media only screen and (min-width: 501px) and (max-width: 1600px) { 
+  .move-chart-1 {
+    height: 70%;
   }
 }
 @media only screen and (min-width: 501px) and (max-width: 960px) {
@@ -4095,12 +4105,12 @@ input#text-date {
   .inner-container {
     letter-spacing: 0.em;
   }
-  .move-chart-1 {
+  /* .move-chart-1 {
     top: 28px;
     }
   .move-chart-1.active {
     top: 29px;
-  }
+  } */
 }
 @media only screen and (min-width: 961px){
   img#live_c2 {
@@ -4137,6 +4147,16 @@ tbody#nprList:hover {
     font-size: 9px;
     top: 5%;
     left: 7%;
+  }
+}
+@media only screen and (min-width: 2200px){
+  .move-chart {
+    top: -65px;
+  }
+}
+@media only screen and (min-width: 501px) and (max-width: 1627px) {
+  .move-chart {
+    top: -65px !important;
   }
 }
 .retains_sec{
@@ -4750,4 +4770,9 @@ div[role="progressbar"]::before {
 }
 span.progress{
   margin: 56% 25%;
+}
+
+#modal-color input:read-only {
+  cursor: not-allowed;
+  color: #bf9a2e;
 }

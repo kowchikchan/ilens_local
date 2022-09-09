@@ -53,8 +53,7 @@ $(document).ready(function(){
    }else{
     $("#title").hide();
     $("#updateTitle").show();
-    $("#UserID").prop("readonly", true);
-    $("#location").prop("readonly", true);
+    $("#UserID").prop("readonly", true).attr("title","Edit is not allowed this field");
    }
 });
 

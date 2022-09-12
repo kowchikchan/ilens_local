@@ -420,7 +420,7 @@ $(window).resize(function() {
         userList=userList+'<div class="userHead1" value='+data[i].id+'>';
         userList=userList+'<div class="col-12 colSplit">';
         userList=userList+'<div class="col-11"><span class="ctext2">Member ID: '+'</span>'+data[i].userId+'</div>';
-        userList=userList+'<div class="dataTraining col-1"><a onclick="adminEdit(\''+data[i].id+'\',\''+data[i].firstName+'\');" id="id_'+data[i].id+'" class="hide_icon"><i onclick="" class="fa fa-desktop data-icon icon-size Align" data-toggle="tooltip" data-original-title="Train user profile" aria-hidden="true"></i></a></div>';
+        userList=userList+'<div class="dataTraining col-1"><a onclick="adminEdit(\''+data[i].userId+'\',\''+data[i].firstName+'\');" id="id_'+data[i].id+'" class="hide_icon"><i onclick="" class="fa fa-desktop data-icon icon-size Align" data-toggle="tooltip" data-original-title="Train user profile" aria-hidden="true"></i></a></div>';
         userList=userList+'</div>';
         userList=userList+'<div class="col-12 colSplit">';
         userList=userList+'<div class="col-6 margin"><span class="ctext2">Name: '+'</span><br>'+data[i].firstName+" "+data[i].lastName+'</div>';

@@ -61,6 +61,7 @@
     </div>
 	<div class="records"></div>
 <script>
+	$(".pre-loading").show();
 	$(document).ready(function(){
 		$("#unknownRegistry").addClass('active');
 		date=($("#text-date").val())+" 00:00:01";
@@ -131,10 +132,16 @@
 				$("#unknownList").html(unknownList);
 				$(".records").hide()
 			}
+			setTimeout(function(){
+				$(".pre-loading").hide();
+			  },2000);
 			},
 
 		error:function(err){
 			console.log(err);
+			setTimeout(function(){
+				$(".pre-loading").hide();
+			  },2000);
 			}
 		});
 	}
@@ -253,19 +260,15 @@
             $('.pagination-nav1').show();
           }else{
               $("#unknownList").empty();
-			       $(".records").html("No Records Found").show();
-			       $('.pagination-nav1').hide();
-		      } 
+				$(".records").html("No Records Found").show();
+				$('.pagination-nav1').hide();
+				$(".pre-loading").hide();
+		      }
         }
       });
     }
 </script>
 
 </div>
-<script>
-  $(window).on('load', function () {
-    $('.pre-loading').hide();
-  }) 
-</script>
 </body>
 </html>

@@ -65,19 +65,11 @@
       <div class="records"></div>
 <script>
   var windowsize = $(window).width();
+  $(".pre-loading").show();
 	$(document).ready(function(){
     $("#attendance").addClass('active');
-    $("#attendance").on("click",function(){
-        $(".pre-loading").show();
-          window.setTimeout(function(){
-            $(".pre-loading").hide();
-          }, 2000);
-      });
       userFilter();
 	});
-  $(window).on('load', function() {
-    $(".pre-loading").hide();
-  });  
 
 
 
@@ -185,12 +177,13 @@
             }).on("page",function(event,num){});
           }else{
             if ( windowsize < 500 ){
-                 $("#mobileList").hide();
-              }else{
-               $("#attendanceList").hide();
-              }
-               $(".records").html("No Records Found").show();
-               $('.pagination-nav1').hide();
+              $("#mobileList").hide();
+            }else{
+              $("#attendanceList").hide();
+            }
+            $(".records").html("No Records Found").show();
+            $('.pagination-nav1').hide();
+            $(".pre-loading").hide();
           }
         }
       });
@@ -407,9 +400,15 @@ $("#clearIcon").on("click",function(){
               $(".records").hide();
               $('.pagination-nav1').show();
             }
+            setTimeout(function(){
+              $(".pre-loading").hide();
+            },2000);
           },
           error:function(err){
-               console.log(err);
+            console.log(err);
+            setTimeout(function(){
+              $(".pre-loading").hide();
+            },2000);
           }
 		});
 	}
@@ -485,9 +484,15 @@ $(window).resize(function() {
                $("#mobileList").html(attendanceList).show(); 
                $('.pagination-nav1').show();
             }
+            setTimeout(function(){
+              $(".pre-loading").hide();
+            },2000);
           },
           error:function(err){
-               console.log(err);
+            console.log(err);
+            setTimeout(function(){
+              $(".pre-loading").hide();
+            },2000);
           }
 		});
 	}

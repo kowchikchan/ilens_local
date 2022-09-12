@@ -1506,14 +1506,14 @@ input:disabled{
 /*camera setting*/
 
 #container {
-  margin: 0px auto 30px;
-  width: 337px;
-  height: 254px;
+  margin: 0px auto 0px;
+  width: 273px;
+  height: 200px;
   border: 2px solid #f9c631;
 }
-#video{
-  width: 333px;
-  height: 250px;
+#video {
+  width: 268px;
+  height: 196px;
   background-color: #666;
   overflow: hidden;
 }
@@ -1707,12 +1707,10 @@ select option[value="Admin"] {
 }
 
 .training_process{
-  position: absolute;
-  margin-right: 10.8rem;
-  padding: 5px 5px;
+  position: relative;
+  padding: 7px 19px 0px;
   color: white;
-  right: 0;
-  bottom: 10px;
+  opacity: 0;
 }
 
 #finished_trainData{
@@ -2305,15 +2303,13 @@ fa-warning:before, .fa-exclamation-triangle:before {
     margin-right: 0px;
   }
   #container{
-    width: 290px;
-    height: 180px;
+    width: 209px;
+    height: 115px;
     position: relative;
-    left: -14px;
   }
   #video {
-    position: absolute;
-    width: 286px;
-    height: 176px;
+    width: 205px;
+    height: 110px;
   }
   .floating-1{
     width: 98%;
@@ -2338,6 +2334,7 @@ fa-warning:before, .fa-exclamation-triangle:before {
   }
   .training_process{
     margin-right: 0;
+    text-align: center;
   }
 }
 
@@ -3513,7 +3510,7 @@ span.crop1 {
     text-align: -webkit-center;
   }
   #remove-footer {
-    margin-top: 30px;
+    margin-top: 10px;
   }
   div[role="progressbar"] {
     --size: 62px !important;
@@ -3524,11 +3521,11 @@ span.crop1 {
     position: relative !important;
   }
   .renlian {
-    left: 0 !important;
-    top: -2px !important;
-    width: 100px !important;
-    height: 65px !important;
+    width: 47vw !important;
+    height: 170px !important;
     position: relative !important;
+    background-position: 0px 0px !important;
+    background-size: 100% 100% !important;
   }
   .dashboard {
     right: 32px !important;
@@ -3914,10 +3911,11 @@ input#text-date {
   #video {
     position: initial;
     width: 100%;
+    height: 111px;
   }
   #container {
-    width: 100%;
-    margin-left: 13px;
+    width: 60%;
+    margin: 4px auto;
   }
   .container-switch.po {
     width: 110px;
@@ -4561,13 +4559,12 @@ width: 560px;
 /* face scaning*/
 
 .renlian {
-    position: absolute;
-    background:url("/web/images/front.gif") no-repeat;
-    background-size: 100% 100%;
-    left: 29px;
-    top: 30%;
-    width: 106px;
-    height: 106px;
+  position: relative;
+  background: url(/web/images/front.gif) no-repeat;
+  background-size: 107% 107%;
+  background-position: -16px -17px;
+  width: 331px;
+  height: 250px;
 }
 
 
@@ -4609,18 +4606,14 @@ width: 560px;
           stroke-dashoffset: 100;
       }
   } */
-.dashboard{
-  position: absolute;
-  right: 32px;
-  top: 94px;
-  display: none;
+  .dashboard {
+    position: relative;
+    margin-bottom: 10px;
+    opacity: 0;
 }
 .fcDetactText{
-  position: absolute;
-  left: 19px;
-  top: 63%;
+  position: relative;
   color: white;
-  width: 130px;
   text-align: center;
 }
 #scanFace{
@@ -4629,47 +4622,12 @@ width: 560px;
 
 
 
-@keyframes growProgressBar {
-  0%, 33% { --pgPercentage: 0; }
-  100% { --pgPercentage: var(--value); }
-}
-
-@property --pgPercentage {
-  syntax: '<number>';
-  inherits: false;
-  initial-value: 0;
-}
-
-div[role="progressbar"] {
-  --size: 110px;
-  --fg: #f9c631;
-  --bg: #c4c8cb;
-  --pgPercentage: var(--value);
-  animation: growProgressBar 3s 1 forwards;
-  width: var(--size);
-  height: var(--size);
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: 
-    radial-gradient(closest-side, #062e51 80%, transparent 0 99.9%, #062e51 0),
-    conic-gradient(var(--fg) calc(var(--pgPercentage) * 1%), var(--bg) 0)
-    ;
-  font-family: Helvetica, Arial, sans-serif;
-  font-size: calc(var(--size) / 5);
-  color: var(--fg);
-}
-
-div[role="progressbar"]::before {
-  counter-reset: percentage var(--value);
-  content: counter(percentage) '%';
-}
-
 .timpickerCloseBtn::before{
   font-family:"FontAwesome";
   content: "\f00c";
   font-weight: 600;
   font-size: 20px;
+  line-height: 2.5em;
 }
 
 .bootstrap-datetimepicker-widget table td.day:hover,
@@ -4680,11 +4638,11 @@ div[role="progressbar"]::before {
   color: #062e51 !important;
 }
 .mobile-progress-bar {
-  position: absolute;
-  top: 50%;
+  position: relative;
   width: 0%;
+  max-width: 100%;
   height: 10px;
-  width:counter(percentage)'%';
+  width: counter(percentage)'%';
   border-radius: 0 10px 10px 0;
   background: #f9c631;
 }
@@ -4696,17 +4654,16 @@ div[role="progressbar"]::before {
   position: relative;
   color: #d6b036;
 }
-.mobile-progress-div{
-  top: 23%;
+.mobile-progress-div {
   position: relative;
-  display: none;
+  padding: 0px 18px;
+  margin-top: 23px;
+  opacity: 0;
 }
 
 @media only screen and (min-width: 501px) and (max-width: 700px) {
   .fcDetactText {
-    left: -24px !important;
-    top: 64% !important;
-    font-size: 11px;
+    font-size: 15px;
   }
   .dashboard {
     right: -98px !important;
@@ -4716,9 +4673,10 @@ div[role="progressbar"]::before {
     --size: 74px !important;
   }
   .renlian {
-    left: -4px !important;
-    width: 93px !important;
-    height: 93px !important;
+    width: 248px !important;
+    height: 150px !important;
+    background-position: 0px 0px;
+    margin: 0px auto;
   }
   span.progress {
     margin: 56% 25% !important;
@@ -4726,14 +4684,13 @@ div[role="progressbar"]::before {
 }
 @media only screen and (min-width: 701px) and (max-width: 900px) {
   .renlian {
-    left: 0% !important;
-    width: 85px !important;
-    height: 85px !important;
+    width: 263px !important;
+    height: 246px !important;
+    background-position: 0px -20px;
+    margin: 0px auto;
   }
   .fcDetactText {
-    left: -22px !important;
-    top: 59% !important;
-    font-size: 11px;
+    font-size: 15px;
   }
   .dashboard {
     right: -1% !important;
@@ -4775,4 +4732,17 @@ span.progress{
 #modal-color input:read-only {
   cursor: not-allowed;
   color: #bf9a2e;
+}
+.bootstrap-datetimepicker-widget table td span:hover{
+  color: var(--blue) !important;
+}
+.bootstrap-datetimepicker-widget button[data-action] {
+  color:var(--yellow) !important;
+  background:var(--blue) !important;
+  border: none;
+  font-weight: 800;
+}
+.bootstrap-datetimepicker-widget:hover button[data-action]:hover {
+  color:var(--blue) !important;
+  background:white !important;
 }

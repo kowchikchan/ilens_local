@@ -21,29 +21,28 @@
           </div>
         </div>
       </div>
-      <div class="modal-body">
-        <div id="scanFace">
-          <div class="renlian"></div>
-          <div class="fcDetactText">Show front side</div>
+      <div class="modal-body row col-md-12">
+        <div class="col-md-6">
+          <div id="scanFace">
+            <div class="renlian"></div>
+            <div class="fcDetactText">Show front side</div>
+          </div>
         </div>
-        <div id="container">
-        <div class="dashboard">
-          <div role="progressbar" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100" style="--value:0" id="progressbar"></div>
-        </div>
-            <div class="camera">
+        <div class="col-md-6">
+            <div class="camera" id="container">
               <video id="video">Video stream not available.</video>
+            </div>
+            <div class="training_process">
+              <i class="loading-icon fa fa-spinner fa-spin"></i>
+              <span class="">Streaming...</span>
+            </div>
+            <div class="mobile-progress-div">
+              <div class="mobile-progress-bar" style="--value:0" aria-valuemax="100"></div>
             </div>
             <canvas id='canvas' width='750' height='1000'></canvas>
             <div id="savedImage">
 
             </div> 
-          <div class="mobile-progress-div">
-            <div class="mobile-progress-bar" style="--value:0"></div>
-          </div>
-        </div>
-        <div class="training_process">
-            <i class="loading-icon fa fa-spinner fa-spin"></i>
-            <span class="">Streaming...</span>
         </div>
         <span id="finished_trainData">Train data finished..</span>
       </div>
@@ -63,7 +62,6 @@
 <script>
  var windowsize = $(window).width();
 $(document).ready(function(){
-  $(".training_process").hide();
   $("#finished_trainData").hide();
   $("#trainUserId").html($("#trainId").val());
   var name=($("#trainName").val()+" "+$("#trainLastname").val());
@@ -172,10 +170,9 @@ function stop() {
   clearTimeout(timeout2);
   clearTimeout(timeout3);
   clearTimeout(timeout4);
-  $(".training_process").hide();
+  $(".training_process").css("opacity",0);
   $("#scanFace").hide();
-  $(".mobile-progress-div").hide();
-  $(".dashboard").hide();
+  $(".mobile-progress-div").css("opacity",0);
 }
 
 function base64ToBlob(base64, mime) {
@@ -201,7 +198,7 @@ function base64ToBlob(base64, mime) {
 }
 
 function startTraining(image){
-  $(".training_process").show();
+  $(".training_process").css("opacity",1);
   var base64ImageContent = image.replace(/^data:image\/(png|jpg);base64,/, "");
   var blob = base64ToBlob(base64ImageContent, 'image/png');                
   var formData = new FormData();
@@ -260,11 +257,7 @@ function faceDetaction(){
   startup();
   timeout1=setTimeout(function(){
     $("#scanFace").show();
-    if ( windowsize < 500 ){
-      $(".mobile-progress-div").show();
-    }else{
-      $(".dashboard").show();
-    }
+    $(".mobile-progress-div").css("opacity",1); 
 
     intervel=setInterval(function(){
       if(counter==25){
@@ -324,12 +317,11 @@ function faceDetaction(){
         startup();
         counter=75;
         intervel3=setInterval(function(){
-          if(counter==100){
+          if(counter>=100){
               stop();
               clearInterval(intervel3);
               $("#scanFace").hide();
-              $(".mobile-progress-div").hide();
-              $(".dashboard").hide();
+              $(".mobile-progress-div").css("opacity",0);
               trainingId($("#trainId").val());
           }else{
           counter+=5;

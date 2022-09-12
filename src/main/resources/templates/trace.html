@@ -76,9 +76,6 @@
         name:""
     }
 		getTraceById(entryExitFilter, pageNumber);
-    setTimeout(function(){
-    	$(".pre-loading").hide();
-  	},2000);
 	});
 
   function back(){
@@ -243,19 +240,25 @@
           		//console.log("Encoded string : " + encodedString);
            	}
           	if(data == 0){
-			   $("#traceHeading").hide();
-			   $("#traceList").hide();
-               $(".records").html("No Records Found").show();
-               $('.pagination-nav').hide();
+              $("#traceHeading").hide();
+              $("#traceList").hide();
+              $(".records").html("No Records Found").show();
+              $('.pagination-nav').hide();
           	}else{
           		$(".records").hide();
                $("#traceHeading").html(traceHeading).show(); 
                $("#traceList").html(traceList).show();
                $('.pagination-nav').show();
           	}
+            setTimeout(function(){
+              $(".pre-loading").hide();
+            },2000);
           },
           error:function(data, err){
-               console.log(err);
+            console.log(err);
+            setTimeout(function(){
+            $(".pre-loading").hide();
+            },2000);
           }
 		});
 	}

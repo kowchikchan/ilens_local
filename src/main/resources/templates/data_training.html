@@ -53,7 +53,7 @@
             <span class="required-image" id="error-required"></span>
         </div>
         <button class="train-button" onclick="start();">Start Training</button>
-        <button class="train-button" onclick="stop();">Stop Training</button>
+        <button class="train-button" onclick="stopBtn();">Stop Training</button>
         <button type="button" class="cancel-button button-fit" data-dismiss="modal" onclick="cancelModal()">Cancel</button>
       </div>
     </div>
@@ -101,6 +101,7 @@ function startup() {
         }
     }, false);
     setTimeout(function(){
+      $(".training_process").css("opacity",1);
       takepicture($("#hostname").val());
     },3000);
 }
@@ -166,13 +167,23 @@ function stop() {
   video.pause();
   video.src = '';
   localStream.getVideoTracks()[0].stop();
+  $(".training_process").css("opacity",0);
+  $("#scanFace").hide();
+  $(".mobile-progress-div").css("opacity",0);
+}
+
+function stopBtn(){
   clearTimeout(timeout1);
   clearTimeout(timeout2);
   clearTimeout(timeout3);
   clearTimeout(timeout4);
+  video.src = '';
+  video.pause();
+  localStream.getVideoTracks()[0].stop();
   $(".training_process").css("opacity",0);
   $("#scanFace").hide();
   $(".mobile-progress-div").css("opacity",0);
+  removeUnknowData();
 }
 
 function base64ToBlob(base64, mime) {
@@ -198,7 +209,6 @@ function base64ToBlob(base64, mime) {
 }
 
 function startTraining(image){
-  $(".training_process").css("opacity",1);
   var base64ImageContent = image.replace(/^data:image\/(png|jpg);base64,/, "");
   var blob = base64ToBlob(base64ImageContent, 'image/png');                
   var formData = new FormData();
@@ -322,6 +332,11 @@ function faceDetaction(){
               clearInterval(intervel3);
               $("#scanFace").hide();
               $(".mobile-progress-div").css("opacity",0);
+              localStream.getVideoTracks().forEach(function(track) {
+                if (track.readyState == 'live' && track.kind === 'video') {
+                  track.stop();
+                }
+              });
               trainingId($("#trainId").val());
           }else{
           counter+=5;
@@ -331,6 +346,21 @@ function faceDetaction(){
         },1000);
       },2000);
     },28000); 
+}
+
+function removeUnknowData(){
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+   $.ajax({
+        url: "api/v1/ilens/delete/directory/"+$("#trainId").val(),
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "DELETE",
+        success:function(xhr){
+         console.log(xhr);
+      },
+        error:function(){
+          setTimeout(function(){ toastr.error("Error found.."); }, 1000); 
+      }
+   });
 }
 </script>
 

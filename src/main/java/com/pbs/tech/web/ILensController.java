@@ -162,7 +162,7 @@ public class ILensController {
     @GetMapping("/violation")
     public String violation(){return "violation";}
 
-    @GetMapping("/data_configuration")
+    @GetMapping("/settings")
     public String dataConfiguration(){return "data_configuration";}
 
     @GetMapping(path = "/logout")

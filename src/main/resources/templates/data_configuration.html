@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
 <head>
-	<title>[[${session.APP_NAME}]] - Data Configurations</title>
+	<title>[[${session.APP_NAME}]] - Settings</title>
 </head>c
 <body>
 <div layout:fragment="content" class="contant">
@@ -9,14 +9,18 @@
     	<img class="loader" src="/web/images/loader.png" />
   	</div>
       <div class="heading">
-        <span class="heading-text fs-30">Configurations</span>
+        <span class="heading-text fs-30">Settings</span>
     </div>
     <div class="main-table">  
         <div class="data_api">
             <div>
                 <ul class="nav nav-tabs separator-tabs ml-0" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link fs-16 active" id="first-tab" data-toggle="tab" href="#first" role="tab"
+                        <a class="nav-link fs-16 active"  id="fourth-tab" data-toggle="tab" href="#fourth" role="tab"
+                           aria-controls="second" aria-selected="false">Data API</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-16" id="first-tab" data-toggle="tab" href="#first" role="tab"
                            aria-controls="first" aria-selected="true">Entry Exit</a>
                     </li>
 
@@ -24,9 +28,14 @@
                         <a class="nav-link fs-16"  id="second-tab" data-toggle="tab" href="#second" role="tab"
                            aria-controls="second" aria-selected="false">Data Retains </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-16"  id="third-tab" data-toggle="tab" href="#third" role="tab"
+                           aria-controls="second" aria-selected="false">Report</a>
+                    </li>
+
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane show active" id="first" role="tabpanel" aria-labelledby="first-tab">
+                    <div class="tab-pane show" id="first" role="tabpanel" aria-labelledby="first-tab">
                         <div class="row">
                             <div class="col-12 col-lg-12 apisty">
                                 <div class="row g-0">
@@ -110,6 +119,72 @@
                             </div>
                         </div>
                     </div>
+                    <div class="tab-pane show" id="third" role="tabpanel" aria-labelledby="third-tab">
+                        <div class="row">
+                            <div class="col-12 col-lg-12 apisty">
+                                <div class="row g-0">	
+                                    <div class="col-md-12 row">
+                                        <div class="col-md-2">
+                                        <label class="config_labels">Report Generation Interval <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Ilens will send an attendance report for the chosen period to the specified report receipt email address." ></i></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <select class="retains_sec" id="interval" name="interval">                  
+                                                <option value="1">1 Day</option>
+                                                <option value="2">2 Days</option>
+                                                <option value="7">1 Week</option>
+                                                <option value="14">2 Weeks</option>
+                                                <option value="30">1 Month</option>
+                                            </select>
+                                        </div>
+                                    </div>    
+                                    <div class="col-md-12 row pt-3">
+                                        <div class="col-md-2">
+                                            <label class="config_labels">Report Recipient Email <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The attendance report will be sent to this email address." ></i></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="text" id="receipt" data-role="tagsinput" value="" class="Report_receipt" name="receipt"/>
+                                            <div id="mailSendBtn">
+                                                <div class="text-warning ml-3 errorDiv"><i class="fas fa-exclamation-triangle"><span id="errorMsg" class="text-white"></span></i></div>
+                                            </div>
+                                        </div>
+                                    </div>   
+                                    <div class="col-md-12 row pt-3">
+                                        <div class="col-md-2">
+                                            <label class="config_labels">Week Days <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Choose working days to customise the outcome." ></i></label>
+                                        </div>
+                                        <div class="col-md-8 reportCheck">
+                                            <input type="checkbox" name="checkbox" id="sunday" class="save_check" value="sunday"><span>Sun</span>
+                                            <input type="checkbox" name="checkbox" id="monday" class="save_check" value="monday"><span>Mon</span>
+                                            <input type="checkbox" name="checkbox" id="tuesday" class="save_check" value="tuesday"><span>Tues</span>
+                                            <input type="checkbox" name="checkbox" id="wednesday" class="save_check" value="wednesday"><span>Wed</span>
+                                            <input type="checkbox" name="checkbox" id="thursday" class="save_check" value="thursday"><span>Thu</span>
+                                            <input type="checkbox" name="checkbox" id="friday" class="save_check" value="friday"><span>Fri</span>
+                                            <input type="checkbox" name="checkbox" id="saturday" class="save_check" value="saturday"><span>Sat</span>
+                                            <div class="pt-2"><button class="emailButton" onclick="reportGenerate()">Generate Now</button></div>
+                                        </div>
+                                    </div>     
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane show active" id="fourth" role="tabpanel" aria-labelledby="fourth-tab">
+                        <div class="row">
+                            <div class="col-12 col-lg-12 apisty">
+                                <div class="col-md-12 p-0">
+                                    <label class="dinput-labels">Data API <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The API that accepts data to process and present on cloud" ></i></label>
+                                    <input type="text"  class="dlens_input"  id="apiValue" />
+                                </div>
+                                <div class="col-md-12 p-0">
+                                    <label class="dinput-labels">Report API <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The API URL is receive process data" ></i></label>
+                                    <input type="text"  class="Report_input"  id="reportValue" />
+                                </div>
+                                <div class="col-md-12 p-0">
+                                    <label class="dinput-labels">API Token <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The token to authentication remote API server" ></i></label>
+                                    <input type="text"   class="alens_input" id="tokenValue"  />
+                                </div>                                      
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -121,6 +196,8 @@
 <script>
   	$(document).ready(function(){
         configurationsList();
+        reportlist();
+        getDataApi();
       $('#timeSelector').datetimepicker({
         format: 'LT',
         showClear:true,
@@ -159,6 +236,12 @@
     })
 
     $("#update").click(function(){
+      if(checkReport()==false){
+        return false;
+      }
+      if(dataApiSave()==false){
+        return false;
+      }
     var retainsPeriod=$("#dayRetains").val();
     var videoStatus=$("#saveCheck").is(':checked') ? true : false;
     var graceTime=$("#graceTime").val();
@@ -249,9 +332,181 @@
             }
         });
     }
+    function reportlist(){
+        var days = [];
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/report/list";  
+        $.ajax({
+                contentType: "application/json;charset=UTF-8",
+                url: apiUrl,
+                dataType:'json',      
+                headers:{'CLIENT_KEY': sessionToken},
+                type: 'GET',
+                async: false,
+                success: function(data){ 
+                    $("#interval").val(data.reportPeriod);
+                    $("#receipt").val(data.mail);
+                    $('#receipt').tagsinput('add', data.mail);
+                    days = data.weekDays.split(",");
+                    for(var i=0; i<days.length; i++){
+                        $("#"+days[i]).prop("checked", true);
+                    }
+                },
+                error: function(err){
+                    setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+                }
+            });
+    }
+    function reportGenerate(){
+        $(".pre-loading").show();
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/report/generate";  
+        $.ajax({
+                contentType: "application/json;charset=UTF-8",
+                url: apiUrl,
+                headers:{'CLIENT_KEY': sessionToken},
+                type: 'GET',
+                async: true,
+                success: function(data){ 
+                    setTimeout(function(){ $(".pre-loading").hide();}, 2000);
+                    setTimeout(function(){ toastr.success("Report sent successfully"); }, 1000);
+                },
+                error: function(err){
+                    setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+                }
+            });
+    }
+
+    function checkReport(){
+        var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        var emailaddressVal = ($("#receipt").val()).split(",");
+        for(i=0;i<emailaddressVal.length;i++){
+            if(emailaddressVal[i] == '') {
+                $("#errorMsg").html('Please enter your email address.');
+                $(".errorDiv").css("opacity", "1");
+                return false;
+            }else if(!emailReg.test(emailaddressVal[i])) {
+                $("#errorMsg").html('Enter a valid email address.');
+                $(".errorDiv").css("opacity", "1");
+                return false;
+            }
+        };
+        $(".errorDiv").css("opacity", "0");
+        saveReport();
+    }
+
+    function saveReport(){
+        var reportPeriod= $("#interval").val();
+        var mail= $("#receipt").val();
+        var weekDays = [];
+        $(':checkbox:checked').each(function(i){
+            weekDays[i] = $(this).val();
+        });
+        weekDays=weekDays.join()
+       var data={
+            reportPeriod:reportPeriod,
+            mail:mail,
+            weekDays:weekDays,
+            id:1
+        }
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/report/save";  
+        $.ajax({
+                contentType: "application/json;charset=UTF-8",
+                url: apiUrl,   
+                headers:{'CLIENT_KEY': sessionToken},
+                type: 'POST',
+                data: JSON.stringify(data),
+                async: false,
+                success: function(data){ 
+                    // setTimeout(function(){ toastr.success("Configuration updated"); }, 1000);
+                },
+                error: function(err){
+                    setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+                }
+            });
+    }
+    function getDataApi() {
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/dataApi/details";  
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url: apiUrl,
+            dataType:'json',      
+            headers:{'CLIENT_KEY': sessionToken},
+            type: 'GET',
+            async: false,
+            success: function(data){ 
+                $("#tokenValue").val(data.apiToken);
+                $("#apiValue").val(data.dataApi);
+                $("#reportValue").val(data.reportApi);
+            },
+            error: function(err){
+                setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+            }
+        });
+    }
+
+    function apiHealthCheck(reportApi, apiToken) {
+        var returnVal = "false";
+        var url = reportApi.toString().endsWith("/")?reportApi:reportApi+"/"; 
+        var finalUrl = url + "api/v1/dataApi/details"; 
+        var ilensApiClientVO  = {
+                                    api: finalUrl,
+                                    clientKey: apiToken.toString(),
+                                    inputVo: {},
+                                    method: "GET"
+                                }
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url: "/api/v1/iLensApiClient",
+            dataType:'json',      
+            headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+            type: 'POST',
+            data: JSON.stringify(ilensApiClientVO),
+            crossDomain: true,       
+            async: false,
+            complete: function(xhr, data){      
+                if(xhr.status == 200){
+                returnVal = "true";
+                }     
+            }
+        });
+
+        return returnVal;
+    }
 
 
-
+    function dataApiSave(){
+        var rtnVl = apiHealthCheck($("#reportValue").val(), $("#tokenValue").val());
+        var update = {
+            apiToken: $("#tokenValue").val(),
+            reportApi:$("#reportValue").val(),
+            dataApi: $("#apiValue").val(),
+            id: ("0")
+            };
+        var sessionToken = "[[${session.USER.sessionToken}]]";
+        var apiUrl ="api/v1/dataApi/update";
+        if(rtnVl == "true"){
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url:apiUrl,
+            headers:{'CLIENT_KEY':sessionToken},
+            type: 'POST',
+            data: JSON.stringify(update),
+            async: false,
+            success: function(data){
+                // setTimeout(function(){ toastr.success("Success.."); }, 1000);
+            },
+            error: function(err){
+                setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+            }
+            });
+        }else{
+            setTimeout(function(){ toastr.error("Invalid Data API or API Token "); }, 1000);
+            return false;
+        }
+    }
 
 </script>
 

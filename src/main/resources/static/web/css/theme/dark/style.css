@@ -3093,9 +3093,9 @@ object {
 }
 .dinput-labels{
   color: white;
-    margin-left: 50px;
+    margin-left: 17px;
     font-size: 16px;
-    display: initial; !important;
+    display: initial !important;
 }
 .dlens_input {
   width: 35%;
@@ -4561,8 +4561,8 @@ width: 560px;
 .renlian {
   position: relative;
   background: url(/web/images/front.gif) no-repeat;
-  background-size: 107% 107%;
-  background-position: -16px -17px;
+  background-size: 100% 100%;
+  background-position: 0px -3px;
   width: 331px;
   height: 250px;
 }

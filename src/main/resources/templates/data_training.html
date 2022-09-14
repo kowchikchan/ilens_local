@@ -30,7 +30,7 @@
         </div>
         <div class="col-md-6">
             <div class="camera" id="container">
-              <video id="video">Video stream not available.</video>
+              <div id="video"></div>
             </div>
             <div class="training_process">
               <i class="loading-icon fa fa-spinner fa-spin"></i>
@@ -78,34 +78,24 @@ var photo = null;
 var startbutton = null;
 var outputImage =document.getElementById('savedImage');
 function startup() {
-    video = document.getElementById('video');  
-    startbutton = document.getElementById('startbutton');
-    navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: false
-    })
-    .then(function(stream) {
-        window.localStream = stream;
-        video.srcObject = stream;
-        video.play();
-    })
-    .catch(function(err) {
-        console.log("An error occurred: " + err);
-    });
-
-    video.addEventListener('canplay', function(ev) {
-        if (!streaming) {
-            video.setAttribute('width', width);
-            video.setAttribute('height', height);
-            streaming = true;
-        }
-    }, false);
-    setTimeout(function(){
-      $(".training_process").css("opacity",1);
-      takepicture($("#hostname").val());
-    },3000);
+  Webcam.set({
+   image_format: 'png',
+   jpeg_quality: 90
+  });
+  Webcam.attach( '#video' );  
+  Webcam.on( 'load', function() {
+    $(".training_process").css("opacity",1);
+    faceDetaction();
+  });
+  Webcam.on('error', function(err) {
+    var error=err.toString();
+      if(error.includes("Permission denied")){
+				alert("Allow camera permission");
+			}else{
+				console.log("Error: " + error);
+			}
+	}); 
 }
-window.addEventListener('load', startup, false);
 
 function enableMethod(id,name){
    $("#trainId").val(id);
@@ -140,33 +130,22 @@ function start(){
   $("#error-required").html("");
   $("#error-required").hide();
   // startup();
-  faceDetaction();
+  startup();
 }
       
 function takepicture(count) {
   var count=5;
   for(i=1; i <= count; i++){
       setTimeout(function() {
-          var imgshow= '';
-          imgshow= '';
-          var canvas = document.getElementById('canvas');
-          var context = document.getElementById('canvas').getContext('2d');
-          context.drawImage(video, 0, 0, width, height);
-          var base64img = canvas.toDataURL('image/png');
-          startTraining(base64img);            
-          context.clearRect(0, 0, canvas.width, canvas.height);
+          Webcam.snap( function(base64img) {
+            startTraining(base64img);   
+         } );
       }, i * 500);
-  }
-  // setTimeout(function() {
-  //      stop();
-  //   //   trainingId($("#trainId").val());
-  // }, 500 * count);   
+  } 
 }
 
 function stop() {
-  video.pause();
-  video.src = '';
-  localStream.getVideoTracks()[0].stop();
+  Webcam.reset();
   $(".training_process").css("opacity",0);
   $("#scanFace").hide();
   $(".mobile-progress-div").css("opacity",0);
@@ -177,9 +156,7 @@ function stopBtn(){
   clearTimeout(timeout2);
   clearTimeout(timeout3);
   clearTimeout(timeout4);
-  video.src = '';
-  video.pause();
-  localStream.getVideoTracks()[0].stop();
+  Webcam.reset();
   $(".training_process").css("opacity",0);
   $("#scanFace").hide();
   $(".mobile-progress-div").css("opacity",0);
@@ -264,11 +241,10 @@ function trainingId(id){
 var counter=0;
 function faceDetaction(){
   /*front side*/
-  startup();
+  $("#scanFace").show();
+    $(".mobile-progress-div").css("opacity",1);
   timeout1=setTimeout(function(){
-    $("#scanFace").show();
-    $(".mobile-progress-div").css("opacity",1); 
-
+    takepicture($("#hostname").val());
     intervel=setInterval(function(){
       if(counter==25){
           clearInterval(intervel);
@@ -285,7 +261,7 @@ function faceDetaction(){
       $(".renlian").css({"background": "url('/web/images/left-side.gif') no-repeat","background-size":"100% 100%"});
       $(".fcDetactText").html("Turn left side");
       setTimeout(function(){
-        startup();
+        takepicture($("#hostname").val());
         clearInterval();
         counter=25;
         intervel1 = setInterval(function(){ 
@@ -305,7 +281,7 @@ function faceDetaction(){
       $(".renlian").css({"background": "url('/web/images/right-side.gif') no-repeat","background-size":"100% 100%"});
       $(".fcDetactText").html("Turn right side");
       setTimeout(function(){
-        startup();
+        takepicture($("#hostname").val());
         counter=50;
         intervel2=setInterval(function(){
           if(counter==75){
@@ -324,7 +300,7 @@ function faceDetaction(){
       $(".renlian").css({"background": "url('/web/images/front.gif') no-repeat","background-size":"100% 100%"});
       $(".fcDetactText").html("Look up");
       setTimeout(function(){
-        startup();
+        takepicture($("#hostname").val());
         counter=75;
         intervel3=setInterval(function(){
           if(counter>=100){
@@ -332,11 +308,6 @@ function faceDetaction(){
               clearInterval(intervel3);
               $("#scanFace").hide();
               $(".mobile-progress-div").css("opacity",0);
-              localStream.getVideoTracks().forEach(function(track) {
-                if (track.readyState == 'live' && track.kind === 'video') {
-                  track.stop();
-                }
-              });
               trainingId($("#trainId").val());
           }else{
           counter+=5;
@@ -355,7 +326,7 @@ function removeUnknowData(){
         headers:{'CLIENT_KEY':sessionToken},
         type: "DELETE",
         success:function(xhr){
-         console.log(xhr);
+         console.log(xhr.status);
       },
         error:function(){
           setTimeout(function(){ toastr.error("Error found.."); }, 1000); 

@@ -3503,6 +3503,12 @@ span.crop1 {
 }
 /* Phone view /////////////////////////////////////////////////////////////////// */
 @media only screen and (max-width: 500px) {
+  .nav-tabs {
+    font-size: 10px !important;
+  }
+  .nav-tabs .nav-item::after {
+    margin-bottom: -2px !important;
+  }
   span.progress {
     margin: 100% 25% !important;
   }

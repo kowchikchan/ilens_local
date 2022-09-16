@@ -18,6 +18,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Date;
+import org.apache.commons.io.FileUtils;
+
 
 @Service
 public class FileServices {
@@ -50,5 +52,9 @@ public class FileServices {
         } catch (IOException ex) {
             throw new FileServiceException("Could not store file " + fileName + ". Please try again!", ex);
         }
+    }
+
+    public void deleteDir(String dirName) throws IOException {
+        FileUtils.deleteDirectory(new File(uploadDir +"/" + "." + dirName));
     }
 }

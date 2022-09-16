@@ -16,15 +16,23 @@ except IOError as e:
     raise IOError("Users list not found", e)
 
 
-def autoLabel(rects, percentage):
+def autoLabel(rects, percentage, duration):
+    if len(rects) > 0:
+        plt1.text(105, rects[0].get_y() + len(rects)+.2 * rects[0].get_height(), 'Spent time \n (hrs.)', fontweight='bold', size=21)
+        plt1.text(112, rects[0].get_y() + len(rects)+.2 * rects[0].get_height(), 'Spent time \n Average\n(hr/day)', fontweight='bold', va='baseline', size=21)
+
     for i in range(len(rects)):
         width = rects[i].get_width()
         plt.text(rects[i].get_width() + 2, rects[i].get_y() + 0.5 * rects[i].get_height(),
                  '%s' % str(int(width)) + "%",
                  ha='center', va='center', fontsize=22, fontweight='bold')
 
-        plt.text(102, rects[i].get_y() + 0.5 * rects[i].get_height(),
+        plt.text(108, rects[i].get_y() + 0.5 * rects[i].get_height(),
                  '%s' % str(percentage[i]),
+                 ha='center', va='center', fontsize=22, fontweight='bold')
+
+        plt.text(115, rects[i].get_y() + 0.5 * rects[i].get_height(),
+                 '%s' % str(round(percentage[i]/duration, 2)),
                  ha='center', va='center', fontsize=22, fontweight='bold')
 
 
@@ -41,7 +49,7 @@ def reportGraph():
     br2 = [x + barWidth for x in br1]
     br3 = [x + barWidth for x in br2]
 
-    onTimePlot = plt.bar(br1, onTime, color='#76b083', width=barWidth, edgecolor='#76b083', label='on time entry')
+    onTimePlot = plt.bar(br1, onTime, color='#117d2a', width=barWidth, edgecolor='#117d2a', label='on time entry')
     graceTimePlot = plt.bar(br2, graceTime, color='#d0a71a', width=barWidth, edgecolor='#d0a71a',
                             label='grace time entry')
     beyondTimePlot = plt.bar(br3, beyondGraceTime, color='#c63535', width=barWidth, edgecolor="#c63535",
@@ -53,7 +61,7 @@ def reportGraph():
 
     # legend.
     plt.legend()
-    plt.legend(prop={'size': 15})
+    plt.legend(prop={'size': 15}, bbox_to_anchor=(0.36, 1), loc="lower left", ncol=3)
 
     # chart values.
     plt.bar_label(onTimePlot, padding=3, fontsize=22)
@@ -90,18 +98,15 @@ def performanceGraph():
     profit_color = [{p < 50: '#d6423a', 50 <= p <= 90: '#ccb350', p > 90: '#1d470a'}[True] for p in percentage]
 
     rects = plt1.barh(users, percentage, color=profit_color)
-    autoLabel(rects, hours)
-    # plt1.ylabel('Users', fontweight='bold', fontsize=22)
+    autoLabel(rects, hours, totalHours / 8)
     plt1.xlabel('User performance percentage', fontweight='bold', fontsize=22)
-    # plt1.xticks([f for f in range(1, 101, 18)])
-    plt1.xlim(0, 100, 20)
-
-    # plt1.text(98, 5.7, "Spent time\n(Hrs.)", fontsize=22, fontweight='bold')
+    plt1.xlim(0, 105, 20)
 
     poor = mpatches.Patch(color='#d6423a', label='0-50%')
     moderate = mpatches.Patch(color='#ccb350', label='51-80%')
     excellent = mpatches.Patch(color='#1d470a', label='81-100%')
-    plt1.legend(handles=[poor, moderate, excellent], prop={'size': 20})
+    plt1.legend(handles=[poor, moderate, excellent], prop={'size': 20},
+                bbox_to_anchor=(0.36, 1), loc="lower left", ncol=3)
 
     plt1.savefig(os.path.dirname(__file__) + '/performanceGraph.png')
 

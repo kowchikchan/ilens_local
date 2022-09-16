@@ -133,9 +133,9 @@ public class ScheduledReportSend {
             cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
             cell.setBorderColor(new BaseColor(255, 255, 255));
             cell.setBackgroundColor(new BaseColor(232, 232, 232));
-            if (i == 1) {
+            if (i == 2) {
                 cell.setBackgroundColor(this.compareTime(entryOnTime, entryGraceTime, overView[i], "entry"));
-            } else if (i == 3) {
+            } else if (i == 4) {
                 cell.setBackgroundColor(this.compareTime(exitOnTime, exitGraceTime, overView[i], "exit"));
             }
             table.addCell(cell);
@@ -297,7 +297,7 @@ public class ScheduledReportSend {
         ilensLogo.setAbsolutePosition(55, 790);
 
         Image performanceGraph = Image.getInstance(scriptPath + "/report/performanceGraph.png");
-        performanceGraph.scaleToFit(1200, 1210);
+        performanceGraph.scaleToFit(1140, 1210);
         performanceGraph.setAbsolutePosition(26, 130);
 
         document.add(ilensLogo);
@@ -325,9 +325,9 @@ public class ScheduledReportSend {
         document.add(new Paragraph("User performance report", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY)));
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("Total hours: " + String.valueOf(reportVO.getWeekDaysCount() * 8), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY)));
-        Paragraph totTimeHrs = new Paragraph("Spent time\n(Hrs.)", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY));
+        /*Paragraph totTimeHrs = new Paragraph("Spent time\n(Hrs.)", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY));
         totTimeHrs.setAlignment(Element.ALIGN_RIGHT);
-        document.add(totTimeHrs);
+        document.add(totTimeHrs);*/
         document.add(performanceGraph);
 
 
@@ -352,16 +352,16 @@ public class ScheduledReportSend {
             paragraph.setSpacingBefore(30f);
             document.add(paragraph);
             List<ReportGenVO> employeesList = attendanceList.get(j).getEmployees();
-            PdfPTable overAllTable = this.tableCreation(new String[]{"Name", "Entry time", "Entry location", "Exit time", "Exit location"}, new float[]{30, 15, 20, 15, 20});
+            PdfPTable overAllTable = this.tableCreation(new String[]{"Id", "Name", "Entry time", "Entry location", "Exit time", "Exit location", "Spent hours"}, new float[]{8,25, 9, 19, 9, 19, 11});
             overAllTable.setHeaderRows(1);
             font = FontFactory.getFont(FontFactory.HELVETICA, 16, BaseColor.DARK_GRAY);
             for (int i = 0; i < employeesList.size(); i++) {
                 ReportGenVO details = employeesList.get(i);
-                this.addCell(new String[]{details.getName(), details.getEntryTime(), details.getEntryLocation(), details.getExitTime(), details.getExitLocation()}, overAllTable, font);
+                this.addCell(new String[]{details.getId(), details.getName(), details.getEntryTime(), details.getEntryLocation(), details.getExitTime(), details.getExitLocation(), details.getSpentHours()}, overAllTable, font);
             }
             if(employeesList.size() == 0){
                 font = FontFactory.getFont(FontFactory.HELVETICA, 20, BaseColor.DARK_GRAY);
-                this.addCell(new String[]{"","","No Data Found","",""},overAllTable,font);
+                this.addCell(new String[]{"","","","No Data Found","","", ""},overAllTable,font);
             }
             document.add(overAllTable);
             if (j != attendanceList.size()-1)

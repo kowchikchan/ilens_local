@@ -79,6 +79,10 @@ var startbutton = null;
 var outputImage =document.getElementById('savedImage');
 function startup() {
   Webcam.set({
+   dest_width: 750, // device capture size
+   dest_height: 500,
+   crop_width: 750, // final cropped size
+   crop_height: 1000,
    image_format: 'png',
    jpeg_quality: 90
   });
@@ -240,6 +244,7 @@ function trainingId(id){
 }
 var counter=0;
 function faceDetaction(){
+  var sound= new Audio("/web/images/sound.mp3");
   /*front side*/
   $("#scanFace").show();
     $(".mobile-progress-div").css("opacity",1);
@@ -260,6 +265,7 @@ function faceDetaction(){
       $("#finished_trainData").hide();
       $(".renlian").css({"background": "url('/web/images/left-side.gif') no-repeat","background-size":"100% 100%"});
       $(".fcDetactText").html("Turn left side");
+      sound.play();
       setTimeout(function(){
         takepicture($("#hostname").val());
         clearInterval();
@@ -280,6 +286,7 @@ function faceDetaction(){
       $("#finished_trainData").hide();
       $(".renlian").css({"background": "url('/web/images/right-side.gif') no-repeat","background-size":"100% 100%"});
       $(".fcDetactText").html("Turn right side");
+      sound.play();
       setTimeout(function(){
         takepicture($("#hostname").val());
         counter=50;
@@ -299,6 +306,7 @@ function faceDetaction(){
       $("#finished_trainData").hide();
       $(".renlian").css({"background": "url('/web/images/front.gif') no-repeat","background-size":"100% 100%"});
       $(".fcDetactText").html("Look up");
+      sound.play();
       setTimeout(function(){
         takepicture($("#hostname").val());
         counter=75;

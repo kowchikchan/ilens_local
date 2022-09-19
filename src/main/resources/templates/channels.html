@@ -691,9 +691,11 @@ $("#channelForm").hide();
           $(".records").hide();
           $('#pagination').show();
         }
+          $(".pre-loading").hide();
       },
       error:function(err){
          console.log(error);
+          $(".pre-loading").hide();
        }
     });
 }
@@ -957,14 +959,17 @@ $("#channelForm").hide();
           $(".records").hide();
           $('#pagination').show();
         }
+          $(".pre-loading").hide();
       },
       error:function(err){
          console.log(error);
+          $(".pre-loading").hide();
        }
     });
 }
 
 $('#userFilter').on('change', function() {
+  $(".pre-loading").show();
   var status=this.value;
   $("#channelList").empty();
   $("#mobileList").empty();

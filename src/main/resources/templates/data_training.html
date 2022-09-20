@@ -79,10 +79,6 @@ var startbutton = null;
 var outputImage =document.getElementById('savedImage');
 function startup() {
   Webcam.set({
-   dest_width: 750, // device capture size
-   dest_height: 500,
-   crop_width: 750, // final cropped size
-   crop_height: 1000,
    image_format: 'png',
    jpeg_quality: 90
   });
@@ -141,8 +137,13 @@ function takepicture(count) {
   var count=5;
   for(i=1; i <= count; i++){
       setTimeout(function() {
+        var video=document.getElementById("video1");
           Webcam.snap( function(base64img) {
-            startTraining(base64img);   
+          var canvas = document.getElementById("canvas");
+          var ctx = canvas.getContext("2d");
+          ctx.drawImage(video, 0, 0,750,1000);
+          var base64img = canvas.toDataURL('image/png');
+          startTraining(base64img);   
          } );
       }, i * 500);
   } 

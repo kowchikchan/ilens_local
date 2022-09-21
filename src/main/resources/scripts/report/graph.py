@@ -85,10 +85,7 @@ def performanceGraph():
     percentage = []
     for val in performanceData:
         users.append(val)
-        if performanceData.get(val) > 60:
-            per = round(performanceData.get(val) / 60, 2)
-        else:
-            per = float(str(0) + "." + str(performanceData.get(val)))
+        per = round(performanceData.get(val), 2)
         roundedPercentage = round((per / totalHours) * 100, 2)
         if roundedPercentage > 100:
             roundedPercentage = 100

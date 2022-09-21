@@ -150,9 +150,9 @@ public class ScheduledReportSend {
             Date parsedGraceTime = dateFormat.parse(graceTime);
             Date parsedOnTime = dateFormat.parse(onTime);
             if(Objects.equals(type, "entry")) {
-                if (parseEntryTime.after(parsedGraceTime)) {
+                if (parseEntryTime.after(parsedGraceTime) || parseEntryTime.equals(parsedGraceTime)) {
                     return new BaseColor(245, 198, 203);
-                } else if (parseEntryTime.after(parsedOnTime)) {
+                } else if (parseEntryTime.after(parsedOnTime) || parseEntryTime.equals(parsedOnTime)) {
                     return new BaseColor(255, 238, 186);
                 } else {
                     return new BaseColor(195, 230, 203);
@@ -352,7 +352,7 @@ public class ScheduledReportSend {
             paragraph.setSpacingBefore(30f);
             document.add(paragraph);
             List<ReportGenVO> employeesList = attendanceList.get(j).getEmployees();
-            PdfPTable overAllTable = this.tableCreation(new String[]{"Id", "Name", "Entry time", "Entry location", "Exit time", "Exit location", "Spent hours"}, new float[]{8,25, 9, 19, 9, 19, 11});
+            PdfPTable overAllTable = this.tableCreation(new String[]{"Id", "Name", "Entry time", "Entry location", "Exit time", "Exit location", "Spent hours(h:m)"}, new float[]{8,25, 9, 18, 9, 18, 13});
             overAllTable.setHeaderRows(1);
             font = FontFactory.getFont(FontFactory.HELVETICA, 16, BaseColor.DARK_GRAY);
             for (int i = 0; i < employeesList.size(); i++) {

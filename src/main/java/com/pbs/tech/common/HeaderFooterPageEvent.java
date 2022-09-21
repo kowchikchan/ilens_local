@@ -32,6 +32,8 @@ public class HeaderFooterPageEvent extends PdfPageEventHelper {
             Rectangle rect = writer.getBoxSize("art");
             ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("Generated Date: " + curDate,
                     FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10.0f, WebColors.getRGBColor("#062E51"))), 140, 23, 0);
-            ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase(" "), rect.getRight(), rect.getBottom(), 0);
+            ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER,
+                    new Phrase(String.valueOf(document.getPageNumber()),
+                            FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10.0f, WebColors.getRGBColor("#062E51"))), 600, 23, 0);
         }
 }

@@ -124,6 +124,7 @@ public class UserService {
             userObj.setUpdatedDt(new Date());
             userObj.setDepartment(user.getDepartment());
             userObj.setRole(ROLES_TYPE.valueOf(user.getRole()));
+            userObj.setLocation(user.getLocation());
             userRepo.save(userObj);
         } catch (NoSuchElementException e) {
             throw new IlensException("No object found");

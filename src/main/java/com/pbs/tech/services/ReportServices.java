@@ -52,7 +52,7 @@ public class ReportServices {
         try {
             Calendar calendar = Calendar.getInstance();
             ReportPeriod rptPeriod = reportPeriodRepo.findById(Long.valueOf(1)).get();
-            calendar.add(Calendar.MINUTE, 11);
+            calendar.add(Calendar.MINUTE, -11);
             rptPeriod.setPreviousDate(calendar.getTime());
             rptPeriod.setUpdatedDt(new Date());
             reportPeriodRepo.save(rptPeriod);

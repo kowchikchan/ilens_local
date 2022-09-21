@@ -45,6 +45,9 @@ ilens:
 mail:
   host: smtp.gmail.com
   port: 587
+  tls: true
+  ssl: false
+  auth: true
   user-name: admin@logicfocus.net
   password: fzteixkjcpwufgsx
 

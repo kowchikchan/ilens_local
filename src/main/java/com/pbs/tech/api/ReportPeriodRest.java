@@ -32,9 +32,9 @@ public class ReportPeriodRest {
         return new ResponseEntity<>(reportServices.getList(), HttpStatus.OK);
     }
 
-    @GetMapping("/generate")
-    public ResponseEntity<Object> report(@RequestHeader("CLIENT_KEY") String clientKey) throws Exception {
-        scheduledReportSend.getPdf(null);
+    @GetMapping("/generate/{toMail}")
+    public ResponseEntity<Object> report(@RequestHeader("CLIENT_KEY") String clientKey, @PathVariable String toMail) throws Exception {
+        scheduledReportSend.getPdf(toMail, null);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -70,6 +70,7 @@ class FRMethod:
         dt_string = now.strftime("%d%m%Y%H%M%S")
         img = adjustGamma(self.frame, gamma=1.7)
         img = cv2.resize(img, (0, 0), fx=0.30, fy=0.30)
+        imgResized = cv2.resize(self.frame, (0, 0), fx=0.30, fy=0.30)
         faces = face_locations(img)
         # diff
         diff = datetime.now() - self.startTime
@@ -82,7 +83,7 @@ class FRMethod:
                 matchList = [f'{str(i)}' for i in matches]
                 contCount = checkContiguousOccurrence(matchList)
                 print(f'contCount, {contCount}')
-                # (top, right, bottom, left) = faceLoc
+                (top, right, bottom, left) = faceLoc
                 json_values["channelId"] = self.cameraId
                 json_values["channelName"] = self.place
                 json_values["snapshot"] = dt_string
@@ -98,7 +99,9 @@ class FRMethod:
                         json_values["entryViolationVos"] = None
                         json_values["npr"] = None
                         json_values["socialViolation"] = None
-                        cv2.imwrite(face_file_name, cv2.resize(cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB), (490, 334),
+                        cv2.rectangle(imgResized, (left, top), (right, bottom), (252, 3, 3), 2)
+                        cv2.putText(imgResized, emp_name, (left - 10, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (252, 3, 3), 1, cv2.LINE_AA)
+                        cv2.imwrite(face_file_name, cv2.resize(cv2.cvtColor(imgResized, cv2.COLOR_BGR2RGB), (490, 334),
                                                                interpolation=cv2.INTER_AREA))
                         try:
                             headers = {'Content-type': 'application/json', 'Accept': 'text/plain',

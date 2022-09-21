@@ -41,7 +41,7 @@ public class IlenService {
     Logger log = LoggerFactory.getLogger(IlenService.class);
 
     static List<ChannelRunTime> runtimes = new ArrayList<>();
-    private static final String dateFormatForDb = "yyyy-MM-dd HH:mm:ss";
+    private static final SimpleDateFormat dateWithHrMnSec = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat dateWithDayFormat = new SimpleDateFormat("dd MMMM yyyy-EEEE");
     private static final SimpleDateFormat timeFormatOnly = new SimpleDateFormat("hh:mm a");
     private static final String os = System.getProperty("os.name");
@@ -521,11 +521,21 @@ public class IlenService {
         return slice.getContent();
     }
 
-    public long getTodayCount() {
-        Calendar date = new GregorianCalendar();
-        Date startDate = this.getDayStTime(date.getTime());
-        Date endDate = this.getDayEndTime(date.getTime());
+    public long getTodayCount(String date) throws ParseException {
+        Date date1 = dateWithHrMnSec.parse(date);
+        Date startDate = this.getDayStTime(date1);
+        Date endDate = this.getDayEndTime(date1);
         return entryExitRepo.findAllByFromAndToTime(startDate, endDate).size();
+    }
+
+    private IdTraceDetailsVO convertToTrace(EntryExitEntity entity) throws Exception {
+        IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
+        idTraceDetailsVO.setTime(entity.getTime());
+        idTraceDetailsVO.setType(entity.getType());
+        idTraceDetailsVO.setSnapshot(entity.getSnapshot());
+        Channel ch = this.getChannelDetailsById(Long.parseLong(entity.getLocation()));
+        idTraceDetailsVO.setChannelId(ch.getName());
+        return idTraceDetailsVO;
     }
 
     public  Object getAttendance(@RequestBody EntryExitFilter entryExitFilter, int pageNumber) throws Exception {
@@ -534,10 +544,9 @@ public class IlenService {
         if(!StringUtils.isBlank(entryExitFilter.getId())){
 
             // Person detailed report by id
-            SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
             IdTraceVO traceVO = new IdTraceVO();
-            String selectedDate = df.format(this.getDayStTime(entryExitFilter.getDate()));
-            String endDate = df.format(this.getDayEndTime(entryExitFilter.getDate()));
+            String selectedDate = dateWithHrMnSec.format(this.getDayStTime(entryExitFilter.getDate()));
+            String endDate = dateWithHrMnSec.format(this.getDayEndTime(entryExitFilter.getDate()));
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("SELECT * FROM ilens.EntryExit WHERE time >= " + "'" + selectedDate + "'" + " AND time<= "
                     + "'" + endDate + "'" +" AND id=" + "'" + entryExitFilter.getId() +"'" + " ALLOW FILTERING");
@@ -545,7 +554,35 @@ public class IlenService {
             try {
                 List<EntryExitEntity> slice = cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
                 List<IdTraceDetailsVO> idTraceDetailsVOList = new ArrayList<>();
-                for (EntryExitEntity entryExitEntity : slice) {
+                String swapType = "";
+                for(int i=0; i<slice.size(); i++){
+                    traceVO.setId(slice.get(i).getId());
+                    traceVO.setName(slice.get(i).getName());
+                    if(i == slice.size()-1){
+                        if(slice.get(i).getType().equals("exit")){
+                            IdTraceDetailsVO convertedVo = this.convertToTrace(slice.get(i));
+                            idTraceDetailsVOList.add(convertedVo);
+                        }
+                    }
+                    if(i == 0 && slice.get(i).getType().equals("entry")){
+                        IdTraceDetailsVO convertedVo = this.convertToTrace(slice.get(i));
+                        idTraceDetailsVOList.add(convertedVo);
+                        swapType = slice.get(i).getType();
+                    }else if(!Objects.equals(swapType, slice.get(i).getType())){
+                        if(slice.get(i).getType().equals("entry")) {
+                            // exit
+                            IdTraceDetailsVO convertedVo = this.convertToTrace(slice.get(i-1));
+                            idTraceDetailsVOList.add(convertedVo);
+
+                            // entry
+                            IdTraceDetailsVO convertedVo1 = this.convertToTrace(slice.get(i));
+                            idTraceDetailsVOList.add(convertedVo1);
+                            swapType = slice.get(i).getType();
+                        }
+                        swapType = slice.get(i).getType();
+                    }
+                }
+                 /*for (EntryExitEntity entryExitEntity : slice) {
                     traceVO.setId(entryExitEntity.getId());
                     traceVO.setName(entryExitEntity.getName());
                     IdTraceDetailsVO idTraceDetailsVO = new IdTraceDetailsVO();
@@ -556,7 +593,7 @@ public class IlenService {
                     //idTraceDetailsVO.setChannelId(entryExitEntity.getLocation());
                     idTraceDetailsVO.setSnapshot(entryExitEntity.getSnapshot());
                     idTraceDetailsVOList.add(idTraceDetailsVO);
-                }
+                }*/
                 traceVO.setTrace(idTraceDetailsVOList);
             } catch (NoSuchElementException e) {
                 throw new NoSuchElementException("No Such Element Exception" + e.getMessage());
@@ -571,7 +608,7 @@ public class IlenService {
                     log.info("Without filter...");
                     List<EntryExitEntity> entities = this.getTodayAttendance(pageNumber);
                     //List<EntryExit> entryExits = new ArrayList<>(entities.size());
-                    for (int val = 0; val < getTodayCount(); val++) {
+                    for (int val = 0; val < getTodayCount(dateWithHrMnSec.format(entryExitFilter.getDate())); val++) {
                         List<ExitView> exitDetails = this.getTodayExit(pageNumber, entities.get(val).getId());
                         EntryExit entryExit = new EntryExit();
                         //entryExit.setId(entities.get(val).getId());
@@ -602,11 +639,10 @@ public class IlenService {
                 if (entryExitFilter.getDate() != null && !StringUtils.isEmpty(entryExitFilter.getDate().toString())) {
 
                     //selected date
-                    SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
-                    String selectedDate = df.format(this.getDayStTime(entryExitFilter.getDate()));
+                    String selectedDate = dateWithHrMnSec.format(this.getDayStTime(entryExitFilter.getDate()));
 
                     //selected date end time.
-                    String endDate = df.format(this.getDayEndTime(entryExitFilter.getDate()));
+                    String endDate = dateWithHrMnSec.format(this.getDayEndTime(entryExitFilter.getDate()));
 
                     //start time.
                     specificationValues.add(new SearchCriteria("time", ">=", selectedDate));
@@ -707,6 +743,32 @@ public class IlenService {
         }
     }
 
+    public List<EntryExit> getAttendanceWithoutPagination(Date fromTime, Date toTime){
+        List<EntryExit> entryExits = new ArrayList<>();
+        List<EntryExitEntity> entities = entryExitRepo.findAllByFromAndToTime(fromTime, toTime);
+        for (EntryExitEntity entity : entities) {
+            List<ExitView> exitDetails = this.exitData(entity.getId(), fromTime);
+            EntryExit entryExit = new EntryExit();
+            entryExit.setId(entity.getId());
+            entryExit.setName(entity.getName());
+            try {
+                Channel ch = this.getChannelDetailsById(Long.parseLong(entity.getLocation()));
+                entity.setLocation(ch.getName());
+                // exit
+                if(exitDetails.size() > 0){
+                    Channel ch1 = this.getChannelDetailsById(Long.parseLong(exitDetails.get(0).getLocation()));
+                    exitDetails.get(0).setLocation(ch1.getName());
+                }
+            }catch (Exception e){
+                log.info("no channel found");
+            }
+            entryExit.setEntry_view(entity);
+            entryExit.setExit_view(exitDetails);
+            entryExits.add(entryExit);
+        }
+        return entryExits;
+    }
+
     public Channel getChannelDetailsById(long id) throws Exception {
         Channel channel = null;
         try {
@@ -718,14 +780,13 @@ public class IlenService {
     }
 
     public List<ExitView> exitData(String id, Date selectedDate){
-        SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
         List<ExitView> exitView = new ArrayList<>();
 
         // start time
-        String startDt = df.format(this.getDayStTime(selectedDate));
+        String startDt = dateWithHrMnSec.format(this.getDayStTime(selectedDate));
 
         // end time
-        String endDt = df.format(this.getDayEndTime(selectedDate));
+        String endDt = dateWithHrMnSec.format(this.getDayEndTime(selectedDate));
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("SELECT * FROM ilens.ExitView WHERE time>=" + "'" + startDt + "'" + " AND time<="
@@ -1068,9 +1129,8 @@ public class IlenService {
         List<EntryExit> entryExits = new ArrayList<>();
         List<SearchCriteria> specificationValues = new ArrayList<>();
         if (entryExitFilter.getDate() != null && !StringUtils.isEmpty(entryExitFilter.getDate().toString())) {
-            SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
-            String selectedDate = df.format(this.getDayStTime(entryExitFilter.getDate()));
-            String endDate = df.format(this.getDayEndTime(entryExitFilter.getDate()));
+            String selectedDate = dateWithHrMnSec.format(this.getDayStTime(entryExitFilter.getDate()));
+            String endDate = dateWithHrMnSec.format(this.getDayEndTime(entryExitFilter.getDate()));
 
             //start time
             specificationValues.add(new SearchCriteria("time", ">=", selectedDate));
@@ -1188,8 +1248,7 @@ public class IlenService {
     }
 
     public long unknownCount(String date) throws ParseException {
-        SimpleDateFormat df = new SimpleDateFormat(dateFormatForDb);
-        Date date1 = df.parse(date);
+        Date date1 = dateWithHrMnSec.parse(date);
         Date selectedDate = this.getDayStTime(date1);;
         Date endDate = this.getDayEndTime(date1);
         List<UnknownEntry> unknownEntries = unknownEntryRepo.getUnknownCount(selectedDate, endDate);
@@ -1215,6 +1274,36 @@ public class IlenService {
         cal.set(Calendar.SECOND, 58);
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
+    }
+
+    public long totalHoursCal(String id, Date date) throws Exception {
+        EntryExitFilter entryExitFilter = new EntryExitFilter();
+
+        // filter
+        entryExitFilter.setLocation("");
+        entryExitFilter.setName("");
+        entryExitFilter.setId(id);
+        entryExitFilter.setDate(date);
+        IdTraceVO traceList = (IdTraceVO) this.getAttendance(entryExitFilter, 0);
+
+        Date prevTime = null;
+        long totCount = 0;
+        for(int i=0; i<traceList.getTrace().size(); i++) {
+            if (Objects.equals(traceList.getTrace().get(i).getType(), "entry")) {
+                prevTime = traceList.getTrace().get(i).getTime();
+            } else if (Objects.equals(traceList.getTrace().get(i).getType(), "exit")) {
+                if(prevTime != null) {
+                    Date curDt = traceList.getTrace().get(i).getTime();
+                    long diff = Math.abs(curDt.getTime() - prevTime.getTime());
+                    long inMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
+                    totCount += inMinutes;
+                    prevTime = null;
+                }
+            }
+        }
+
+        return totCount / 60;
+
     }
 
     public ReportVO totalEntries(long days, String type) throws Exception {
@@ -1276,11 +1365,14 @@ public class IlenService {
                 entryExitFilter.setName("");
                 entryExitFilter.setDate(dayStTime);
 
-                List<EntryExit> entryExit = (List<EntryExit>) this.getAttendance(entryExitFilter, 0);
+                //List<EntryExitEntity> entryExit = entryExitRepo.findAllByFromAndToTime(dayStTime, dayEdTime);
+                List<EntryExit> entryExit = this.getAttendanceWithoutPagination(dayStTime, dayEdTime);
                 if (entryExit.size() > 0) {
                     for (int l = 0; l < entryExit.size(); l++) {
                         attList = new ReportGenVO();
                         attList.setName(entryExit.get(l).getEntry_view().getName());
+                        attList.setId(entryExit.get(l).getId());
+                        attList.setSpentHours(String.valueOf(this.totalHoursCal(entryExit.get(l).getId(), dayStTime)));
                         Date curTime = entryExit.get(l).getEntry_view().getTime();
                         if (curTime.after(onTime) && curTime.before(graceTime)) {
                             graceTimeCount += 1;

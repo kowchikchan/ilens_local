@@ -39,6 +39,9 @@ public class SystemConfig {
     @Autowired
     MenuStatusRepo menuStatusRepo;
 
+    @Autowired
+    SmtpRepo smtpRepo;
+
     @Value("${ilens.python.path}")
     String pythonPath;
 
@@ -47,6 +50,25 @@ public class SystemConfig {
 
     @Value("${default-config.password}")
     String password;
+
+    @Value("${mail.host}")
+    String host;
+
+    @Value("${mail.port}")
+    long port;
+
+    @Value("${mail.tls}")
+    boolean tls;
+
+    @Value("${mail.ssl}")
+    boolean ssl;
+
+    @Value("${mail.user-name}")
+    String userName;
+
+    @Value("${mail.password}")
+    String mailSecret;
+
 
     @EventListener(ApplicationReadyEvent.class)
     public void addDefaultUser() throws Exception {
@@ -133,6 +155,19 @@ public class SystemConfig {
             menuStatus.setId(1L);
             menuStatus.setStatus(false);
             menuStatusRepo.save(menuStatus);
+        }
+
+        //Default smtp configurations.
+        Smtp smtp;
+        try {
+            smtp = smtpRepo.findById(1L).get();
+        }catch (Exception e){
+            smtp = new Smtp(1, host, port, ssl, tls, userName, mailSecret);
+            smtp.setCreatedBy(user);
+            smtp.setUpdatedBy(user);
+            smtp.setCreatedDt(new Date());
+            smtp.setUpdatedDt(new Date());
+            smtpRepo.save(smtp);
         }
 
         // Start RTSP Server.

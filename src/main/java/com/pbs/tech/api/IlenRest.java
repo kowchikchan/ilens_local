@@ -1,5 +1,6 @@
 package com.pbs.tech.api;
 
+import com.pbs.tech.services.FileServices;
 import com.pbs.tech.services.IlenService;
 import com.pbs.tech.vo.EntryExitFilter;
 import com.pbs.tech.vo.ChannelData;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 @RestController
 @RequestMapping("/api/v1/ilens")
@@ -18,6 +20,9 @@ public class IlenRest {
 
     @Autowired
     IlenService ilenService;
+
+    @Autowired
+    FileServices fileServices;
 
     @GetMapping("/entryexit")
     public ResponseEntity<?> getEntryExit(@RequestHeader("CLIENT_KEY") String clientKey){
@@ -37,9 +42,10 @@ public class IlenRest {
         return new ResponseEntity(ilenService.getAttendance(entryExitFilter,pageNumber), HttpStatus.OK);
     }
 
-    @GetMapping("/attendance/count")
-    public ResponseEntity<?> getAttendanceCount(@RequestHeader("CLIENT_KEY") String clientKey){
-        return new ResponseEntity(ilenService.getTodayCount(), HttpStatus.OK);
+    @GetMapping("/attendance/count/{date}")
+    public ResponseEntity<?> getAttendanceCount(@RequestHeader("CLIENT_KEY") String clientKey,
+                                                @PathVariable String date) throws ParseException {
+        return new ResponseEntity(ilenService.getTodayCount(date), HttpStatus.OK);
     }
 
 
@@ -134,5 +140,13 @@ public class IlenRest {
                                          @PathVariable String date) throws Exception {
         return new ResponseEntity<>(ilenService.unknownCount(date), HttpStatus.OK);
     }
+
+    @DeleteMapping("/delete/directory/{dirName}")
+    public ResponseEntity<?> deleteFolder(@RequestHeader("CLIENT_KEY") String clientKey,
+                                          @PathVariable String dirName) throws Exception {
+        fileServices.deleteDir(dirName);
+        return new ResponseEntity<> (HttpStatus.OK);
+    }
+
 }
 

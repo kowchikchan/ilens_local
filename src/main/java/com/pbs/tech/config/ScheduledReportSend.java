@@ -4,11 +4,10 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.html.WebColors;
 import com.itextpdf.text.pdf.*;
 import com.pbs.tech.common.HeaderFooterPageEvent;
+import com.pbs.tech.common.MailSend;
 import com.pbs.tech.model.ReportPeriod;
-import com.pbs.tech.services.ChannelRunTime;
-import com.pbs.tech.services.IlenService;
-import com.pbs.tech.services.MailSend;
-import com.pbs.tech.services.ReportServices;
+import com.pbs.tech.model.Smtp;
+import com.pbs.tech.services.*;
 import com.pbs.tech.vo.ReportGen1VO;
 import com.pbs.tech.vo.ReportGenVO;
 import com.pbs.tech.vo.ReportVO;
@@ -41,6 +40,9 @@ public class ScheduledReportSend {
     @Autowired
     IlenService ilenService;
 
+    @Autowired
+    SmtpServices smtpServices;
+
     @Value("${ilens.python.path}")
     String pythonPath;
 
@@ -66,13 +68,13 @@ public class ScheduledReportSend {
 
     @Scheduled(cron = "0 1 0 * * *")
     public void sendReport() throws Exception {
-        log.info("Report Triggered.");
+        log.info("Automate Report Triggered.");
         ReportPeriod reportPeriod = reportServices.getList();
         Date curDtTime = new Date();
         long diff = curDtTime.getTime() - reportPeriod.getPreviousDate().getTime();
         long differenceBetweenDts = diff / 1000 / 60 / 60 / 24;
         if (differenceBetweenDts == reportPeriod.getReportPeriod()){
-            this.getPdf("automate");
+            this.getPdf(reportPeriod.getMail(), "automate");
         }
     }
 
@@ -133,9 +135,9 @@ public class ScheduledReportSend {
             cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
             cell.setBorderColor(new BaseColor(255, 255, 255));
             cell.setBackgroundColor(new BaseColor(232, 232, 232));
-            if (i == 1) {
+            if (i == 2) {
                 cell.setBackgroundColor(this.compareTime(entryOnTime, entryGraceTime, overView[i], "entry"));
-            } else if (i == 3) {
+            } else if (i == 4) {
                 cell.setBackgroundColor(this.compareTime(exitOnTime, exitGraceTime, overView[i], "exit"));
             }
             table.addCell(cell);
@@ -150,9 +152,9 @@ public class ScheduledReportSend {
             Date parsedGraceTime = dateFormat.parse(graceTime);
             Date parsedOnTime = dateFormat.parse(onTime);
             if(Objects.equals(type, "entry")) {
-                if (parseEntryTime.after(parsedGraceTime)) {
+                if (parseEntryTime.after(parsedGraceTime) || parseEntryTime.equals(parsedGraceTime)) {
                     return new BaseColor(245, 198, 203);
-                } else if (parseEntryTime.after(parsedOnTime)) {
+                } else if (parseEntryTime.after(parsedOnTime) || parseEntryTime.equals(parsedOnTime)) {
                     return new BaseColor(255, 238, 186);
                 } else {
                     return new BaseColor(195, 230, 203);
@@ -203,7 +205,7 @@ public class ScheduledReportSend {
 
 
     @Async
-    public void getPdf(String type) throws Exception {
+    public void getPdf(String toMail, String type) throws Exception {
 
         // cell widths.
         float[] titleClWidths = new float[]{2f};
@@ -297,7 +299,7 @@ public class ScheduledReportSend {
         ilensLogo.setAbsolutePosition(55, 790);
 
         Image performanceGraph = Image.getInstance(scriptPath + "/report/performanceGraph.png");
-        performanceGraph.scaleToFit(1200, 1210);
+        performanceGraph.scaleToFit(1140, 1210);
         performanceGraph.setAbsolutePosition(26, 130);
 
         document.add(ilensLogo);
@@ -325,9 +327,9 @@ public class ScheduledReportSend {
         document.add(new Paragraph("User performance report", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY)));
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("Total hours: " + String.valueOf(reportVO.getWeekDaysCount() * 8), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY)));
-        Paragraph totTimeHrs = new Paragraph("Spent time\n(Hrs.)", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY));
+        /*Paragraph totTimeHrs = new Paragraph("Spent time\n(Hrs.)", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY));
         totTimeHrs.setAlignment(Element.ALIGN_RIGHT);
-        document.add(totTimeHrs);
+        document.add(totTimeHrs);*/
         document.add(performanceGraph);
 
 
@@ -352,16 +354,16 @@ public class ScheduledReportSend {
             paragraph.setSpacingBefore(30f);
             document.add(paragraph);
             List<ReportGenVO> employeesList = attendanceList.get(j).getEmployees();
-            PdfPTable overAllTable = this.tableCreation(new String[]{"Name", "Entry time", "Entry location", "Exit time", "Exit location"}, new float[]{30, 15, 20, 15, 20});
+            PdfPTable overAllTable = this.tableCreation(new String[]{"Id", "Name", "Entry time", "Entry location", "Exit time", "Exit location", "Spent hours(h:m)"}, new float[]{8,25, 9, 18, 9, 18, 13});
             overAllTable.setHeaderRows(1);
             font = FontFactory.getFont(FontFactory.HELVETICA, 16, BaseColor.DARK_GRAY);
             for (int i = 0; i < employeesList.size(); i++) {
                 ReportGenVO details = employeesList.get(i);
-                this.addCell(new String[]{details.getName(), details.getEntryTime(), details.getEntryLocation(), details.getExitTime(), details.getExitLocation()}, overAllTable, font);
+                this.addCell(new String[]{details.getId(), details.getName(), details.getEntryTime(), details.getEntryLocation(), details.getExitTime(), details.getExitLocation(), details.getSpentHours()}, overAllTable, font);
             }
             if(employeesList.size() == 0){
                 font = FontFactory.getFont(FontFactory.HELVETICA, 20, BaseColor.DARK_GRAY);
-                this.addCell(new String[]{"","","No Data Found","",""},overAllTable,font);
+                this.addCell(new String[]{"","","","No Data Found","","", ""},overAllTable,font);
             }
             document.add(overAllTable);
             if (j != attendanceList.size()-1)
@@ -379,7 +381,11 @@ public class ScheduledReportSend {
                 + "<br>Report generated date time: <strong>"+dayFormatWithTime.format(new Date())+ "</strong>."
                 + "<br>Thanks,"
                 +"<br><strong>Note: </strong>This is system generated mail and report, for any clarification please reach out to admin@logicfocus.net.";
-        MailSend mailSend = new MailSend();
-        mailSend.mailSend(host, port, username, password, reportPeriod.getMail(), subject, msgContent, scriptPath + "/report/iLens Report - "+dayFormat.format(new Date())+".pdf");
+
+        // smtp configurations.
+        Smtp smtp = smtpServices.getList();
+        MailSend.mailSend(smtp.isTls(), smtp.isSsl(), smtp.getHost(), String.valueOf(smtp.getPort()),
+                smtp.getUserMail(), smtp.getSecret(), toMail, subject, msgContent,
+                scriptPath + "/report/iLens Report - "+dayFormat.format(new Date())+".pdf");
     }
 }

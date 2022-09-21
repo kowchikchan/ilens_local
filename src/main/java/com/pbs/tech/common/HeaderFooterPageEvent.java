@@ -25,13 +25,15 @@ public class HeaderFooterPageEvent extends PdfPageEventHelper {
             ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("From Date : "+ previousDt +" 00:00 AM",
                     FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12.2f, WebColors.getRGBColor("#062E51"))), 170, 740, 0);
             ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("To Date : " + curDate,
-                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12.2f, WebColors.getRGBColor("#062E51"))), 1055, 740, 0);
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12.2f, WebColors.getRGBColor("#062E51"))), 1045, 740, 0);
         }
         public void onEndPage(PdfWriter writer,Document document) {
             String curDate = toDtFormat.format(new Date());
             Rectangle rect = writer.getBoxSize("art");
             ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase("Generated Date: " + curDate,
                     FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10.0f, WebColors.getRGBColor("#062E51"))), 140, 23, 0);
-            ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER, new Phrase(" "), rect.getRight(), rect.getBottom(), 0);
+            ColumnText.showTextAligned(writer.getDirectContent(),Element.ALIGN_CENTER,
+                    new Phrase(String.valueOf(document.getPageNumber()),
+                            FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10.0f, WebColors.getRGBColor("#062E51"))), 600, 23, 0);
         }
 }

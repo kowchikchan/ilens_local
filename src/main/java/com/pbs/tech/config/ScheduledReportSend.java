@@ -4,11 +4,10 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.html.WebColors;
 import com.itextpdf.text.pdf.*;
 import com.pbs.tech.common.HeaderFooterPageEvent;
+import com.pbs.tech.common.MailSend;
 import com.pbs.tech.model.ReportPeriod;
-import com.pbs.tech.services.ChannelRunTime;
-import com.pbs.tech.services.IlenService;
-import com.pbs.tech.services.MailSend;
-import com.pbs.tech.services.ReportServices;
+import com.pbs.tech.model.Smtp;
+import com.pbs.tech.services.*;
 import com.pbs.tech.vo.ReportGen1VO;
 import com.pbs.tech.vo.ReportGenVO;
 import com.pbs.tech.vo.ReportVO;
@@ -41,6 +40,9 @@ public class ScheduledReportSend {
     @Autowired
     IlenService ilenService;
 
+    @Autowired
+    SmtpServices smtpServices;
+
     @Value("${ilens.python.path}")
     String pythonPath;
 
@@ -66,13 +68,13 @@ public class ScheduledReportSend {
 
     @Scheduled(cron = "0 1 0 * * *")
     public void sendReport() throws Exception {
-        log.info("Report Triggered.");
+        log.info("Automate Report Triggered.");
         ReportPeriod reportPeriod = reportServices.getList();
         Date curDtTime = new Date();
         long diff = curDtTime.getTime() - reportPeriod.getPreviousDate().getTime();
         long differenceBetweenDts = diff / 1000 / 60 / 60 / 24;
         if (differenceBetweenDts == reportPeriod.getReportPeriod()){
-            this.getPdf("automate");
+            this.getPdf(reportPeriod.getMail(), "automate");
         }
     }
 
@@ -203,7 +205,7 @@ public class ScheduledReportSend {
 
 
     @Async
-    public void getPdf(String type) throws Exception {
+    public void getPdf(String toMail, String type) throws Exception {
 
         // cell widths.
         float[] titleClWidths = new float[]{2f};
@@ -379,7 +381,11 @@ public class ScheduledReportSend {
                 + "<br>Report generated date time: <strong>"+dayFormatWithTime.format(new Date())+ "</strong>."
                 + "<br>Thanks,"
                 +"<br><strong>Note: </strong>This is system generated mail and report, for any clarification please reach out to admin@logicfocus.net.";
-        MailSend mailSend = new MailSend();
-        mailSend.mailSend(host, port, username, password, reportPeriod.getMail(), subject, msgContent, scriptPath + "/report/iLens Report - "+dayFormat.format(new Date())+".pdf");
+
+        // smtp configurations.
+        Smtp smtp = smtpServices.getList();
+        MailSend.mailSend(smtp.isTls(), smtp.isSsl(), smtp.getHost(), String.valueOf(smtp.getPort()),
+                smtp.getUserMail(), smtp.getSecret(), toMail, subject, msgContent,
+                scriptPath + "/report/iLens Report - "+dayFormat.format(new Date())+".pdf");
     }
 }

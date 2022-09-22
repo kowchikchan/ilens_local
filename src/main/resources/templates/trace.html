@@ -202,7 +202,7 @@
           data: JSON.stringify(ilensApiClientVO),
           success: function(data){
           	//totalPagesMethod(data.trace.length);
-          	traceHeading = traceHeading + "Id : " +data.id + '<br>' + "Name : " +  data.name + '</br>';
+          	traceHeading = traceHeading + "Id : " +data.id + '<br>' + "Name : " + data.name + '</br>'+"Total spent hours : "+data.hourSpent;
           	for(i=0;i<data.trace.length;i++){
                 var traceTime = moment(data.trace[i].time).format("DD-MM-YYYY hh:mm:ss A");
           		encodedString = getSnapshotString(data.trace[i].snapshot);

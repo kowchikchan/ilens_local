@@ -44,6 +44,8 @@ public class IlenService {
     private static final SimpleDateFormat dateWithHrMnSec = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat dateWithDayFormat = new SimpleDateFormat("dd MMMM yyyy-EEEE");
     private static final SimpleDateFormat timeFormatOnly = new SimpleDateFormat("hh:mm a");
+    private static final SimpleDateFormat minutes = new SimpleDateFormat("mm");
+    private static final SimpleDateFormat hoursMinutes = new SimpleDateFormat("HH.mm");
     private static final String os = System.getProperty("os.name");
     private static final double PER_PAGES = 10;
 
@@ -538,6 +540,25 @@ public class IlenService {
         return idTraceDetailsVO;
     }
 
+    private String findSpentHours(List<IdTraceDetailsVO> traceList) throws ParseException {
+        Date prevTime = null;
+        long totCount = 0;
+        for(int i=0; i<traceList.size(); i++) {
+            if (Objects.equals(traceList.get(i).getType(), "entry")) {
+                prevTime = traceList.get(i).getTime();
+            } else if (Objects.equals(traceList.get(i).getType(), "exit")) {
+                if(prevTime != null) {
+                    Date curDt = traceList.get(i).getTime();
+                    long diff = Math.abs(curDt.getTime() - prevTime.getTime());
+                    long inMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
+                    totCount += inMinutes;
+                    prevTime = null;
+                }
+            }
+        }
+        return hoursMinutes.format(minutes.parse(String.valueOf(totCount)));
+    }
+
     public  Object getAttendance(@RequestBody EntryExitFilter entryExitFilter, int pageNumber) throws Exception {
         List<EntryExit> entryExits = new ArrayList<>();
 
@@ -545,6 +566,7 @@ public class IlenService {
 
             // Person detailed report by id
             IdTraceVO traceVO = new IdTraceVO();
+            List<IdTraceDetailsVO> idTraceDetailsVOList = new ArrayList<>();
             String selectedDate = dateWithHrMnSec.format(this.getDayStTime(entryExitFilter.getDate()));
             String endDate = dateWithHrMnSec.format(this.getDayEndTime(entryExitFilter.getDate()));
             StringBuilder stringBuilder = new StringBuilder();
@@ -553,7 +575,6 @@ public class IlenService {
             log.info("Query {}, ", stringBuilder.toString());
             try {
                 List<EntryExitEntity> slice = cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
-                List<IdTraceDetailsVO> idTraceDetailsVOList = new ArrayList<>();
                 String swapType = "";
                 for(int i=0; i<slice.size(); i++){
                     traceVO.setId(slice.get(i).getId());
@@ -598,6 +619,7 @@ public class IlenService {
             } catch (NoSuchElementException e) {
                 throw new NoSuchElementException("No Such Element Exception" + e.getMessage());
             }
+            traceVO.setHourSpent(this.findSpentHours(idTraceDetailsVOList));
             return traceVO;
         }else {
             //If filter values IDLE.
@@ -1276,40 +1298,11 @@ public class IlenService {
         return cal.getTime();
     }
 
-    public long totalHoursCal(String id, Date date) throws Exception {
-        EntryExitFilter entryExitFilter = new EntryExitFilter();
-
-        // filter
-        entryExitFilter.setLocation("");
-        entryExitFilter.setName("");
-        entryExitFilter.setId(id);
-        entryExitFilter.setDate(date);
-        IdTraceVO traceList = (IdTraceVO) this.getAttendance(entryExitFilter, 0);
-
-        Date prevTime = null;
-        long totCount = 0;
-        for(int i=0; i<traceList.getTrace().size(); i++) {
-            if (Objects.equals(traceList.getTrace().get(i).getType(), "entry")) {
-                prevTime = traceList.getTrace().get(i).getTime();
-            } else if (Objects.equals(traceList.getTrace().get(i).getType(), "exit")) {
-                if(prevTime != null) {
-                    Date curDt = traceList.getTrace().get(i).getTime();
-                    long diff = Math.abs(curDt.getTime() - prevTime.getTime());
-                    long inMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
-                    totCount += inMinutes;
-                    prevTime = null;
-                }
-            }
-        }
-
-        return totCount / 60;
-
-    }
 
     public ReportVO totalEntries(long days, String type) throws Exception {
         List<String> day = new ArrayList<>(Arrays.asList("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"));
 
-        HashMap<String, Integer> map = new HashMap<>();
+        HashMap<String, Float> map = new HashMap<>();
         List<ReportGen1VO> attendance = new ArrayList<>();
         ReportVO reportVO = new ReportVO();
 
@@ -1372,7 +1365,9 @@ public class IlenService {
                         attList = new ReportGenVO();
                         attList.setName(entryExit.get(l).getEntry_view().getName());
                         attList.setId(entryExit.get(l).getId());
-                        attList.setSpentHours(String.valueOf(this.totalHoursCal(entryExit.get(l).getId(), dayStTime)));
+                        IdTraceVO idTraceVO = (IdTraceVO) this.getAttendance(new EntryExitFilter(cal.getTime(), entryExit.get(l).getId(), "", ""), 1);
+                        attList.setSpentHours(idTraceVO.getHourSpent());
+                        //attList.setSpentHours(this.totalHoursCal(entryExit.get(l).getId(), dayStTime));
                         Date curTime = entryExit.get(l).getEntry_view().getTime();
                         if (curTime.after(onTime) && curTime.before(graceTime)) {
                             graceTimeCount += 1;
@@ -1411,37 +1406,13 @@ public class IlenService {
                 for (UserVo userVo : userVos) {
                     if (!Objects.equals(userVo.getUserId(), "Admin")) {
                         // input for getAttendance method.
-                        entryExitFilter.setId(userVo.getUserId());
-                        entryExitFilter.setLocation("");
-                        entryExitFilter.setName("");
-                        entryExitFilter.setDate(dayStTime);
-                        String swapType = "";
-                        Date prevTime = null;
-                        long totCount = 0;
-                        IdTraceVO traceList = (IdTraceVO) this.getAttendance(entryExitFilter, 0);
-                        for (int k = 0; k < traceList.getTrace().size(); k++) {
-                            if (k == 0) {
-                                prevTime = traceList.getTrace().get(k).getTime();
-                                swapType = traceList.getTrace().get(k).getType();
-                            } else if (!Objects.equals(swapType, traceList.getTrace().get(k).getType())) {
-                                if (Objects.equals(traceList.getTrace().get(k).getType(), "entry")) {
-                                    prevTime = traceList.getTrace().get(k).getTime();
-                                } else if (Objects.equals(traceList.getTrace().get(k).getType(), "exit")) {
-                                    Date curDt = traceList.getTrace().get(k).getTime();
-                                    long diff = Math.abs(curDt.getTime() - prevTime.getTime());
-                                    long inMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
-                                    totCount += inMinutes;
-                                    prevTime = null;
-                                }
-
-                                swapType = traceList.getTrace().get(k).getType();
-                            }
-                        }
+                        //String totCount = this.totalHoursCal(userVo.getUserId(), dayStTime);
+                        IdTraceVO idTraceVO = (IdTraceVO) this.getAttendance(new EntryExitFilter(dayStTime, userVo.getUserId(), "", ""),1);
                         if (map.containsKey(userVo.getFirstName() + " " + userVo.getLastName() + "[" + userVo.getUserId() + "]")) {
-                            Integer newVal = map.get(userVo.getFirstName() + " " + userVo.getLastName() + "[" + userVo.getUserId() + "]") + (int) totCount;
+                            Float newVal = map.get(userVo.getFirstName() + " " + userVo.getLastName() + "[" + userVo.getUserId() + "]") + Float.parseFloat(idTraceVO.getHourSpent());
                             map.put(userVo.getFirstName() + " " + userVo.getLastName() + "[" + userVo.getUserId() + "]", newVal);
                         } else {
-                            map.put(userVo.getFirstName() + " " + userVo.getLastName() + "[" + userVo.getUserId() + "]", (int) totCount);
+                            map.put(userVo.getFirstName() + " " + userVo.getLastName() + "[" + userVo.getUserId() + "]", Float.parseFloat(idTraceVO.getHourSpent()));
                         }
                     }
                 }

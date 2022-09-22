@@ -32,6 +32,10 @@
                         <a class="nav-link fs-16"  id="third-tab" data-toggle="tab" href="#third" role="tab"
                            aria-controls="second" aria-selected="false">Report</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-16"  id="fifth-tab" data-toggle="tab" href="#fifth" role="tab"
+                           aria-controls="second" aria-selected="false">SMTP</a>
+                    </li>
 
                 </ul>
                 <div class="tab-content">
@@ -185,6 +189,56 @@
                             </div>
                         </div>
                     </div>
+                    <div class="tab-pane show" id="fifth" role="tabpanel" aria-labelledby="fifth-tab">
+                        <div class="row">
+                            <div class="col-12 col-lg-12 apisty">
+                                <form class="smtpForm">
+                                    <div class="row mb-3">
+                                      <div class="col-md-6">
+                                        <label class="config_labels">SMTP Host</label>
+                                        <input type="text" class="form-control smtpInput" id="smtpHost" required>
+                                        <div class="error-feedback" id="error1">This field cannot be empty <i class='fas fa-exclamation-circle'></i></div>
+                                      </div>
+                                      <div class="col-md-6">
+                                        <label class="config_labels">Port Number</label>
+                                        <input type="text" class="form-control smtpInput" id="smtpPort" required>
+                                        <div class="error-feedback" id="error2">This field cannot be empty <i class='fas fa-exclamation-circle'></i></div>
+                                      </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                          <label class="config_labels">Email ID</label>
+                                          <input type="text" class="form-control smtpInput" id="smtpEmail" required>
+                                          <div class="error-feedback" id="error3">This field cannot be empty <i class='fas fa-exclamation-circle'></i></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                          <label class="config_labels">Password</label>
+                                          <input type="password" class="form-control smtpInput" id="smtpPassword" required>
+                                          <div class="error-feedback" id="error4">This field cannot be empty <i class='fas fa-exclamation-circle'></i></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="config_labels">Secure</label>
+                                            <div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="smtpSSL">
+                                                    <label class="form-check-label config_labels" for="inlineRadio1">SSL</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="smtpTLS">
+                                                    <label class="form-check-label config_labels" for="inlineRadio2">TLS</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <buttonn type="button" class="emailButton" data-toggle="modal" data-target="#testModel">Test Email</button>
+                                        </div>
+                                    </div>
+                                </form>                                    
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -193,11 +247,44 @@
         </div>
 
     </div>
+    <div class="modal" id="testModel">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content smtpModel">
+            <div class="pre-loading" id="smtploader">
+                <img class="smptloader" src="/web/images/loader.png" />
+              </div>
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Test Email</h4>
+              <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                      <label class="config_labels">Email ID</label>
+                      <input type="text" class="form-control smtpInput" id="smtpTestEmail">
+                      <div class="text-warning ml-3 errorDiv1"><i class="fas fa-exclamation-triangle"><span id="errorMsg" class="errorMsg text-white"></span></i></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="smtpBtn" id="testMail">Test Email</button>
+              <button type="button" class="smtpBtn" data-dismiss="modal">Close</button>
+            </div>
+            
+          </div>
+        </div>
+      </div>
 <script>
   	$(document).ready(function(){
         configurationsList();
         reportlist();
         getDataApi();
+        getSMTP();
       $('#timeSelector').datetimepicker({
         format: 'LT',
         showClear:true,
@@ -238,8 +325,9 @@
     $("#update").click(function(){
       if(checkReport()==false){
         return false;
-      }
-      if(dataApiSave()==false){
+      }else if(dataApiSave()==false){
+        return false;
+      }else if(smtp()==false){
         return false;
       }
     var retainsPeriod=$("#dayRetains").val();
@@ -358,9 +446,24 @@
             });
     }
     function reportGenerate(){
+        var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        var emailaddressVal = ($("#receipt").val()).split(",");
+        for(i=0;i<emailaddressVal.length;i++){
+            if(emailaddressVal[i] == '') {
+                $("#errorMsg").html('Please enter your email address.');
+                $(".errorDiv").css("opacity", "1");
+                return false;
+            }else if(!emailReg.test(emailaddressVal[i])) {
+                $("#errorMsg").html('Enter a valid email address.');
+                $(".errorDiv").css("opacity", "1");
+                return false;
+            }
+        };
+        $(".errorDiv").css("opacity", "0");
         $(".pre-loading").show();
+        var mail= $("#receipt").val();
         var sessionToken = "[[${session.API_TOKEN}]]";
-        var apiUrl = "api/v1/report/generate";  
+        var apiUrl = "api/v1/report/generate/"+mail;  
         $.ajax({
                 contentType: "application/json;charset=UTF-8",
                 url: apiUrl,
@@ -508,6 +611,142 @@
         }
     }
 
+    function getSMTP() {
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "/api/v1/smtp/configs/list";  
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url: apiUrl,
+            dataType:'json',      
+            headers:{'CLIENT_KEY': sessionToken},
+            type: 'GET',
+            async: false,
+            success: function(data){ 
+               $("#smtpHost").val(data.host);
+               $("#smtpPort").val(data.port);
+               $("#smtpEmail").val(data.userMail);
+               $("#smtpPassword").val(data.secret);
+               if(data.ssl==true){
+                $("#smtpSSL").attr('checked', true);
+               }else{
+                $("#smtpTLS").attr('checked', true);
+               }
+            },
+            error: function(err){
+                setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+            }
+        });
+    }
+
+
+    function smtp(){
+        var host= $("#smtpHost").val();
+        var port= $("#smtpPort").val();
+        var userMail= $("#smtpEmail").val();
+        var secret= $("#smtpPassword").val();
+        var ssl=$("#smtpSSL").is(':checked') ? true : false;
+        var tls=$("#smtpTLS").is(':checked') ? true : false;
+        $("#error-feedback").css("opacity", "0");
+        if(host==""){
+            $("#error1").css("opacity", "1");
+            return false
+        }else if(port==""){
+            $("#error2").css("opacity", "1");
+            return false  
+        }else if(userMail==""){
+            $("#error3").css("opacity", "1");
+            return false  
+        }else if(secret==""){
+            $("#error4").css("opacity", "1");
+            return false  
+        }
+        var data={
+            host:host,
+            port:port,
+            userMail:userMail,
+            secret:secret,
+            ssl:ssl,
+            tls:tls,
+            id:1
+        }
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "/api/v1/smtp/configs/save";  
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url: apiUrl,   
+            headers:{'CLIENT_KEY': sessionToken},
+            type: 'POST',
+            data: JSON.stringify(data),
+            async: false,
+            success: function(data){ 
+                // setTimeout(function(){ toastr.success("Configuration updated"); }, 1000);
+            },
+            error: function(err){
+                setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+            }
+        });
+    }
+
+    $("#testMail").click(function(){
+    var email=$("#smtpTestEmail").val();
+    var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+    if(email== '') {
+        $(".errorMsg").html('Please enter your email address.');
+        $(".errorDiv1").css("opacity", "1");
+        return false;
+    }else if(!emailReg.test(email)) {
+        $(".errorMsg").html('Enter a valid email address.');
+        $(".errorDiv1").css("opacity", "1");
+        return false;
+    }
+    $(".errorDiv1").css("opacity", "0");
+   testEmail();
+    })
+
+    function testEmail(){
+        $("#smtploader").show();
+        var toMail=$("#smtpTestEmail").val();
+        var host= $("#smtpHost").val();
+        var port= $("#smtpPort").val();
+        var userMail= $("#smtpEmail").val();
+        var secret= $("#smtpPassword").val();
+        var ssl=$("#smtpSSL").is(':checked') ? true : false;
+        var tls=$("#smtpTLS").is(':checked') ? true : false;
+        var data={
+            host:host,
+            port:port,
+            userMail:userMail,
+            secret:secret,
+            ssl:ssl,
+            tls:tls,
+            toMail:toMail,
+            id:1
+        }
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "/api/v1/smtp/mail/test";  
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url: apiUrl,   
+            headers:{'CLIENT_KEY': sessionToken},
+            type: 'POST',
+            data: JSON.stringify(data),
+            async: true,
+            success: function(data){ 
+                setTimeout(function(){ toastr.success("Test email sent"); }, 1000);
+                modalHide();
+            },
+            error: function(xhr,err,errorThrown){
+                setTimeout(function(){ toastr.error(xhr.responseJSON.message); }, 1000);
+                modalHide();
+            }
+        });
+    }
+
+function modalHide(){
+    $("#testModel").modal('hide');
+    $("#smtploader").hide();
+    $("#smtpTestEmail").val("");
+}
 </script>
 
 </div>

@@ -4,6 +4,15 @@ import java.util.Date;
 
 public class EntryExitFilter {
 
+    public EntryExitFilter(Date date, String id, String name, String location){
+        this.date = date;
+        this.id = id;
+        this.name = name;
+        this.location = location;
+    }
+
+    public EntryExitFilter(){}
+
     private Date date;
     private String id;
     private String name;

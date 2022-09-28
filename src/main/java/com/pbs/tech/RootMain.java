@@ -28,7 +28,7 @@ public class RootMain {
                 .builder()
                 .setCredentials(googleCredentials)
                 .build();
-        FirebaseApp app = FirebaseApp.initializeApp(firebaseOptions, "MyIlens Application");
+        FirebaseApp app = FirebaseApp.initializeApp(firebaseOptions, "com.example.myilensapplication");
         return FirebaseMessaging.getInstance(app);
     }
 }

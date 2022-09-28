@@ -1,10 +1,9 @@
 package com.pbs.tech.services;
 
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.pbs.tech.vo.PushNotificationDataVO;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +17,43 @@ public class FirebaseMessagingServices {
         this.firebaseMessaging = firebaseMessaging;
     }
     @Async
-    public void sendNotification(String title, String body, String token) throws Exception {
+    public void sendNotification(PushNotificationDataVO dataVO, String token) throws Exception {
         try {
-            Notification notification = Notification.builder().setTitle(title).setBody(body).build();
-            Message message = Message.builder().setToken(token).
-                    setNotification(notification)
-                    //.putAllData(note.getData())
+            Notification notification = Notification
+                    .builder()
+                    .setTitle(dataVO.getSubject())
+                    .setBody(dataVO.getContent())
+                    .build();
+
+            Message message = Message
+                    .builder()
+                    .setToken(token)
+                    .setNotification(notification)
+                    .putAllData(dataVO.getData())
                     .build();
             firebaseMessaging.send(message);
+
+        }catch (Exception e){
+            throw new Exception("Exception : " + e.getMessage());
+        }
+    }
+
+    public void sendTestNotification(PushNotificationDataVO dataVO, String token) throws Exception {
+        try {
+            Notification notification = Notification
+                    .builder()
+                    .setTitle(dataVO.getSubject())
+                    .setBody(dataVO.getContent())
+                    .build();
+
+            Message message = Message
+                    .builder()
+                    .setToken(token)
+                    .setNotification(notification)
+                    .putAllData(dataVO.getData())
+                    .build();
+            firebaseMessaging.send(message);
+
         }catch (Exception e){
             throw new Exception("Exception : " + e.getMessage());
         }

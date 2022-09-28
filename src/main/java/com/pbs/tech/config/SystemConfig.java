@@ -42,6 +42,9 @@ public class SystemConfig {
     @Autowired
     SmtpRepo smtpRepo;
 
+    @Autowired
+    FCMRepo fcmRepo;
+
     @Value("${ilens.python.path}")
     String pythonPath;
 
@@ -168,6 +171,19 @@ public class SystemConfig {
             smtp.setCreatedDt(new Date());
             smtp.setUpdatedDt(new Date());
             smtpRepo.save(smtp);
+        }
+
+        //Default FCM Token>
+        FCMToken fcmToken;
+        try {
+            fcmToken = fcmRepo.findById(1L).get();
+        }catch (Exception e){
+            fcmToken = new FCMToken(1L, null);
+            fcmToken.setCreatedDt(new Date());
+            fcmToken.setCreatedBy(user);
+            fcmToken.setUpdatedDt(new Date());
+            fcmToken.setUpdatedBy(user);
+            fcmRepo.save(fcmToken);
         }
 
         // Start RTSP Server.

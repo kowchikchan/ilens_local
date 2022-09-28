@@ -90,6 +90,16 @@ test {
     useJUnitPlatform()
 }
 
+sourceSets {
+    main{
+        resources {
+            exclude 'scripts/faceDetection/extracted_imgs/**'
+            exclude 'scripts/faceDetection/face_training/training_imgs/**'
+            exclude 'scripts/report/*.pdf'
+        }
+    }
+}
+
 def packageDistribution =copySpec {
 
     def distroName = "$name-$version";
@@ -127,6 +137,7 @@ def packageDistribution =copySpec {
 
         into('scripts') {
             from "build/resources/main/scripts/"
+            exclude '**/*.jpg'
             include '**/*.py'
             include '**/*.xml'
         }
@@ -140,7 +151,6 @@ def packageDistribution =copySpec {
 
 
 }
-
 
 
 task releaseTar(type: Tar, dependsOn: ['build']) { with packageDistribution }

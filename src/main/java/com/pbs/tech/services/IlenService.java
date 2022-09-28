@@ -127,6 +127,9 @@ public class IlenService {
     @Autowired
     ReportServices reportServices;
 
+    @Autowired
+    FCMTokenServices fcmTokenServices;
+
     public static class UnknownEntriesSort implements Comparator<UnknownEntry> {
         @Override
         public int compare(UnknownEntry o1, UnknownEntry o2) {
@@ -384,7 +387,6 @@ public class IlenService {
 
     SimpleDateFormat dt = new SimpleDateFormat("ddMMyyyyHHmmss");
 
-
     public void saveDataSet(ChannelData channelData) throws Exception {
         boolean x = true;
         ObjectMapper mapper = new ObjectMapper();
@@ -421,6 +423,7 @@ public class IlenService {
                 }
                 AccessConfigs accessConfigs = accessConfigRepo.findByChannelIdAndPersonId(channelData.getChannelId(),
                             String.valueOf(user.getId()));
+
                 if (accessConfigs == null && channel.isAccessEnabled()) {
                     entryViolation.setTime(now);
                     entryViolation.setType(channelData.getType());
@@ -429,9 +432,20 @@ public class IlenService {
                     entryViolation.setLocation(channelData.getChannelName());
                     entryViolation.setSnapshot(channelData.getSnapshot());
                     entryViolationRepo.save(entryViolation);
-                    String body = "["+entryExit.getId()+"] "+entryExit.getName() + " has entered " + channelData.getChannelName();
-                    firebaseMessagingServices.sendNotification("Violation", body,
-                            "dsWwKEq9T5aR_uiuJlRXaW:APA91bE8fCkLtydbxdPr0u4-5Yy7wGiHkPaX7nMsNyi7L3bPw-KXUsTw76M1SUEV7z1TlmvAEf3uPxY6fEe8BKqpx_ZnYwE1FbdFx2bd9g8mxatlJ23eGpE5GldgaAoRG5Y0MjKqmnBV");
+
+                    // push notifications data.
+                    String fcmToken = fcmTokenServices.get().getToken();
+                    if(fcmToken != null) {
+                        String subject = "Violation - " + "[" + entryExit.getId() + "] " + entryExit.getName() + " has entered " + channelData.getChannelName();
+                        Map<String, String> data = new HashMap<>();
+                        data.put("title", "violation");
+                        data.put("message", subject);
+                        data.put("snapshot", channelData.getSnapshot());
+                        PushNotificationDataVO dataVO = new PushNotificationDataVO(subject, "", data, "");
+                        firebaseMessagingServices.sendNotification(dataVO, fcmToken);
+                    }else {
+                        log.warn("fcm token is not present.");
+                    }
                 }
                 entryExitRepo.save(entryExist);
             }

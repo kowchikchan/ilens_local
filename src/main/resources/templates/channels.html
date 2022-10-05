@@ -105,6 +105,7 @@
       var addedPersons = [];
       var removedPersons = [];
       var windowsize = $(window).width();
+      var userlist=[];
       $(document).ready(function () {
         var channelFilterVO={ status: "All" }
         if ( windowsize < 500 ){
@@ -220,7 +221,6 @@ function filterIp(){
             }
             channelList=channelList+'<td id="server_'+data[i].id+'" class="database-icon">';
 
-            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
 
           if(rL.includes(data[i].id.toString())){
             channelList=channelList+'<a href="#" class="tooltipMenu-color">';
@@ -235,14 +235,14 @@ function filterIp(){
 
           }else{
             if(data[i].status==false){
-              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li inactive1"><i class="fa fa-play fa-sm"></i>';
+              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li disable" title="this channel is disabled.&#013;You can enable this channel in the settings."><i class="fa fa-play fa-sm"></i></li></td>';
             }else{
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm"></i>';
+              channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm"></i>';
+              channelList=channelList+'<div class="tooltipMenu rightSide">';
+              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Start</a></li></ul></div></li></ul></a></td>';
             }
           }
-            channelList=channelList+'<div class="tooltipMenu rightSide">';
-
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Start</a></li></ul></div></li></ul></a></td>';
 
             channelList=channelList+'<td class="personEnteries"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></td>';
             channelList=channelList+'<td><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  href=\'#\'></i></div></td>';
@@ -442,6 +442,7 @@ function configName(accessConfig){
       for(j=0;j<data.length;j++){
         if(data[j].id==accessConfig){
           if(data[j].id!=1){
+            userlist.push(data[j].id);
             userName +='<option value='+data[j].id+'>'+data[j].userId+' ['+data[j].firstName+" "+data[j].lastName+']</option>';
           } 
           }
@@ -653,7 +654,6 @@ $("#channelForm").hide();
           
           channelList=channelList+'<td id="server_'+data[i].id+'" class="database-icon">';
 
-          channelList=channelList+'<a href="#" class="tooltipMenu-color">';
 
           if(rL.includes(data[i].id.toString())){
             channelList=channelList+'<a href="#" class="tooltipMenu-color">';
@@ -668,15 +668,14 @@ $("#channelForm").hide();
 
           }else{
             if(data[i].status==false){
-              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li inactive1"><i class="fa fa-play fa-sm"></i>';
+              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li disable" title="this channel is disabled.&#013;You can enable this channel in the settings."><i class="fa fa-play fa-sm"></i></li></ul></td>';
             }else{
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm"></i>';
+              channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm"></i>';
+              channelList=channelList+'<div class="tooltipMenu rightSide">';
+              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Start</a></li></ul></div></li></ul></a></td>';
             }
           }
-
-          channelList=channelList+'<div class="tooltipMenu rightSide">';
-
-          channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Start</a></li></ul></div></li></ul></a></td>';
 
           channelList=channelList+'<td class="personEnteries"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></td>';
           channelList=channelList+'<td><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  href=\'#\'></i></div></td>';

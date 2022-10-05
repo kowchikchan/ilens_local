@@ -14,7 +14,7 @@
 <div class="main-table">
   <div class="col-md-12 row table-responsive">
 	<div class="container-div">
-		<div class="left-div">
+		<div class="left-div profile">
 			<p class="profile-head">Profile Details</p>
 			    <div class="col-md-12 p-0">
 			      <label class="input-labels">First Name</label>
@@ -211,7 +211,7 @@ function userProfile(){
           dateOfBirth: "2021-04-16T06:08:27.803Z",
           department:$("#profile-Dept").val(),
           firstName:$("#profile-Fname").val(),
-          id: [[${session.USER.id}]],
+          id: "[[${session.USER.id}]]",
           lastName:$("#profile-Lname").val(),
           location:$("#location").val(),
           role:$("#role").val(),

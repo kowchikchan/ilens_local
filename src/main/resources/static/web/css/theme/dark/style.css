@@ -151,6 +151,7 @@ body{
   color: white;
   padding: 0 12px;
   box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.75);
+  
 }
 .lens_input:focus{
   outline: none;
@@ -219,7 +220,7 @@ body{
   width: 100%;
   background-color: #3a5362;
   border: 1px solid #a08852;
-  border-radius: 10px;
+  border-radius: 6px;
   color: #f9c631;
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
@@ -672,8 +673,9 @@ header .main-menu li.drop:hover > ul.drop-down {
 }
 
 .button-scan:hover {
-  background: #347790d1;
+  background: var(--yellow);
   text-decoration: none;
+  color: #062E51;
 }
 
 .button-scan:focus {
@@ -1329,7 +1331,7 @@ header .main-menu li.drop:hover > ul.drop-down {
 }
 input:disabled{
   border-bottom: 1px solid #7b7a7a !important;
-  color: #c9c9c9c !important;
+  color: #9c9c9c !important;
 }
 .flex-half span{
   color: #fff;
@@ -1554,8 +1556,9 @@ input:disabled{
 }
 
 .submit-button:hover {
-  background: #347790d1;
+  background: var(--yellow);
   text-decoration: none;
+  color: #062E51;
 }
 
 .submit-button:focus {
@@ -1581,8 +1584,9 @@ input:disabled{
 }
 
 .cancel-button:hover {
-  background: #347790d1;
+  background: var(--yellow);
   text-decoration: none;
+  color: #062E51;
 }
 
 .cancel-button:focus {
@@ -1600,7 +1604,7 @@ input:disabled{
 .new-button{
   cursor: pointer;
   background-color: #1e384800;
-  color: #d0b833;
+  color: #fff;
   font-size: 16px;
   padding: 4px 20px;
   margin: 0 0 0 10px;
@@ -1611,8 +1615,9 @@ input:disabled{
 }
 
 .new-button:hover {
-  background: #347790d1;
+  background: var(--yellow);
   text-decoration: none;
+  color: #062E51;
 }
 
 .new-button:focus {
@@ -1626,7 +1631,7 @@ input:disabled{
 .train-button{
   cursor: pointer;
   background-color: #1e384800;
-  color: #fff;
+  color:#ffffff;
   font-size: 16px;
   padding: 8px 35px;
   margin: 0 0 0 10px;
@@ -1637,8 +1642,9 @@ input:disabled{
 }
 
 .train-button:hover {
-  background: #347790d1;
+  background: var(--yellow);
   text-decoration: none;
+  color: #062E51;
 }
 
 .train-button:focus {
@@ -1661,7 +1667,7 @@ input:disabled{
 
 .button-position{
     margin-right: 10px;
-    color: #f9c631;
+    color: #fff;
 }
 
 .button-type{
@@ -1814,7 +1820,7 @@ option:hover{
 }
 
 .plus-button:hover{
-  background: #347790d1;
+  background: var(--yellow);
   text-decoration: none;
 }
 
@@ -1838,7 +1844,7 @@ option:hover{
 }
 
 .minus-button:hover{
-  background: #347790d1;
+  background: var(--yellow);
   text-decoration: none;
 }
 
@@ -2103,14 +2109,16 @@ option:hover{
   padding: 5px 20px;
   color: #fff;
   font-size: 17px;
-  background-color: #3a5362;
+  background-color: var(--blue);
   border: 1px solid #a08852;
   text-decoration: none;
+  border-radius: 6px;
 }
 
 .profile-button:hover {
-  background: #062e51;
+  background: var(--yellow);
   text-decoration: none;
+  color: #062E51;
 }
 
 .profile-button:focus {
@@ -2158,13 +2166,14 @@ option:hover{
 #modal-color{
   background-color: #062e51;
   padding: 10px;
-  border-color: #a08852;
+  /*border-color: #a08852;*/
+  border: 1px solid #f9c631;
   text-align: right;
 }
 
 .modal-title{
   color: white;
-  font-size: 30px;
+  font-size: 25px;
   font-weight: 200;
 }
 
@@ -3086,11 +3095,16 @@ object {
   margin-right: 30px;
   cursor: pointer;
   padding: 5px 20px;
-  color: #062e51;
+  color: #fff;
   font-size: 17px;
-  background-color: #f9c631;
+  background-color: var(--blue);
   border: 1px solid #a08852;
   text-decoration: none;
+  border-radius: 6px;
+}
+.api-button:hover{
+  background-color: var(--yellow);
+  color: #062E51;
 }
 .dinput-labels{
   color: white;
@@ -3104,7 +3118,7 @@ object {
   height: 35px;
   margin-left: 84px;
   background-color: #3a5362;
-  border: 1px solid #f9c631 !important;
+  border: 1px solid #a08852  !important;
   border: none;
   color: white;
   padding: 0 12px;
@@ -3117,7 +3131,7 @@ object {
   height: 35px;
   margin-left: 75px;
   background-color: #3a5362;
-  border: 1px solid #f9c631 !important;
+  border: 1px solid #a08852  !important;
   border: none;
   color: white;
   padding: 0 12px;
@@ -3475,9 +3489,9 @@ li.aircomplete-list-item.aircomplete-focused {
 }
 button.LicenceBtn {
   background: #062e51;
-  color: #f4be34;
-  border: 1px solid;
-  border-radius: 5px;
+  color: #ffffe6;
+  border: 1px solid #a08852;
+  border-radius: 6px;
   padding: 3px;
   font-size: 17px;
   width: 89px;
@@ -3485,6 +3499,7 @@ button.LicenceBtn {
   float: right;
   cursor: pointer;
   margin-right: 16px;
+  margin-top: 10px;
 }
 button.LicenceBtn:hover {
   background: #f4be34;
@@ -4144,7 +4159,7 @@ tbody#nprList:hover {
   height: 35px;
   margin-left: 68px;
   background-color: #3a5362;
-  border: 1px solid #f9c631 !important;
+  border: 1px solid #a08852  !important;
   border: none;
   color: white;
   padding: 0 12px;
@@ -4461,7 +4476,8 @@ background-color: #fff;
   text-align: center;
 }
 .emailButton:hover{
-  background: #347790d1;
+  background: var(--yellow);
+  color: #062E51;
 }
 
 #mailSendBtn{
@@ -4775,7 +4791,7 @@ span.progress{
 .smtpInput{
     height: 35px;
     background-color: #3a5362;
-    border: 1px solid #f9c631 !important;
+    border: 1px solid #a08852  !important;
     border: none;
     color: white;
     padding: 0 12px;
@@ -4792,9 +4808,10 @@ span.progress{
 .smtpModel{
   background: var(--blue);
   border: 2px solid var(--yellow);
+  max-width: 100%;
 }
 .modal-header {
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 0px solid #e9ecef;
 }
 .smtpBtn{
   cursor: pointer;
@@ -4809,7 +4826,8 @@ span.progress{
   height: fit-content;
 }
 .smtpBtn:hover{
- background: #347790d1;;
+ background: var(--yellow);
+ color: #062E51;
 }
 .modal-backdrop {
   background-color: #0000 !important;
@@ -4846,4 +4864,56 @@ span.progress{
   left: 47%;
   right: 0;
   z-index: 100;
+}
+
+.btn-outline-warning{
+  border-color: #a08852;
+  color: #fff;
+  border-radius: 6px;
+}
+.btn-outline-warning:hover{
+  color: var(--blue);
+  border-color: #a08852;
+  background-color: var(--yellow);
+}
+.modal-footer{
+  border-top: 0px solid #e9ecef;
+} 
+
+/*page*/
+.title {
+  position: absolute;
+  margin-top: 185px;
+  right: 540px;
+}
+ .title h2 {
+  font-size: 100px;
+  color: #d6b036;
+  text-align: center;
+}
+.title p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: --yellow;
+  color: #d6b036;
+  font-size: 35px;
+}
+.disable {
+  color: white;
+}
+/* profile*/
+p.profile-head {
+  color: white;
+}
+
+.left-div.profile {
+  background: transparent;
+  border: 1px solid var(--yellow);
+}
+.profile label {
+  color: white;
+}
+.profile .lens_input {
+  border: 1px solid var(--yellow);
 }

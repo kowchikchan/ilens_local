@@ -272,8 +272,8 @@
             
             <!-- Modal footer -->
             <div class="modal-footer">
+                <button type="button" class="smtpBtn" data-dismiss="modal">Close</button>
                 <button type="button" class="smtpBtn" id="testMail">Test Email</button>
-              <button type="button" class="smtpBtn" data-dismiss="modal">Close</button>
             </div>
             
           </div>
@@ -638,7 +638,6 @@
         });
     }
 
-
     function smtp(){
         var host= $("#smtpHost").val();
         var port= $("#smtpPort").val();
@@ -646,19 +645,25 @@
         var secret= $("#smtpPassword").val();
         var ssl=$("#smtpSSL").is(':checked') ? true : false;
         var tls=$("#smtpTLS").is(':checked') ? true : false;
+        var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
         $("#error-feedback").css("opacity", "0");
         if(host==""){
             $("#error1").css("opacity", "1");
-            return false
+            return false;
         }else if(port==""){
             $("#error2").css("opacity", "1");
-            return false  
+            return false;  
         }else if(userMail==""){
+            $("#error3").html('This field cannot be empty <i class="fas fa-exclamation-circle">');
             $("#error3").css("opacity", "1");
-            return false  
+            return false;
+        }else if(!emailReg.test(userMail)) {
+            $("#error3").html('Enter a valid email address <i class="fas fa-exclamation-circle">');
+            $("#error3").css("opacity", "1");
+            return false;
         }else if(secret==""){
             $("#error4").css("opacity", "1");
-            return false  
+            return false; 
         }
         var data={
             host:host,

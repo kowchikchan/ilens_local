@@ -325,7 +325,7 @@ function usersPageList(pageNumber){
         userList=userList+'<td>'+data[i].location+'</td>';
         userList=userList+'<td class="dataTraining"><a onclick="adminEdit(\''+data[i].userId+'\',\''+data[i].firstName+'\',\''+data[i].lastName+'\');" id="id_'+data[i].id+'" class="hide_icon"><i onclick="" class="fa fa-desktop data-icon icon-size" data-toggle="tooltip" data-original-title="Train user profile" aria-hidden="true"></i></a></td>';
         userList=userList+'<td>'+data[i].role+'</td>';
-        userList=userList+'<td class="align"><a onclick="usersEdit(\''+data[i].id+'\');"><i id="edit" class="fa fa-pencil-square-o edit-config icon-size editUser" aria-hidden="true"></i></a><a onclick="deleteUser(\''+data[i].id+'\');"><i class="fa fa-trash icon-size" aria-hidden="true"></i></a></td>';
+        userList=userList+'<td class="align"><a onclick="usersEdit(\''+data[i].id+'\');"><i id="edit" class="fa fa-pencil-square-o edit-config icon-size editUser" aria-hidden="true"></i></a><a onclick="confirm(\''+data[i].id+'\');"><i class="fa fa-trash icon-size" aria-hidden="true"></i></a></td>';
         userList=userList+'</tr>';
       }
     }
@@ -432,7 +432,7 @@ $(window).resize(function() {
         userList=userList+'<div class="col-12 colSplit">';
         userList=userList+'<div class="col-6 margin1"><span class="ctext2">DEPT: </span><br>'+data[i].department+'</div>';
         userList=userList+'<div class="col-5"><span class="ctext2">Location: </span><br>'+data[i].location+'</div>';
-        userList=userList+'<div class="col-1 align"><a onclick="deleteUser(\''+data[i].id+'\');"><i class="fa fa-trash icon-size" aria-hidden="true"></i></a></div>';
+        userList=userList+'<div class="col-1 align"><a onclick="confirm(\''+data[i].id+'\');"><i class="fa fa-trash icon-size" aria-hidden="true"></i></a></div>';
         userList=userList+'</div>';
         userList=userList+'</div>';
       }
@@ -452,6 +452,30 @@ $(window).resize(function() {
     }
   });
 };
+
+function confirm(id){
+  $.confirm({ 
+    animation: 'none',
+    closeAnimation: 'none',
+    useBootstrap: false,
+    title:'Delete Member',
+    content: '<div class="confirmDiv"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>'+
+             '<p class="mb-0">In future, this member will no longer be accessible. This action cannot be reversed. Data may exist in some places for the future reference.</p></div>'+
+             '<div class="confirmDiv p-0 ml-35"><p>Are you sure want to delete?</p></div>',  
+    type: 'yellow',
+    buttons: {
+      no:{
+          btnClass: 'btn btn-sty',
+        },
+        delete:{
+          btnClass: 'btn btn-sty',
+          action: function(){
+            deleteUser(id);
+          }
+        },
+    }
+  });  
+} 
 
 </script>
  </div>

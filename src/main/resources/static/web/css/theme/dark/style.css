@@ -4917,3 +4917,53 @@ p.profile-head {
 .profile .lens_input {
   border: 1px solid var(--yellow);
 }
+.jconfirm {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99999999;
+  font-family: "Montserrat";
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+}
+.jconfirm .jconfirm-box .jconfirm-buttons {
+  padding-bottom: 11px;
+  text-align: right;
+}
+.jc-bs3-container.container {
+  width: 100% !important;
+}
+.jconfirm-box.jconfirm-hilight-shake.jconfirm-type-yellow.jconfirm-type-animated {
+  background:var(--blue);
+  border: 1px solid var(--yellow);
+  width: 29% !important;
+}
+.jconfirm-title-c {
+  color: white;
+}
+.confirmDiv{
+  color: white;
+  font-size: 14px;
+  padding: 9px;
+  display: inline-flex;
+}
+.confirmDiv i{
+  margin-left: 15px;
+  color: red;
+}
+.ml-35{
+  margin-left: 35px;
+}
+.btn-sty {
+  color: #fff;
+  background-color: var(--blue);
+  border: 1px solid #a08852 !important;
+  letter-spacing: 1px;
+}
+.btn-sty:hover{
+  color: var(--blue);
+  background-color:var(--yellow);
+  border: 1px solid var(--blue) !important;
+}

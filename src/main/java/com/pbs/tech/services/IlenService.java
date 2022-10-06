@@ -49,6 +49,11 @@ public class IlenService {
     private static final String os = System.getProperty("os.name");
     private static final double PER_PAGES = 10;
 
+    public String attendanceType = null;
+    public String attendanceName = null;
+    public String violationType = null;
+    public String violationName = null;
+
     @Autowired
     EntryExitRepo entryExitRepo;
 
@@ -128,7 +133,7 @@ public class IlenService {
     ReportServices reportServices;
 
     @Autowired
-    FCMTokenServices fcmTokenServices;
+    UserService userService;
 
     public static class UnknownEntriesSort implements Comparator<UnknownEntry> {
         @Override
@@ -433,8 +438,35 @@ public class IlenService {
                     entryViolation.setSnapshot(channelData.getSnapshot());
                     entryViolationRepo.save(entryViolation);
 
+                    // send violation notification to all admin.
+                    List<UserVo> userVo = userService.getAllByRole("Admin");
+                    if((violationName == null && violationType == null) || ((!Objects.equals(entryExit.getName(), violationName)) || (!Objects.equals(channelData.getType(), violationType)))) {
+                        for(UserVo u : userVo){
+                                if (!Objects.equals(u.getUserId(), "Admin")) {
+                                    UserTokenVO userTokenVO = userService.getById(u.getId());
+                                    if (userTokenVO != null) {
+                                        // input params.
+                                        String subject = "[" + entryExit.getId() + "] " + entryExit.getName()
+                                                + " has entered " + channelData.getChannelName() + " " + timeFormatOnly.format(dt.parse(channelData.getTime()));
+                                        Map<String, String> data = new HashMap<>();
+                                        data.put("title", "violation");
+                                        data.put("message", subject);
+                                        data.put("snapshot", channelData.getSnapshot());
+                                        PushNotificationDataVO dataVO = new PushNotificationDataVO("Violation", subject, data, "");
+
+                                        // send notification.
+                                        firebaseMessagingServices.sendNotification(dataVO, userTokenVO.getToken());
+
+                                        violationName = entryExit.getName();
+                                        violationType = channelData.getType();
+                                    }
+                                }
+
+                            }
+                    }
+
                     // push notifications data.
-                    String fcmToken = fcmTokenServices.get().getToken();
+                    /*String fcmToken = fcmTokenServices.get().getToken();
                     if(fcmToken != null) {
                         String subject = "Violation - " + "[" + entryExit.getId() + "] " + entryExit.getName() + " has entered " + channelData.getChannelName();
                         Map<String, String> data = new HashMap<>();
@@ -445,9 +477,28 @@ public class IlenService {
                         firebaseMessagingServices.sendNotification(dataVO, fcmToken);
                     }else {
                         log.warn("fcm token is not present.");
-                    }
+                    }*/
                 }
                 entryExitRepo.save(entryExist);
+
+                // send attendance notification to the particular user.
+                if((attendanceName == null && attendanceType == null) || (!Objects.equals(entryExit.getName(), attendanceName) || !Objects.equals(channelData.getType(), attendanceType))) {
+                    UserTokenVO userTokenVO = userService.getById(user.getId());
+                    if (userTokenVO != null) {
+                        String subject = "[" + entryExit.getId() + "] " + entryExit.getName() +
+                                " your attendance has been recorded at " + timeFormatOnly.format(dt.parse(channelData.getTime()));
+                        Map<String, String> data = new HashMap<>();
+                        data.put("title", "attendance");
+                        data.put("message", subject);
+                        data.put("snapshot", channelData.getSnapshot());
+                        PushNotificationDataVO dataVO = new PushNotificationDataVO("Attendance", subject, data, "");
+                        firebaseMessagingServices.sendNotification(dataVO, userTokenVO.getToken());
+
+                        attendanceName = entryExit.getName();
+                        attendanceType = channelData.getType();
+                    }
+
+                }
             }
         }
         if(channelData.getPeopleCount() != null){

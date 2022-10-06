@@ -1,7 +1,5 @@
 package com.pbs.tech.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.pbs.tech.common.CONS;
 import com.pbs.tech.common.ROLES_TYPE;
@@ -11,6 +9,7 @@ import com.pbs.tech.common.security.ChipperUtil;
 import com.pbs.tech.model.User;
 import com.pbs.tech.repo.UserRepo;
 import com.pbs.tech.vo.UserFilterVO;
+import com.pbs.tech.vo.UserTokenVO;
 import com.pbs.tech.vo.UserVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -269,6 +268,22 @@ public class UserService {
         Optional<ProcessHandle> optionalProcessHandle = ProcessHandle.of(pid);
         optionalProcessHandle.get().destroy();
 
+    }
+
+    public UserTokenVO getById(long id) throws Exception {
+        try {
+            return userRepo.findAllById(id);
+        }catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public List<UserVo> getAllByRole(String role) throws Exception {
+        try {
+            return userRepo.findAllByRole(ROLES_TYPE.valueOf(role));
+        }catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
     }
 
 }

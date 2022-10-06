@@ -19,13 +19,13 @@ public class FCMRest {
 
     @PostMapping
     public ResponseEntity<?> postToken(@RequestHeader("CLIENT_KEY") String clientKey,
-                                     @RequestBody FCMToken fcmToken, HttpServletRequest request) throws Exception {
-        fcmTokenServices.save(fcmToken, request);
+                                     @RequestBody FCMToken fcmToken) throws Exception {
+        fcmTokenServices.post(fcmToken);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @GetMapping
     public ResponseEntity<?> getToken(@RequestHeader("CLIENT_KEY") String clientKey) throws Exception {
-        return new ResponseEntity<>(fcmTokenServices.get(), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(fcmTokenServices.getFcmTokens(), HttpStatus.ACCEPTED);
     }
 }

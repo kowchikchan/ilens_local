@@ -4,6 +4,7 @@ package com.pbs.tech.vo;
 import java.util.Map;
 
 public class PushNotificationDataVO {
+    private long userId;
     private String subject;
     private String content;
     private Map<String, String> data;
@@ -17,6 +18,10 @@ public class PushNotificationDataVO {
     }
 
     public PushNotificationDataVO(){}
+
+    public long getUserId() {return userId;}
+
+    public void setUserId(long userId) {this.userId = userId;}
 
     public String getSubject() {return subject;}
 

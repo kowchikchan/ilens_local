@@ -231,10 +231,11 @@ function trainingId(id){
           $(".pre-loading").hide();
           $("#finished_trainData").show();
           setTimeout(function(){ toastr.success("Train data finished.."); }, 1000);
-          setTimeout(function(){ cancelModal();},2000);
+          setTimeout(function(){ cancelModal(); location.reload();},2000);
         }else{
           $(".pre-loading").hide();
           setTimeout(function(){ toastr.error("Error found.."); }, 1000); 
+          location.reload();
         }
       },
       error:function(){

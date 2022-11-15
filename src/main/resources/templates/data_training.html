@@ -265,9 +265,9 @@ function faceDetaction(){
     /*leftside*/
     timeout2=setTimeout(function(){
       $("#finished_trainData").hide();
-      $(".renlian").css({"background": "url('/web/images/left-side.gif') no-repeat","background-size":"100% 100%"});
-      $(".fcDetactText").html("Turn left side");
-      sound.play();
+     // $(".renlian").css({"background": "url('/web/images/left-side.gif') no-repeat","background-size":"100% 100%"});
+     // $(".fcDetactText").html("Turn left side");
+     // sound.play();
       setTimeout(function(){
         takepicture($("#hostname").val());
         clearInterval();
@@ -282,13 +282,13 @@ function faceDetaction(){
           }
         },1000);
       },2000);
-    },8000);
+    },7000);
     /*look up*/
     timeout3=setTimeout(function(){
       $("#finished_trainData").hide();
-      $(".renlian").css({"background": "url('/web/images/right-side.gif') no-repeat","background-size":"100% 100%"});
-      $(".fcDetactText").html("Turn right side");
-      sound.play();
+    //  $(".renlian").css({"background": "url('/web/images/right-side.gif') no-repeat","background-size":"100% 100%"});
+    //  $(".fcDetactText").html("Turn right side");
+    //  sound.play();
       setTimeout(function(){
         takepicture($("#hostname").val());
         counter=50;
@@ -302,13 +302,13 @@ function faceDetaction(){
           }
         },1000);
       },2000);
-    },20000); 
+    },14000); 
     /*rightside*/
     timeout4=setTimeout(function(){
       $("#finished_trainData").hide();
-      $(".renlian").css({"background": "url('/web/images/front.gif') no-repeat","background-size":"100% 100%"});
-      $(".fcDetactText").html("Look up");
-      sound.play();
+    //  $(".renlian").css({"background": "url('/web/images/front.gif') no-repeat","background-size":"100% 100%"});
+    //  $(".fcDetactText").html("Look up");
+    // sound.play();
       setTimeout(function(){
         takepicture($("#hostname").val());
         counter=75;
@@ -326,7 +326,7 @@ function faceDetaction(){
           }
         },1000);
       },2000);
-    },28000); 
+    },22000); 
 }
 
 function removeUnknowData(){

@@ -110,8 +110,8 @@ function adminEdit(id,name,lstName){
    $("#trainLastname").val(lstName);
    $.ajax({
     contentType: "application/json;charset=UTF-8",
-    url: "/upload",
-    // url: "/data_training",
+    //url: "/upload",
+    url: "/data_training",
     type: "GET",
     async: false,
     success: function (data){

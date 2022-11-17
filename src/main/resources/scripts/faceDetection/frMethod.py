@@ -51,6 +51,22 @@ def featuresAndLabels():
 
 # trained Features and Labels
 modelFeatures, modelLabels = featuresAndLabels()
+unknownEncodings = []
+CONFIDENCE = .5
+
+
+def postUnknown(dataLocation, dt_string, frame, apiToken, postURL, json_values):
+    face_file_name = "".join([dataLocation, "/unknown/", dt_string, ".jpg"])
+    cv2.imwrite(face_file_name, cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (490, 334),
+                                           interpolation=cv2.INTER_AREA))
+    try:
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain',
+                   'CLIENT_KEY': str(apiToken)}
+        response = requests.post(url=postURL + "/unknown/save", data=json.dumps(json_values),
+                                 headers=headers, verify=False)
+        print("[INFO]: Unknown Person : {}", response.status_code)
+    except ConnectionError as e:
+        raise ConnectionError("Server Connection Exception {}", e)
 
 
 class FRMethod:
@@ -66,6 +82,8 @@ class FRMethod:
         self.startTime = startTime
 
     def liveMethod(self):
+        # global faceEncode
+        global unknownEncodings
         now, json_values, emp_name = datetime.now(), {}, "----"
         dt_string = now.strftime("%d%m%Y%H%M%S")
         img = adjustGamma(self.frame, gamma=1.7)
@@ -74,11 +92,10 @@ class FRMethod:
         faces = face_locations(img)
         # diff
         diff = datetime.now() - self.startTime
-        print()
         if len(faces) != 0:
             encodesCurFrame = face_encodings(img, faces, model="large")
-            for encodeFace, faceLoc in zip(encodesCurFrame, faces):
-                matches = (np.linalg.norm(modelFeatures - encodeFace, axis=1) < .5)
+            for encodeFace, faceLoc in zip(encodesCurFrame, faces):  # comparison
+                matches = (np.linalg.norm(modelFeatures - encodeFace, axis=1) <= CONFIDENCE)
                 faceDistance = np.linalg.norm(modelFeatures - encodeFace, axis=1)
                 matchList = [f'{str(i)}' for i in matches]
                 contCount = checkContiguousOccurrence(matchList)
@@ -86,7 +103,6 @@ class FRMethod:
                 (top, right, bottom, left) = faceLoc
                 json_values["channelId"] = self.cameraId
                 json_values["channelName"] = self.place
-                json_values["snapshot"] = dt_string
                 json_values["time"] = dt_string
                 json_values["type"] = self.entryOrExit
                 if contCount >= 2:  # based on Training image quantity
@@ -94,13 +110,15 @@ class FRMethod:
                     if matches[matchIndex]:
                         emp_id = modelLabels[matchIndex]
                         if data['usersList'].get(emp_id): emp_name = data['usersList'].get(emp_id)
-                        face_file_name = "".join([self.dataLocation, "/", dt_string, ".jpg"])
+                        face_file_name = "".join([self.dataLocation, "/", dt_string + "_" + emp_id, ".jpg"])
+                        json_values["snapshot"] = dt_string + "_" + emp_id
                         json_values["entryExit"] = [{"id": emp_id, "name": emp_name}]
                         json_values["entryViolationVos"] = None
                         json_values["npr"] = None
                         json_values["socialViolation"] = None
                         cv2.rectangle(imgResized, (left, top), (right, bottom), (252, 3, 3), 2)
-                        cv2.putText(imgResized, emp_name, (left - 10, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (252, 3, 3), 1, cv2.LINE_AA)
+                        cv2.putText(imgResized, emp_name, (left - 10, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                                    (252, 3, 3), 1, cv2.LINE_AA)
                         cv2.imwrite(face_file_name, cv2.resize(cv2.cvtColor(imgResized, cv2.COLOR_BGR2RGB), (490, 334),
                                                                interpolation=cv2.INTER_AREA))
                         try:
@@ -112,18 +130,23 @@ class FRMethod:
                             print()
                             print("[INFO]: Captured Information Post Response : {}", response.status_code)
                         except ConnectionError as e:
-                            raise ConnectionError("Connection Exception {}", e)
+                            raise ConnectionError("Server Connection Exception {}", e)
                 else:
-                    face_file_name = "".join([self.dataLocation, "/unknown/", dt_string, ".jpg"])
-                    cv2.imwrite(face_file_name, cv2.resize(cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB), (490, 334),
-                                                           interpolation=cv2.INTER_AREA))
-                    try:
-                        headers = {'Content-type': 'application/json', 'Accept': 'text/plain',
-                                   'CLIENT_KEY': str(self.apiToken)}
-                        requests.post(url=self.postURL + "/unknown/save", data=json.dumps(json_values),
-                                      headers=headers, verify=False)
-                    except ConnectionError as e:
-                        raise ConnectionError("Connection Exception {}", e)
+                    json_values["snapshot"] = dt_string
+                    if unknownEncodings is None or len(unknownEncodings) == 0:
+                        try:
+                            postUnknown(self.dataLocation, dt_string, self.frame, self.apiToken, self.postURL, json_values)
+                            unknownEncodings = [encodeFace]
+                        except ConnectionError as e:
+                            raise ConnectionError("Server Connection Exception {}", e)
+                    else:
+                        checkConfidence = np.linalg.norm(unknownEncodings - encodeFace) < CONFIDENCE
+                        if not checkConfidence:
+                            try:
+                                postUnknown(self.dataLocation, dt_string, self.frame, self.apiToken, self.postURL, json_values)
+                                unknownEncodings = [encodeFace]
+                            except ConnectionError as e:
+                                raise ConnectionError("Server Connection Exception {}", e)
             json_values.clear()
         # else:
         #     # cv2.rectangle(img, (left, top), (right, bottom), (255, 0, 0), 2)

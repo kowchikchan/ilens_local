@@ -20,16 +20,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 @Service
 public class UserService {
 
@@ -47,6 +47,10 @@ public class UserService {
 
     @Value("${ilens.python.path}")
     String pythonPath;
+
+    @Value("${locations.json-location}")
+    String jsonPath;
+
 
 
     @Autowired
@@ -284,6 +288,50 @@ public class UserService {
         }catch (Exception e){
             throw new Exception(e.getMessage());
         }
+    }
+    public List<String> getTrainedLabels() throws IOException {
+        try {
+            String error = null;
+            String scriptPath = System.getProperty("SCRIPT_PATH");
+
+            //script executing command.
+            String executeCmd = pythonPath + " " + scriptPath + "/pickling/readPickle.py";
+            Process p = Runtime.getRuntime().exec(executeCmd);
+            LOG.info("trained labels file executed. {}", p.pid());
+
+            // read output.
+            BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            try {
+                p.waitFor();
+            } catch (InterruptedException e) {
+                throw new InterruptedException("Error In getting trained labels, " + e.getMessage());
+            }
+            while (in.ready()) {
+                LOG.info("Output : {}", in.readLine());
+            }
+
+            // read, if error occurred.
+            BufferedReader stderr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            while ((error = stderr.readLine()) != null) {
+                LOG.error("Error : {}", error);
+            }
+            stderr.close();
+        }catch (IOException | InterruptedException e){
+            throw new IOException("Error In getting trained labels, " + e.getMessage());
+        }
+        List<String> trainedLabels = null;
+        try {
+            trainedLabels = new ArrayList<>();
+            JSONParser parser = new JSONParser();
+            Object obj = parser.parse(new FileReader(jsonPath + "/labels.json"));
+            JSONArray jsonObject =  (JSONArray) obj;
+            for(int i=0; i<jsonObject.size(); i++){
+                trainedLabels.add(String.valueOf(jsonObject.get(i)));
+            }
+        }catch (Exception e){
+            log.info("no file found {}", e.getMessage());
+        }
+        return trainedLabels;
     }
 
 }

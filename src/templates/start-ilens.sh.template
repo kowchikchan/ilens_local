@@ -71,6 +71,7 @@ case "`uname`" in
 esac
 
 JARPATH=$APP_HOME/lib/@name@-@version@.jar
+JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then

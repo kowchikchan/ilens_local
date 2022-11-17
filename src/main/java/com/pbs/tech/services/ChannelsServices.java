@@ -38,6 +38,9 @@ public class ChannelsServices {
     @Autowired
     LicenceRepo licenceRepo;
 
+    @Autowired
+    ChannelResizeRepo channelResizeRepo;
+
     Logger log= LoggerFactory.getLogger(ChannelsServices.class);
 
 
@@ -187,6 +190,15 @@ public class ChannelsServices {
         channel.setCountsEnabled(vo.isCountsEnabled());
         channel.setStatus(vo.isStatus());
         channelRepo.save(channel);
+
+        if(vo.getId() == 0) {
+            List<Channel> c  = channelRepo.findByIp(vo.getIp());
+            if(c.size() != 0) {
+                ChannelResize cr = new ChannelResize(0, c.get(0).getId(), 0, 0, 0, 0, 0, 0);
+                channelResizeRepo.save(cr);
+            }
+        }
+
         //now save frConfig
         if(vo.getId()!=0){
                 FRConfig frConfigObj = new FRConfig();

@@ -83,6 +83,7 @@ dependencies {
     implementation group: 'javax.mail', name: 'mail', version: '1.4.7'
 
     implementation 'com.google.firebase:firebase-admin:8.1.0'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 
 }
 
@@ -130,9 +131,11 @@ def packageDistribution =copySpec {
             ])
             fileMode = 0755
         }
+
         into('conf') {
             from "src/main/resources/" //custom start script based on startScripts task output
             include '*.yml'
+            include 'ilens-ssl.pkcs12'
         }
 
         into('scripts') {
@@ -140,6 +143,17 @@ def packageDistribution =copySpec {
             exclude '**/*.jpg'
             include '**/*.py'
             include '**/*.xml'
+        }
+
+        into('scripts/report'){
+            from "build/resources/main/static/web/images/"
+            include 'logo.png'
+        }
+
+        into('scripts/rtspServer'){
+            from "build/resources/main/scripts/rtspServer/"
+            include 'ilensCert.crt'
+            include 'ilensKey.key'
         }
 
         rename ("^start-ilens.sh.template\$","start-ilens.sh")

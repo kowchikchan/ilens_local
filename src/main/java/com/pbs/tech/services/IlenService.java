@@ -46,6 +46,7 @@ public class IlenService {
     private static final SimpleDateFormat timeFormatOnly = new SimpleDateFormat("hh:mm a");
     private static final SimpleDateFormat minutes = new SimpleDateFormat("mm");
     private static final SimpleDateFormat hoursMinutes = new SimpleDateFormat("HH.mm");
+    private static final SimpleDateFormat dtOnly = new SimpleDateFormat("yyyy-MM-dd");
     private static final String os = System.getProperty("os.name");
     private static final double PER_PAGES = 10;
 
@@ -486,7 +487,7 @@ public class IlenService {
                     UserTokenVO userTokenVO = userService.getById(user.getId());
                     if (userTokenVO != null) {
                         String subject = "[" + entryExit.getId() + "] " + entryExit.getName() +
-                                " your attendance has been recorded at " + timeFormatOnly.format(dt.parse(channelData.getTime()));
+                                " your " +channelData.getType()+" has been captured at " + timeFormatOnly.format(dt.parse(channelData.getTime())) + " on " + dtOnly.format(dt.parse(channelData.getTime()));
                         Map<String, String> data = new HashMap<>();
                         data.put("title", "attendance");
                         data.put("message", subject);

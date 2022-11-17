@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -118,5 +119,10 @@ public class UserRest {
     public ResponseEntity<?> startDataTraining(@RequestHeader("CLIENT_KEY") String clientKey, @PathVariable int id){
         userService.stopUserDataTraining(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/trained")
+    public ResponseEntity<?> getLabels(@RequestHeader("CLIENT_KEY") String clientKey) throws IOException {
+        return new ResponseEntity<>(userService.getTrainedLabels(), HttpStatus.OK);
     }
 }

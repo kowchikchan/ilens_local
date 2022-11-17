@@ -182,8 +182,40 @@ echo " DEFAULT_JVM_OPTS=$DEFAULT_JVM_OPTS"
 echo " JAVA_OPTS=$JAVA_OPTS"
 echo " @extra_java_opts_property@=$@extra_java_opts_property@"
 echo " CMD=$JAVACMD $@"
-echo "--------------------------------------------------------------"
 
+# kill cassandra.
+CPID="`pgrep -o -f cassandra`"
+if [ -z "$CPID" ]
+then
+    echo "cassandra process is not running"
+else
+  kill -9 "$CPID"
+  echo "cassandra stopped."
+fi
+
+# kill activemq
+QPID="`pgrep -o -f activemq`"
+if [ -z "$QPID" ]
+then
+    echo "activemq is not running."
+else
+  kill -9 "$QPID"
+  echo "activemq stopped."
+fi
+
+# rtsp server.
+APID="`sudo lsof -t -i:5000`"
+if [ -z "$APID" ]
+then
+    echo "RTSP server is not running."
+else
+  kill -9 "$APID"
+  echo "RTSP server stopped."
+fi
+
+# kill application.
 read PID < $APP_HOME/pid.out
 kill -9 "$PID"
 rm -rf $APP_HOME/pid.out
+echo "iLens stopped."
+echo "--------------------------------------------------------------"

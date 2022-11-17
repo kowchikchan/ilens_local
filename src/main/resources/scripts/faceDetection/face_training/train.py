@@ -1,8 +1,7 @@
-import cv2
-from face_recognition import face_encodings
-import os
-import pickle
-import numpy as np
+import cv2, os, pickle, numpy as np
+from face_recognition import face_encodings, face_locations
+from cvzone.SelfiSegmentationModule import SelfiSegmentation
+segmentor = SelfiSegmentation()
 
 
 def adjustGamma(image, gamma=1.0):
@@ -30,11 +29,13 @@ class Train:
                         path = os.path.join(root, file)
                         label = os.path.basename(root).replace(" ", "_").lower()
                         img = cv2.imread(path)
+                        # img = segmentor.removeBG(img, (206, 207, 204), 0.5)
                         # img = cv2.resize(img, (0, 0), fx=0.60, fy=0.60)
                         img = adjustGamma(img, gamma=1.7)
                         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                        faces = face_locations(img)
                         try:
-                            encode = face_encodings(img, model="large")[0]
+                            encode = face_encodings(img, faces, model="large")[0]
                             encodeList.append(encode)
                             classNames.append(label)
                             print(encode)

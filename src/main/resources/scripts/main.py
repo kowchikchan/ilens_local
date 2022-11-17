@@ -53,10 +53,10 @@ async def consumer(appList, idOfCamera, basePath, channelName, frConfigs, postUr
             frameInBytes = bytes(frame, 'utf-8')
             decodedFrame = Image.open(BytesIO(base64.b64decode(frameInBytes)))
             finalDecodedImage = np.array(decodedFrame)
-            if frConfigs == 'entry':
-                finalDecodedImage = finalDecodedImage[10:10 + 1060, 154:154 + 1266]
-            # if frConfigs == 'exit':
-            #    finalDecodedImage = finalDecodedImage[262:262 + 798, 898:898 + 683]
+            isValuesZero = all(eachConfig == 0 for eachConfig in resizeValues)
+            if not isValuesZero:
+                finalDecodedImage = finalDecodedImage[resizeValues[1]:resizeValues[1] + resizeValues[3],
+                                    resizeValues[0]:resizeValues[0] + resizeValues[2]]
             if "fr" in appList:
                 frObject = FRMethod(finalDecodedImage, basePath, idOfCamera, channelName, frConfigs, postUrl,
                                     dataLocation, apiToken, startTime)
@@ -95,8 +95,8 @@ if __name__ == "__main__":
     # basic camera Configuration
     postUrl = data['reportApi'] if str(data['reportApi']).endswith("/") else str(data['reportApi']) + "/"
     postUrl = postUrl + "api/v1/ilens"
-    cameraId, cameraIp, channelName, apiToken, videoStatus = data['id'], data['ip'], data['name'], data['apiToken'], \
-                                                             data['videoSave']
+    cameraId, cameraIp, channelName, apiToken, videoStatus, resizeValues = data['id'], data['ip'], data['name'], data[
+        'apiToken'], data['videoSave'], data['resize']
 
     # base path and data location
     basePath, dataLocation = inputData.basePath, inputData.dataLocation
@@ -134,6 +134,6 @@ if __name__ == "__main__":
         await asyncio.gather(
             publisher(cameraId, cameraURL, data['dataApi'], videoStatus),
             consumer(appsList, cameraId, basePath, channelName, frConfigs, postUrl, dataLocation, apiToken,
-                   data['dataApi']))
+                     data['dataApi']))
 
     asyncio.run(main())

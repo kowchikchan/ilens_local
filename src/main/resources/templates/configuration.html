@@ -28,7 +28,9 @@
         </label>
         <div class="camera_view">
           <div class="camera_head mb-10">
-            <span>Live</span><span class="pull-right"><i class="fa fa-camera y-clr" aria-hidden="true"></i></span>
+            <span>Live</span><span class="pull-right"> <a onclick="resetCrop()" title="Resresize original size."><i class="fa-solid fa-arrows-rotate mr-3 y-clr c-p"></i></a>
+              <a onclick="cropImage(this)" title="You can choose a specific region to process."><i class="fa-solid fa-crop mr-3 y-clr c-p" id="crop"></i></a> 
+              <i class="fa fa-camera y-clr" aria-hidden="true"></i></span>
           </div>
           <div class="camera_live">
             <div class="fp-Video" id="liveVideoDiv">
@@ -60,7 +62,7 @@
               </div>
             </div> 
             <div id="description2" class="collapse  show main-coll" data-parent="#accordion"> 
-              <div class="card-body"> 
+              <div class="card-body bodySty"> 
                 <div class="ratio_part">
                   <div class="class-flex">
                     <div class="ratio-txt">Min Ratio <i class="fa fa-question-circle " data-toggle="tooltip" data-placement="right" title="Minimum ratio of the screen to be captured.  This will help to reduce noise in image and keep focused areas. " id="tol"></i></div>
@@ -121,7 +123,7 @@
               </div> 
             </div> 
           <div id="description1" class="collapse main-coll" data-parent="#accordion"> 
-            <div class="card-body"> 
+            <div class="card-body bodySty"> 
               <div class="ratio_part">
                 <div class="class-flex">
                   <div class="ratio-txt">Min Ratio <i class="fa fa-question-circle " data-toggle="tooltip" data-placement="right" title="Minimum ratio of the screen to be captured.  This will help to reduce noise in image and keep focused areas. " ></i></div>
@@ -197,7 +199,7 @@
                   </div>
               </div> 
               <div id="description3" class="collapse main-coll" data-parent="#accordion"> 
-                <div class="card-body">
+                <div class="card-body bodySty">
                    <div class="ratio_part">
                    <label class="input-label">Maximum number of people:</label>
                   <input id="" type="Number" name="people" class="lens_input input-bg" placeholder="People required" />
@@ -229,7 +231,7 @@
                   </div>
                 </div> 
                 <div id="description4" class="collapse main-coll" data-parent="#accordion"> 
-                  <div id="drop-list" class="col-md-12 row card-body">
+                  <div id="drop-list" class="col-md-12 row card-body bodySty">
                     <div class="col-md-5 userList">
                       <label class="restrict-members"> Members</label>
                         <select multiple="multiple" id="select1" class="select-box-1 custom-scroll">
@@ -252,6 +254,16 @@
      </div>
    </div>
 </div>
+<form class="inline-labels">
+  <input type="hidden"  id="cLeft" name="cLeft" />
+  <input type="hidden"  id="cTop" name="cTop" />
+  <input type="hidden"  id="cWidth" name="cWidth" />
+  <input type="hidden"  id="cHeight" name="cHeight" />
+  <input type="hidden"  id="id" name="id" value="0" />
+  <input type="hidden"  id="tHeight" name="tHeight" />
+  <input type="hidden"  id="tWidth" name="tWidth" />
+  <input type="hidden"  id="cropChannelId" name="channelId"/>
+</form>
 <div class=" row footer-row">
   <div class="row-button">
     <button type="button" class="cancel-button button-size" onclick="goBack()">Cancel</button>
@@ -259,21 +271,49 @@
  </div>
 </div>
 <script>
+  var jcrop_api="";
+  var boundx="";
+  var boundy="";
+  var sessionToken=""
 $(document).ready(function(){
+  sessionToken = "[[${session.USER.sessionToken}]]";
+  $("#cropChannelId").val($("#channelId").val());
   var camIp = $('#ip').val();
   var liveVideoDiv = "";
   const url = window.location.href.toString().split("//");
   const colonSplit = url[1].split(":");
   var ip = colonSplit[0];
-  liveVideoDiv = liveVideoDiv + '<img id="liveVideoId" src="http://'+ ip +':5000/' + camIp + '">';
+  liveVideoDiv = liveVideoDiv + '<img id="liveVideoId" src="https://'+ ip +':5000/' + camIp + '">';
   $("#liveVideoDiv").html(liveVideoDiv).show();
 
   var liveVideoDivAtFR = "";
-  liveVideoDivAtFR = liveVideoDivAtFR + '<img id="liveVideoIdAtFr" src="http://'+ ip +':5000/' + camIp + '">'
+  liveVideoDivAtFR = liveVideoDivAtFR + '<img id="liveVideoIdAtFr" src="https://'+ ip +':5000/' + camIp + '">'
   $("#liveVideoDivAtFR").html(liveVideoDivAtFR).show();
 
+$('#liveVideoDiv').Jcrop({
+  onChange:   crop,
+  onSelect:   crop,
+  onRelease:  clearCoords
+},function(){
+  jcrop_api = this;
+  var bounds = this.getBounds();
+      boundx = parseInt(bounds[0]);
+      boundy = parseInt(bounds[1]);
+      // Store the API in the jcrop_api variable
+      jcrop_api = this;
 
+      // Move the preview into the jcrop container for css positioning
+     // $preview.appendTo(jcrop_api.ui.holder);
+});
 
+  $preview = $('.camera_live'),
+  $pcnt = $('.camera_live #liveVideoDiv'),
+  $pimg = $('.camera_live #liveVideoDiv img'),
+  xsize = $pcnt.width(),
+  ysize = $pcnt.height();
+  $("#tHeight").val(ysize);
+  $("#tWidth").val(xsize);
+  getCropImage();
 userName();
 $(".card-link").on("click",function(){
   $(".bs-icon").removeClass("fa-compress");
@@ -336,15 +376,6 @@ $('.toggle-btn').on('click', function(){
   });
 });
 
-// var jcrop_api;
-
-// $('#liveVideoDiv1').Jcrop({
-//   onChange:   crop,
-//   onSelect:   crop,
-//   onRelease:  clearCoords
-// },function(){
-//   jcrop_api = this;
-// });
 
 // $('#coords').on('change','input',function(e){
 //   var x1 = $('#x1').val(),
@@ -355,22 +386,31 @@ $('.toggle-btn').on('click', function(){
 // });
 
 
-// // Simple event handler, called from onChange and onSelect
-// // event handlers, as per the Jcrop invocation above
-// function crop(c)
-// {
-// $('#x1').val(c.x);
-// $('#y1').val(c.y);
-// $('#x2').val(c.x2);
-// $('#y2').val(c.y2);
-// $('#w').val(c.w);
-// $('#h').val(c.h);
-// };
+// Simple event handler, called from onChange and onSelect
+// event handlers, as per the Jcrop invocation above
+function crop(c){
+  $('#cLeft').val(c.x);
+  $('#cTop').val(c.y);
+  $('#cWidth').val(c.w);
+  $('#cHeight').val(c.h);
+};
 
-// function clearCoords()
-// {
-// $('#coords input').val('');
-// };
+function clearCoords(){
+$('#coords input').val('');
+};
+
+function cropImage(){
+  $(".fa-crop").removeClass("y-clr c-p");
+  var x = $('#cLeft').val(),
+      y = $('#cTop').val(),
+      w = $('#cWidth').val(),
+      h = $('#cHeight').val();
+
+  changeImageSize(x,y,w,h);
+  jcrop_api.release();
+  jcrop_api.disable();
+  saveCropImage();
+}
 
 var rangeSlider = document.getElementById("rs-range-line");
 var rangeBullet = document.getElementById("rs-bullet");
@@ -457,6 +497,73 @@ function userName(){
         }
        }
      }
+  });
+}
+
+function resetCrop(){
+  changeImageSize(0,0,xsize,ysize);
+  jcrop_api.enable();
+  $('#cLeft').val(0);
+  $('#cTop').val(0);
+  $('#cWidth').val(xsize);
+  $('#cHeight').val(ysize);
+  saveCropImage();
+  $(".fa-crop").addClass("y-clr c-p");
+}
+
+function saveCropImage(){
+  var formData = $("form").serializeArray();
+  var data = {};
+  $(formData).each(function(index, obj){
+    data[obj.name] = Math.round(obj.value);
+  });
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/channel/resize",   
+    headers:{'CLIENT_KEY': sessionToken},
+    type: 'POST',
+    data: JSON.stringify(data),
+    async: false,
+    success: function(data){ 
+     // console.log("success");
+    },
+    error: function(err){
+        setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+    }
+  });
+}
+
+function changeImageSize(x,y,w,h){
+  jcrop_api.release();
+  var rx = xsize / w;
+  var ry = ysize / h;
+
+  $pimg.css({
+    width: Math.round(rx * boundx) + 'px',
+    height: Math.round(ry * boundy) + 'px',
+    marginLeft: '-' + Math.round(rx * x) + 'px',
+    marginTop: '-' + Math.round(ry * y) + 'px'
+  });
+}
+
+function getCropImage(){
+  var id=$("#channelId").val();
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/channel/resize/"+id,   
+    headers:{'CLIENT_KEY': sessionToken},
+    type: 'GET',
+    async: false,
+    success: function(data){ 
+      changeImageSize(data.cLeft,data.cTop,data.cWidth,data.cHeight);
+      if((data.cWidth!=0 && data.cWidth!=data.tWidth) || (data.cHeight!=0 && data.cHeight!=data.tHeight) ){
+        $(".fa-crop").removeClass("y-clr c-p");
+        jcrop_api.disable();
+      }
+    },
+    error: function(err){
+        setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+    }
   });
 }
 </script>

@@ -906,11 +906,11 @@ header .main-menu li.drop:hover > ul.drop-down {
 .y-clr{
   color: #f9c631;
 }
-.card-body{
+/* .card-body{
   height: 26rem;
   background-color: #3a5362;
   display: flex;
-}
+} */
 .card{
   border-radius: 0;
   background-color: transparent;
@@ -1435,8 +1435,8 @@ input:disabled{
   .login-logo{
     width: 400px;
   }
-  .card-body {
-    height: 32rem;
+  .bodySty{
+    height: 32rem !important;
   }
 }
 
@@ -1485,7 +1485,8 @@ input:disabled{
 
 .data-icon{
   position: relative;
-  left: 20%;
+  /* left: 20%; */
+  margin-left: 10%;
   cursor: pointer;
   text-align: center;
 }
@@ -4966,4 +4967,31 @@ p.profile-head {
   color: var(--blue);
   background-color:var(--yellow);
   border: 1px solid var(--blue) !important;
+}
+
+.bodySty{
+  height: 26rem;
+  background-color: #3a5362;
+  display: flex;
+}
+.summa{
+  background: #3a5362;
+  color: white;
+}
+
+.clockCounter{
+  color: #f9c631;
+  font-size: 4rem;
+  position: absolute;
+  left: 47%;
+  top: 24%;
+  display: none;
+}
+.dataTringIcon{
+  position: absolute;
+  bottom: 27px;
+}
+
+.c-p{
+  cursor: pointer;
 }

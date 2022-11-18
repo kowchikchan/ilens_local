@@ -25,11 +25,12 @@
         <div class="col-md-6">
           <div id="scanFace">
             <div class="renlian"></div>
-            <div class="fcDetactText">Show front side</div>
+            <div class="fcDetactText">Show front face</div>
           </div>
         </div>
         <div class="col-md-6">
             <div class="camera" id="container">
+              <span id="clock" class="clockCounter">3</span>
               <div id="video"></div>
             </div>
             <div class="training_process">
@@ -82,11 +83,22 @@ function startup() {
    image_format: 'png',
    jpeg_quality: 90
   });
-  Webcam.attach( '#video' );  
+  Webcam.attach( '#video' ); 
   Webcam.on( 'load', function() {
-    $(".training_process").css("opacity",1);
-    faceDetaction();
+    $("#clock").show();
+    var count=3;
+    var counter=setInterval(function(){
+      count=count-1;
+      $("#clock").html(count);
+      if(count == 0){
+        clearInterval(counter); 
+        $(".training_process").css("opacity",1);
+        $("#clock").hide();
+        faceDetaction();
+      }
+    },1000);
   });
+
   Webcam.on('error', function(err) {
     var error=err.toString();
       if(error.includes("Permission denied")){

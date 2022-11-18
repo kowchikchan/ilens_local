@@ -318,6 +318,7 @@ function usersPageList(pageNumber){
       async: false,
       success: function(data) {
       var userList = "";
+      console.log(userTrainedList);
       for(i=0;i<data.length;i++){
         if(data[i].id!=1){
         userList=userList+'<tr value='+data[i].id+'>';
@@ -326,8 +327,9 @@ function usersPageList(pageNumber){
         userList=userList+'<td>'+data[i].lastName+'</td>';
         userList=userList+'<td>'+data[i].department+'</td>';
         userList=userList+'<td>'+data[i].location+'</td>';
-        if(($.inArray((data[i].userId),userTrainedList)) != -1){
-          userList=userList+'<td class="dataTraining"><a onclick="adminEdit(\''+data[i].userId+'\',\''+data[i].firstName+'\',\''+data[i].lastName+'\');" id="id_'+data[i].id+'" class="hide_icon"><i onclick="" class="fa fa-desktop data-icon icon-size" data-toggle="tooltip" data-original-title="Train user profile" aria-hidden="true"></i></a><i class="fa-regular fa-circle-check ml-2 dataTringIcon"></i></td>'; 
+        console.log($.inArray((data[i].userId),userTrainedList));
+        if($.inArray((data[i].userId),userTrainedList) >= 0){
+          userList=userList+'<td class="dataTraining"><a onclick="adminEdit(\''+data[i].userId+'\',\''+data[i].firstName+'\',\''+data[i].lastName+'\');" id="id_'+data[i].id+'" class="hide_icon"><i onclick="" class="fa fa-desktop data-icon icon-size" data-toggle="tooltip" data-original-title="Train user profile" aria-hidden="true"></i></a><i class="fa-regular fa-circle-check ml-2 dataTringIcon" title="User already register."></i></td>'; 
         }else{
           userList=userList+'<td class="dataTraining"><a onclick="adminEdit(\''+data[i].userId+'\',\''+data[i].firstName+'\',\''+data[i].lastName+'\');" id="id_'+data[i].id+'" class="hide_icon"><i onclick="" class="fa fa-desktop data-icon icon-size" data-toggle="tooltip" data-original-title="Train user profile" aria-hidden="true"></i></a></td>';
         }

@@ -29,8 +29,9 @@
         <div class="camera_view">
           <div class="camera_head mb-10">
             <span>Live</span><span class="pull-right"> <a onclick="resetCrop()" title="Resresize original size."><i class="fa-solid fa-arrows-rotate mr-3 y-clr c-p"></i></a>
-              <a onclick="cropImage(this)" title="You can choose a specific region to process."><i class="fa-solid fa-crop mr-3 y-clr c-p" id="crop"></i></a> 
-              <i class="fa fa-camera y-clr" aria-hidden="true"></i></span>
+              <a onclick="cropImage(this)" title="You can choose a specific region to process."><i class="fa-solid fa-crop y-clr c-p" id="crop"></i></a> 
+              <!-- <i class="fa fa-camera y-clr" aria-hidden="true"></i> -->
+            </span>
           </div>
           <div class="camera_live">
             <div class="fp-Video" id="liveVideoDiv">
@@ -505,8 +506,8 @@ function resetCrop(){
   jcrop_api.enable();
   $('#cLeft').val(0);
   $('#cTop').val(0);
-  $('#cWidth').val(xsize);
-  $('#cHeight').val(ysize);
+  $('#cWidth').val(0);
+  $('#cHeight').val(0);
   saveCropImage();
   $(".fa-crop").addClass("y-clr c-p");
 }

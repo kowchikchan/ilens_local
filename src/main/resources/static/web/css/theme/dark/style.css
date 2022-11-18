@@ -4989,7 +4989,7 @@ p.profile-head {
 }
 .dataTringIcon{
   position: absolute;
-  bottom: 27px;
+  /* bottom: 27px; */
 }
 
 .c-p{

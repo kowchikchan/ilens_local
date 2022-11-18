@@ -86,8 +86,12 @@ public class ChannelsServices {
                                channel.setUpdatedDt(new Date());
                                channel.setUpdatedBy("admin");
                                channel.setCreatedBy("admin");
-
                                channelRepo.save(channel);
+                               List<Channel> c  = channelRepo.findByIp(host);
+                               if(c.size() != 0) {
+                                   ChannelResize cr = new ChannelResize(0, c.get(0).getId(), 0, 0, 0, 0, 0, 0);
+                                   channelResizeRepo.save(cr);
+                               }
                            }
                            // channelVos.add(vo);
                             //ips.add(host);

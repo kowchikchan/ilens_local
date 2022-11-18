@@ -136,6 +136,9 @@ public class IlenService {
     @Autowired
     UserService userService;
 
+    @Autowired
+    ChannelResizeRepo channelResizeRepo;
+
     public static class UnknownEntriesSort implements Comparator<UnknownEntry> {
         @Override
         public int compare(UnknownEntry o1, UnknownEntry o2) {
@@ -148,6 +151,27 @@ public class IlenService {
         public int compare(EntryExitEntity o1, EntryExitEntity o2) {
             return o1.getTime().compareTo(o2.getTime());
         }
+    }
+
+    public List<Long> cropCvt(List<Long> croppedValue, long totalWidth, long totalHeight){
+        /*
+            format ==> (Left, Top, Width, Height)
+            croppedValue ==> (570 Width, 260 Height)
+                        convert to
+            new values ==>  (1920 width, 1080 height)
+            newLeft = (old_left  * 3) + 48
+            newTop = (old_top  * 4) + 20
+            newWidth = (old_width * 3) + 34
+            newHeight = (old_height * 4) + 30
+            Note:
+                (1920, 1080) -> hd camera returns these points. if other resolution camera it will be change.
+         */
+        List<Long> convertedValues = new ArrayList<>();
+        convertedValues.add((croppedValue.get(0) * 3) + 48);
+        convertedValues.add((croppedValue.get(1) * 4) + 20);
+        convertedValues.add((croppedValue.get(2) * 3) + 34);
+        convertedValues.add((croppedValue.get(3) * 4) + 30);
+        return convertedValues;
     }
 
     public void startRuntime(String id) throws Exception {
@@ -237,6 +261,12 @@ public class IlenService {
         configJson.put("executions" , executionsConfigs);
         configJson.put("name", channel.getName().replace(" ", ""));
         configJson.put("tesseract", tesseractLocation);
+        ChannelResize channelResize = channelResizeRepo.findByChannelId(Long.valueOf(id));
+        List<Long> values = new ArrayList<>(Arrays.asList(channelResize.getcLeft(), channelResize.getcTop(),
+                channelResize.getcWidth(), channelResize.getcHeight()));
+
+        List<Long> arr = this.cropCvt(values, channelResize.gettWidth(), channelResize.gettHeight());
+        configJson.put("resize", arr);
         try {
             //save configurations as json
             String filePath = configsJsonPath + "/" + id + ".json";

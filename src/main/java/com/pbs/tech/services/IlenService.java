@@ -1550,48 +1550,60 @@ public class IlenService {
 
     public List<EntryExitEntity> getNotifications(EntryExitFilter entryExitFilter){
         // start and end time.
+        StringBuilder stringBuilder = new StringBuilder();
         Date daySt = this.getDayStTime(entryExitFilter.getDate());
         Date dayEnd = this.getDayEndTime(entryExitFilter.getDate());
         List<EntryExitEntity> listOfValues = new ArrayList<>();
         EntryExitEntity entity;
+        List<EntryExitEntity> list = null;
 
-        List<EntryExitEntity> list = entryExitRepo.findAllByFromAndTo(daySt, dayEnd);
-        String swapType = "";
-        String swapName = "";
-        for (int i = 0; i < list.size(); i++) {
-            if (i == 0) {
-                entity = new EntryExitEntity(list.get(i).getTime(), list.get(i).getId(), list.get(i).getLocation(),
-                        list.get(i).getType(), list.get(i).getName(), list.get(i).getSnapshot());
-                listOfValues.add(entity);
-                swapType = list.get(i).getType();
-                swapName = list.get(i).getName();
-            } else if (!Objects.equals(swapType, list.get(i).getType()) ||
-                    !Objects.equals(swapName, list.get(i).getName())) {
-                entity = new EntryExitEntity(list.get(i).getTime(), list.get(i).getId(), list.get(i).getLocation(),
-                        list.get(i).getType(), list.get(i).getName(), list.get(i).getSnapshot());
-                listOfValues.add(entity);
-                swapType = list.get(i).getType();
-                swapName = list.get(i).getName();
+        if(StringUtils.equalsIgnoreCase(entryExitFilter.getName(), "all")){
+            list = entryExitRepo.findAllByFromAndTo(daySt, dayEnd);
+        }else{
+            stringBuilder.append("SELECT * FROM ilens.EntryExit WHERE time>=" + "'" +
+                    dateWithHrMnSec.format(daySt) + "'" + " AND time<="
+                    + "'" + dateWithHrMnSec.format(dayEnd) + "'" +" AND type='" +entryExitFilter.getName()
+                    + "' ALLOW FILTERING");
+            log.info("Query {}, ", stringBuilder.toString());
+            try {
+                list = cassandraTemplate.select(stringBuilder.toString(), EntryExitEntity.class);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        if(list != null) {
+            String swapType = "";
+            String swapName = "";
+            for (int i = 0; i < list.size(); i++) {
+                if (i == 0) {
+                    entity = new EntryExitEntity(list.get(i).getTime(), list.get(i).getId(), list.get(i).getLocation(),
+                            list.get(i).getType(), list.get(i).getName(), list.get(i).getSnapshot());
+                    listOfValues.add(entity);
+                    swapType = list.get(i).getType();
+                    swapName = list.get(i).getName();
+                } else if (!Objects.equals(swapType, list.get(i).getType()) ||
+                        !Objects.equals(swapName, list.get(i).getName())) {
+                    entity = new EntryExitEntity(list.get(i).getTime(), list.get(i).getId(), list.get(i).getLocation(),
+                            list.get(i).getType(), list.get(i).getName(), list.get(i).getSnapshot());
+                    listOfValues.add(entity);
+                    swapType = list.get(i).getType();
+                    swapName = list.get(i).getName();
+                }
             }
         }
         return listOfValues;
     }
 
-    public long notificationsCount(EntryExitFilter entryExitFilter){
-        List<EntryExitEntity> values = this.getNotifications(entryExitFilter);
-        return values.size();
-    }
-    public List<EntryExitEntity> getNotificationsList(EntryExitFilter entryExitFilter, int pageNumber){
+    public List<EntryExitEntity> getNotificationsList(EntryExitFilter entryExitFilter){
         List<EntryExitEntity> listOfValues = this.getNotifications(entryExitFilter);
         int itemsPerPage = Integer.parseInt(entryExitFilter.getId());
-        int perPage = pageNumber * itemsPerPage;
         List<EntryExitEntity> entities = new ArrayList<>();
         int sizeOfList = listOfValues.size();
         try {
-            if (perPage > sizeOfList) {
-                entities = listOfValues.subList((perPage - itemsPerPage), sizeOfList);
+            if (itemsPerPage > sizeOfList) {
+                entities = listOfValues.subList(0, sizeOfList);
             } else {
-                entities = listOfValues.subList((perPage - itemsPerPage), perPage);
+                entities = listOfValues.subList(0, itemsPerPage);
             }
         }catch (Exception e){
             e.printStackTrace();

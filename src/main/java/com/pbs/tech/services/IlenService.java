@@ -166,19 +166,24 @@ public class IlenService {
             Note:
                 (1920, 1080) -> hd camera returns these points. if other resolution camera it will be change.
          */
+        boolean areAllZero = croppedValue.parallelStream().allMatch(i -> i == 0);
+        if(areAllZero){
+            return new ArrayList<Long>(Arrays.asList(0L, 0L, 0L, 0L));
+        }
         List<Long> convertedValues = new ArrayList<>();
-        convertedValues.add((croppedValue.get(0) * 3) + 48);
+        convertedValues.add((croppedValue.get(0) * 3) + 150);
         convertedValues.add((croppedValue.get(1) * 4) + 20);
-        convertedValues.add((croppedValue.get(2) * 3) + 34);
+        convertedValues.add((croppedValue.get(2) * 3) + 90);
         convertedValues.add((croppedValue.get(3) * 4) + 30);
         return convertedValues;
     }
 
     public void startRuntime(String id) throws Exception {
         HashMap<String, String> usersList = new HashMap<>();
-        //TODO: check if already running.
+
+        // check if already running.
         if (isRunning(id)) {
-            throw new IlensException("Arleady Running");
+            throw new IlensException("Already Running");
         }
         String scriptPath = System.getProperty("SCRIPT_PATH");
         Channel channel = channelRepo.findById(Long.valueOf(id)).get();
@@ -1543,4 +1548,56 @@ public class IlenService {
         return reportVO;
     }
 
+    public List<EntryExitEntity> getNotifications(EntryExitFilter entryExitFilter){
+        // start and end time.
+        Date daySt = this.getDayStTime(entryExitFilter.getDate());
+        Date dayEnd = this.getDayEndTime(entryExitFilter.getDate());
+        List<EntryExitEntity> listOfValues = new ArrayList<>();
+        EntryExitEntity entity;
+
+        List<EntryExitEntity> list = entryExitRepo.findAllByFromAndTo(daySt, dayEnd);
+        String swapType = "";
+        String swapName = "";
+        for (int i = 0; i < list.size(); i++) {
+            if (i == 0) {
+                entity = new EntryExitEntity(list.get(i).getTime(), list.get(i).getId(), list.get(i).getLocation(),
+                        list.get(i).getType(), list.get(i).getName(), list.get(i).getSnapshot());
+                listOfValues.add(entity);
+                swapType = list.get(i).getType();
+                swapName = list.get(i).getName();
+            } else if (!Objects.equals(swapType, list.get(i).getType()) ||
+                    !Objects.equals(swapName, list.get(i).getName())) {
+                entity = new EntryExitEntity(list.get(i).getTime(), list.get(i).getId(), list.get(i).getLocation(),
+                        list.get(i).getType(), list.get(i).getName(), list.get(i).getSnapshot());
+                listOfValues.add(entity);
+                swapType = list.get(i).getType();
+                swapName = list.get(i).getName();
+            }
+        }
+        return listOfValues;
+    }
+
+    public long notificationsCount(EntryExitFilter entryExitFilter){
+        List<EntryExitEntity> values = this.getNotifications(entryExitFilter);
+        return values.size();
+    }
+    public List<EntryExitEntity> getNotificationsList(EntryExitFilter entryExitFilter, int pageNumber){
+        List<EntryExitEntity> listOfValues = this.getNotifications(entryExitFilter);
+        int itemsPerPage = Integer.parseInt(entryExitFilter.getId());
+        int perPage = pageNumber * itemsPerPage;
+        List<EntryExitEntity> entities = new ArrayList<>();
+        int sizeOfList = listOfValues.size();
+        try {
+            if (perPage > sizeOfList) {
+                entities = listOfValues.subList((perPage - itemsPerPage), sizeOfList);
+            } else {
+                entities = listOfValues.subList((perPage - itemsPerPage), perPage);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return entities;
+        }
+        return entities;
+
+    }
 }

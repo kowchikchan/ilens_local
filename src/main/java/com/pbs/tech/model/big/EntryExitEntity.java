@@ -24,6 +24,16 @@ public class EntryExitEntity {
 
     private String snapshot;
 
+    public EntryExitEntity(Date time, String id, String location, String type, String name, String snapshot) {
+        this.time = time;
+        this.id = id;
+        this.location = location;
+        this.type = type;
+        this.name = name;
+        this.snapshot = snapshot;
+    }
+    public EntryExitEntity(){}
+
     public Date getTime() {
         return time;
     }

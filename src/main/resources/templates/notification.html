@@ -113,9 +113,9 @@ function notification(type,pagecount){
             list+="<div class='notification d-flex justify-content-between col-lg-12 p-0'>";
             list+="<div class='col-lg-2 p-0 fs-6'>"+fullTimeFormat(data[i].time)+"</div>";
             if(data[i].type =="entry"){
-              list+="<div class='col-lg-10 p-0 fs-5'>"+data[i].id+" "+data[i].name+" has entred "+data[i].location+" at "+timeOnlyFormat(data[i].time)+"</div>";
+              list+="<div class='col-lg-10 p-0 fs-5'>["+data[i].id+"] "+data[i].name+" has entred "+data[i].location+" at "+timeOnlyFormat(data[i].time)+"</div>";
             }else{
-              list+="<div class='col-lg-10 p-0 fs-5'>"+data[i].id+" "+data[i].name+" has exited "+data[i].location+" at "+timeOnlyFormat(data[i].time)+"</div>";
+              list+="<div class='col-lg-10 p-0 fs-5'>["+data[i].id+"] "+data[i].name+" has exited "+data[i].location+" at "+timeOnlyFormat(data[i].time)+"</div>";
             }
             //list+="<a class='col-1 text-end p-0 fs-6 text-right c-b' href='javascript:void(0)'><i class='fa-solid fa-xmark' title='Delete'></i></a>";
             list+="</div>";

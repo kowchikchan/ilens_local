@@ -14,16 +14,10 @@ public class NotificationsRest {
     @Autowired
     IlenService ilenService;
 
-    @PostMapping("/list/{pageNumber}")
+    @PostMapping("/list")
     public ResponseEntity<Object> notificationsList(@RequestHeader("CLIENT_KEY") String clientKey,
-                                                    @RequestBody EntryExitFilter entryExitFilter,
-                                                    @PathVariable int pageNumber) throws Exception {
-        return new ResponseEntity<Object>(ilenService.getNotificationsList(entryExitFilter, pageNumber), HttpStatus.OK);
+                                                    @RequestBody EntryExitFilter entryExitFilter) throws Exception {
+        return new ResponseEntity<Object>(ilenService.getNotificationsList(entryExitFilter), HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("/count")
-    public ResponseEntity<Object> count(@RequestHeader("CLIENT_KEY") String clientKey,
-                                                    @RequestBody EntryExitFilter entryExitFilter) throws Exception {
-        return new ResponseEntity<Object>(ilenService.notificationsCount(entryExitFilter), HttpStatus.OK);
-    }
 }

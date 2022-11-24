@@ -109,6 +109,6 @@ function fullTimeFormat(date){
 }
 
 function timeOnlyFormat(date){
-  var date=moment(date).format("DD-MM-YYYY hh:mm A");
+  var date=moment(date).format("hh:mm A");
   return date;
 }

@@ -165,6 +165,9 @@ public class ILensController {
     @GetMapping("/settings")
     public String dataConfiguration(){return "data_configuration";}
 
+    @GetMapping("/notification")
+    public String notification(){return "notification";}
+
     @GetMapping(path = "/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         request.getSession().invalidate();

@@ -292,6 +292,8 @@ $(document).ready(function(){
   $("#liveVideoDivAtFR").html(liveVideoDivAtFR).show();
 
 $('#liveVideoDiv').Jcrop({
+  bgOpacity: .3,
+  //bgColor:"#f9c631",
   onChange:   crop,
   onSelect:   crop,
   onRelease:  clearCoords
@@ -392,8 +394,8 @@ $('.toggle-btn').on('click', function(){
 function crop(c){
   $('#cLeft').val(c.x);
   $('#cTop').val(c.y);
-  $('#cWidth').val(c.w);
-  $('#cHeight').val(c.h);
+  $('#cWidth').val(c.x2);
+  $('#cHeight').val(c.y2);
 };
 
 function clearCoords(){
@@ -407,8 +409,8 @@ function cropImage(){
       w = $('#cWidth').val(),
       h = $('#cHeight').val();
 
-  changeImageSize(x,y,w,h);
-  jcrop_api.release();
+  //changeImageSize(x,y,w,h);
+ // jcrop_api.release();
   jcrop_api.disable();
   saveCropImage();
 }
@@ -555,11 +557,13 @@ function getCropImage(){
     headers:{'CLIENT_KEY': sessionToken},
     type: 'GET',
     async: false,
-    success: function(data){ 
-      changeImageSize(data.cLeft,data.cTop,data.cWidth,data.cHeight);
+    success: function(data){
+      jcrop_api.setSelect([data.cLeft,data.cTop,data.cWidth,data.cHeight]);
       if((data.cWidth!=0 && data.cWidth!=data.tWidth) || (data.cHeight!=0 && data.cHeight!=data.tHeight) ){
         $(".fa-crop").removeClass("y-clr c-p");
         jcrop_api.disable();
+      }else{
+        jcrop_api.release();
       }
     },
     error: function(err){

@@ -102,3 +102,13 @@ $(window).on('load', function() {
 // function configValidate(){
 
 // }
+
+function fullTimeFormat(date){
+  var date=moment(date).format("DD-MM-YYYY hh:mm A");
+  return date;
+}
+
+function timeOnlyFormat(date){
+  var date=moment(date).format("DD-MM-YYYY hh:mm A");
+  return date;
+}

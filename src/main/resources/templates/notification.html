@@ -21,7 +21,7 @@
                 <option value="exit">Exit</option>
               </select>
             </div> 
-            <div class="col-lg-10 row justify-content-end">
+            <div class="col-lg-10 row justify-content-end p-0">
               <div class="mr-3">
                 <label class="config_labels">Notification Numbers to Show</label>
                 <select class="drop-Btn" id="pageFilter">
@@ -30,7 +30,7 @@
                   <option value="30">30</option>
                 </select>
               </div> 
-              <div class="mr-3">
+              <div class="">
                 <label class="config_labels">Auto Reload Time</label>
                 <select class="drop-Btn" id="reloadFilter">
                   <option value="1">10 sec</option>
@@ -38,15 +38,9 @@
                   <option value="3">30 sec</option>
                 </select>
               </div> 
-              <div class="p-0">
+              <!-- <div class="p-0">
                 <button id="addUser" class="new-button float-right">Clear All</button>
-                  <!-- <div>
-                    <nav aria-label="Page navigation example" class="pagination-nav1">
-                      <ul class="pagination" id="usersPagination">
-                      </ul>
-                    </nav>
-                  </div> -->
-              </div>
+              </div> -->
             </div>
           </div>
           <div class="col-lg-12 p-0" id="notificationList">
@@ -119,9 +113,9 @@ function notification(type,pagecount){
             list+="<div class='notification d-flex justify-content-between col-lg-12 p-0'>";
             list+="<div class='col-lg-2 p-0 fs-6'>"+fullTimeFormat(data[i].time)+"</div>";
             if(data[i].type =="entry"){
-              list+="<div class='col-lg-9 p-0 fs-5'>"+data[i].id+" "+data[i].name+" has entred "+data[i].location+" at "+timeOnlyFormat(data[i].time)+"</div>";
+              list+="<div class='col-lg-10 p-0 fs-5'>["+data[i].id+"] "+data[i].name+" has entred "+data[i].location+" at "+timeOnlyFormat(data[i].time)+"</div>";
             }else{
-              list+="<div class='col-lg-9 p-0 fs-5'>"+data[i].id+" "+data[i].name+" has exited "+data[i].location+" at "+timeOnlyFormat(data[i].time)+"</div>";
+              list+="<div class='col-lg-10 p-0 fs-5'>["+data[i].id+"] "+data[i].name+" has exited "+data[i].location+" at "+timeOnlyFormat(data[i].time)+"</div>";
             }
             //list+="<a class='col-1 text-end p-0 fs-6 text-right c-b' href='javascript:void(0)'><i class='fa-solid fa-xmark' title='Delete'></i></a>";
             list+="</div>";

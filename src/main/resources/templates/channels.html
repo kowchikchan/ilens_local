@@ -86,19 +86,28 @@
 <div id="channelForm"></div>
 <input type="hidden" name="" id="configPageNo">
 <div class="records"></div>
-<div id="popup_default" class="popup">
-          <div class="popup-overlay"></div>
-          <div class="popup-content">
-            <a class="close-popup c-p" data-id="popup_default">&times;</a>
-           <table id="liveId">
-            <div class="pre-loading1">
-              <img class="loader1" src="/web/images/loader.png" />
-            </div>
-            <div class="camera_live">
-              <div class="fp-Video-1" id="liveVideoIdAtChannel" >
-            </div>
-           </table>
+<!--    model-->
+ <div class="modal" id="testModel" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content live-model mr-md-3">
+        <a class="close-popup c-p" data-dismiss="modal" aria-label="Close">&times;</a>
+        <div class="livevideo-preloding">
+          <img class="loader1" src="/web/images/loader.png" />
         </div>
+        <!-- Modal body -->
+        <div class="modal-body p-2 mt-sm-0">
+            <div class="row">
+                <div class="col p-0">
+                  <div class="camera_live">
+                    <div class="fp-Video-1" id="liveVideoIdAtChannel" >
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 <script>
       var accessConfig = [];
       var access = [];
@@ -716,49 +725,23 @@ function addChannel(){
    })
 }
 
-(function($) {
-      $.fn.openPopup = function( settings ) {
-        var elem = $(this);
-        var settings = $.extend({
-          anim: 'fade'
-        }, settings);
-        elem.show();
-        elem.find('.popup-content').addClass(settings.anim+'In');
-      }
-      
-      $.fn.closePopup = function( settings ) {
-        var elem = $(this);
-        var settings = $.extend({
-          anim: 'fade'
-        }, settings);
-        elem.find('.popup-content').removeClass(settings.anim+'In').addClass(settings.anim+'Out');
-        
-        setTimeout(function(){
-            elem.hide();
-            elem.find('.popup-content').removeClass(settings.anim+'Out')
-          }, 400);
-      }
 
-    }(jQuery));
 
     var liveVideoIdAtChannel="";
     function snapshotShow(camIp){
       const url = window.location.href.toString().split("//");
       const colonSplit = url[1].split(":");
       var ip = colonSplit[0];
-      $(".pre-loading1").show()
-        liveVideoIdAtChannel = liveVideoIdAtChannel + '<img id="liveVideo-channel-live" src="https://' + ip +':5000/' + camIp + '">';
+      $(".livevideo-preloding").show()
+        liveVideoIdAtChannel = liveVideoIdAtChannel + '<img class="img-fluid" id="liveVideo-channel-live" src="https://' + ip +':5000/' + camIp + '">';
         $("#liveVideoIdAtChannel").html(liveVideoIdAtChannel);
-        $('#popup_default').openPopup({ anim: 'fade' });
+        $("#testModel").modal('show');
+       // $('#popup_default').openPopup({ anim: 'fade' });
         setTimeout(function(){
-          $(".pre-loading1").hide();
+          $(".livevideo-preloding").hide();
         },2000)
     }
 
-     $('.close-popup').click(function(){
-      liveVideoIdAtChannel= "";
-      $('#popup_default').closePopup({ anim: 'fade' });
-    });
 
 
 function startChannel(id){

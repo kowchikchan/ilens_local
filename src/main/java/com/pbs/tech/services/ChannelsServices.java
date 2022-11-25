@@ -342,10 +342,10 @@ public class ChannelsServices {
         List<Channel> channelList;
         Pageable page = PageRequest.of(pageNumber, 10);
         try {
-            if (channelFilterVO.getStatus().equalsIgnoreCase("All")) {
+            if (channelFilterVO.getStatus().equalsIgnoreCase("All") && StringUtils.equalsIgnoreCase(channelFilterVO.getIp(), "null")) {
                 channelList = channelRepo.findAllByOrderByCreatedDtDesc(page);
             } else {
-                channelList = channelRepo.findAllByStatus(Boolean.parseBoolean(channelFilterVO.getStatus()), page);
+                channelList = channelRepo.findAllByStatusAndIp(Boolean.parseBoolean(channelFilterVO.getStatus()), channelFilterVO.getIp(), page);
             }
         }catch (NoSuchElementException e){
             throw new NoSuchElementException("Exception " + e.getMessage());
@@ -381,12 +381,12 @@ public class ChannelsServices {
 
     }
 
-    public long getPageCount(String filterWord){
+    public long getPageCount(String filterWord, String ip){
         List<Channel> channelList;
-        if(filterWord.equalsIgnoreCase("All")){
+        if(filterWord.equalsIgnoreCase("All") && StringUtils.equalsIgnoreCase(ip, "null")){
             channelList = channelRepo.findAllByOrderByCreatedDtDesc();
         }else {
-            channelList = channelRepo.findAllByStatus(Boolean.parseBoolean(filterWord));
+            channelList = channelRepo.findAllByStatusAndIp(Boolean.parseBoolean(filterWord), ip);
         }
         return  channelList.size();
     }
@@ -402,5 +402,9 @@ public class ChannelsServices {
         Channel channel=channelRepo.findById(id).get();
         channel.setStatus(false);
         channelRepo.save(channel);
+    }
+
+    public List<Channel> channelList(){
+        return (List<Channel>) channelRepo.findAll();
     }
 }

@@ -1574,16 +1574,18 @@ public class IlenService {
         if(list != null) {
             String swapType = "";
             String swapName = "";
+            Channel channel;
             for (int i = 0; i < list.size(); i++) {
+                channel = channelRepo.findById(Long.valueOf(list.get(i).getLocation())).get();
                 if (i == 0) {
-                    entity = new EntryExitEntity(list.get(i).getTime(), list.get(i).getId(), list.get(i).getLocation(),
+                    entity = new EntryExitEntity(list.get(i).getTime(), list.get(i).getId(), channel.getName(),
                             list.get(i).getType(), list.get(i).getName(), list.get(i).getSnapshot());
                     listOfValues.add(entity);
                     swapType = list.get(i).getType();
                     swapName = list.get(i).getName();
                 } else if (!Objects.equals(swapType, list.get(i).getType()) ||
                         !Objects.equals(swapName, list.get(i).getName())) {
-                    entity = new EntryExitEntity(list.get(i).getTime(), list.get(i).getId(), list.get(i).getLocation(),
+                    entity = new EntryExitEntity(list.get(i).getTime(), list.get(i).getId(), channel.getName(),
                             list.get(i).getType(), list.get(i).getName(), list.get(i).getSnapshot());
                     listOfValues.add(entity);
                     swapType = list.get(i).getType();

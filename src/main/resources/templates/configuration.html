@@ -276,6 +276,7 @@
   var boundx="";
   var boundy="";
   var sessionToken=""
+  $(".pre-loading").show();
 $(document).ready(function(){
   sessionToken = "[[${session.USER.sessionToken}]]";
   $("#cropChannelId").val($("#channelId").val());
@@ -377,6 +378,7 @@ $('.toggle-btn').on('click', function(){
       $(this).parent(".inner-container").attr("enable","true");
     }
   });
+  $(".pre-loading").hide();
 });
 
 

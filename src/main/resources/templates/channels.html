@@ -115,6 +115,7 @@
       var removedPersons = [];
       var windowsize = $(window).width();
       var userlist=[];
+      $(".pre-loading").show();
       $(document).ready(function () {
         var channelFilterVO={ status: "All" }
         if ( windowsize < 500 ){
@@ -136,7 +137,6 @@
                })
         $("#channels").addClass('active');
         $("#channels").on("click",function(){
-          $(".pre-loading").show();
             window.setTimeout(function(){
               $(".pre-loading").hide();
             }, 3000);

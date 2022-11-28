@@ -31,9 +31,11 @@ public class ChannelsRest {
         return new ResponseEntity<>(channelsServices.getChannelsList(channelFilterVO, pageNumber), HttpStatus.OK);
     }
 
-    @GetMapping("/pageCount/{filterKey}")
-    public ResponseEntity<Object> getPageCount(@RequestHeader("CLIENT_KEY") String clientKey, @PathVariable String filterKey){
-        return new ResponseEntity<Object>(channelsServices.getPageCount(filterKey), HttpStatus.OK);
+    @GetMapping("/pageCount/{filterKey}/{ip}")
+    public ResponseEntity<Object> getPageCount(@RequestHeader("CLIENT_KEY") String clientKey,
+                                               @PathVariable String filterKey,
+                                               @PathVariable String ip){
+        return new ResponseEntity<Object>(channelsServices.getPageCount(filterKey, ip), HttpStatus.OK);
     }
 
     @PostMapping
@@ -63,6 +65,11 @@ public class ChannelsRest {
     public ResponseEntity<?>channelInActive(@RequestHeader("CLIENT_KEY") String clientKey, @PathVariable long id){
         channelsServices.setInActive(id);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<?>channelList(@RequestHeader("CLIENT_KEY") String clientKey){
+        return new ResponseEntity<>(channelsServices.channelList(), HttpStatus.OK);
     }
 
 }

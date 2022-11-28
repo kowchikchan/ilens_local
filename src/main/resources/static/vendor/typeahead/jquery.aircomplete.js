@@ -111,7 +111,7 @@
             this._oldHtml = $(this.el).clone();
 
             // get the width/height of the input element
-            this._inputw = $(this.el).outerWidth();
+            this._inputw = "84%" //$(this.el).outerWidth();
             this._inputh = $(this.el).outerHeight();
 
             // turn off autocomplete for the input
@@ -170,7 +170,7 @@
         _onWindowResize: function(e) {
             this._debug('aircomplete._onWindowResize()');
             // get the width/height of the input element
-            this._inputw = this._$wrap.parent().width();
+            this._inputw = "84%"; //this._$wrap.parent().width();
             // this._inputh = this._$wrap.parent().height();
             this._$wrap
                 .width(this._inputw)

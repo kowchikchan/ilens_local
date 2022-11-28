@@ -13,31 +13,44 @@
     </div>
     <div id="server_table" class="main-table zoom">
         <div class="col-md-12 pb-12 row m-0">
-            <div class="col-md-12">
-                 <input class="input-search" type="text" name="hostname" id="hostname" onkeydown="inputStop()" value="192.168.0.x" />
-                 <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Please enter the ip range to start staring , Can keep last one can keep empty or .x”" ></i>
-                <button onclick="filterIp()" class="button-scan">
-                    <i class="loading-icon fa fa-spinner fa-spin hide"></i>
-                    <span class="btn-txt">Scan for devices</span>
-                </button>
-                <span id="processing_devices">Please wait it will take some time</span>
-                <div class="navStyle">            
-                  <div>
-                    <nav aria-label="Page navigation example" class="pagination-nav" id="pagination">
-                        <ul class="pagination" id="tablePagination">
-                        </ul>
-                    </nav>
-                  </div>
-              </div>
-                <div class="dropdown">
-                  <select id="userFilter" name="" class="dropBtn">
-                    <option value="All" selected>All</option>
-                    <option value="true">Active</option>
-                    <option value="false">In Active</option>
-                </select>
-                <a onclick="addChannel()"><button id="addUser" class="new-button button-position">New<i class="fa fa-plus-circle" aria-hidden="true"></i></button></a>    
+          <div class="col-lg-12 row p-0 justify-content-between">
+            <div class="col-lg-4">
+              <input class="input-search" type="text" name="hostname" id="hostname" onkeydown="inputStop()" value="192.168.0.x" />
+              <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Please enter the ip range to start staring , Can keep last one can keep empty or .x”" ></i>
+              <button onclick="filterIp()" class="button-scan">
+                <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                <span class="btn-txt">Scan for devices</span>
+              </button>
+             <span id="processing_devices">Please wait it will take some time</span>
+            </div>
+            <div class="col-lg-4 sm-mt-4">
+              <div class="input-group mb-3">
+                <input type="search" class="form-control search-input pr-1" placeholder="Search IP" aria-label="Search By Ip"  id="searchBox">
+                <div class="input-group-append">
+                  <span class="input-group-text serch-button"><i class="fa fa-search"></i></span>
+                </div>
               </div>
             </div>
+            <div class="col-lg-4">
+              <div class="navStyle">            
+                <div>
+                  <nav aria-label="Page navigation example" class="pagination-nav" id="pagination">
+                    <ul class="pagination" id="tablePagination"></ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-12">
+              <div class="dropdown">
+                <select id="userFilter" name="" class="dropBtn">
+                  <option value="All" selected>All</option>
+                  <option value="true">Active</option>
+                  <option value="false">In Active</option>
+              </select>
+              <a onclick="addChannel()"><button id="addUser" class="new-button button-position">New<i class="fa fa-plus-circle" aria-hidden="true"></i></button></a>    
+            </div>
+            </div>
+          </div>
         </div>
         <br>
         <div class="col-md-12 row">
@@ -86,19 +99,28 @@
 <div id="channelForm"></div>
 <input type="hidden" name="" id="configPageNo">
 <div class="records"></div>
-<div id="popup_default" class="popup">
-          <div class="popup-overlay"></div>
-          <div class="popup-content">
-            <a class="close-popup c-p" data-id="popup_default">&times;</a>
-           <table id="liveId">
-            <div class="pre-loading1">
-              <img class="loader1" src="/web/images/loader.png" />
-            </div>
-            <div class="camera_live">
-              <div class="fp-Video-1" id="liveVideoIdAtChannel" >
-            </div>
-           </table>
+<!--    model-->
+ <div class="modal" id="testModel" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content live-model mr-md-3">
+        <a class="close-popup c-p" data-dismiss="modal" aria-label="Close">&times;</a>
+        <div class="livevideo-preloding">
+          <img class="loader1" src="/web/images/loader.png" />
         </div>
+        <!-- Modal body -->
+        <div class="modal-body p-2 mt-sm-0">
+            <div class="row">
+                <div class="col p-0">
+                  <div class="camera_live">
+                    <div class="fp-Video-1" id="liveVideoIdAtChannel" >
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 <script>
       var accessConfig = [];
       var access = [];
@@ -106,18 +128,19 @@
       var removedPersons = [];
       var windowsize = $(window).width();
       var userlist=[];
+      $(".pre-loading").show();
       $(document).ready(function () {
-        var channelFilterVO={ status: "All" }
+        var channelFilterVO={ status: "All",ip:"null"}
         if ( windowsize < 500 ){
           $("#channelList").hide();
           $("#mobileList").show();
-          mobileListFun(pageNumber,channelFilterVO);
+          //mobileListFun(pageNumber,channelFilterVO);
         }else{
           $("#channelList").show();
           $("#mobileList").hide();
-          pageTable(pageNumber,channelFilterVO);
+          //pageTable(pageNumber,channelFilterVO);
         }
-        paging("All",channelFilterVO);
+         filterChennalList();
         $('[data-toggle="tooltip"]').tooltip({
         placement : 'right'
         });
@@ -127,7 +150,6 @@
                })
         $("#channels").addClass('active');
         $("#channels").on("click",function(){
-          $(".pre-loading").show();
             window.setTimeout(function(){
               $(".pre-loading").hide();
             }, 3000);
@@ -145,6 +167,14 @@
           $(".loading-icon").removeClass("hide");
           $(".button-scan").attr("disabled", true);
           $(".btn-txt").text("Scanning...");
+        });
+        $("#searchBox").aircomplete({
+          data: getChannelList(),
+          minSearchStringLength : 1, // show results after a single character is entered
+          onSelect: function(data){
+            filterChennalList(data);
+            return data;
+          },  
         });
   });
   $(window).on('load', function() {
@@ -564,11 +594,11 @@ function inputStop(){
 
 var totalPages = 0;
 var totalCount = 0;
-function paging(filterKey,channelFilterVO){
+function paging(filterKey,channelFilterVO,ip){
   itemsPerPage=10;
   $.ajax({
     contentType: "application/json;charset=UTF-8",
-    url: "api/v1/channels/pageCount/"+filterKey,
+    url: "api/v1/channels/pageCount/"+filterKey+"/"+ip,
     dataType: "json",
     headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},    
     type: "GET",
@@ -597,6 +627,11 @@ function paging(filterKey,channelFilterVO){
                 }
             }
         }).on("page",function(event,num){});
+      }else{
+        $(".records").html("No Records Found");
+        $('#pagination').hide();
+        $(".records").show();
+        $(".pre-loading").hide();
       }
       }
   });
@@ -716,49 +751,23 @@ function addChannel(){
    })
 }
 
-(function($) {
-      $.fn.openPopup = function( settings ) {
-        var elem = $(this);
-        var settings = $.extend({
-          anim: 'fade'
-        }, settings);
-        elem.show();
-        elem.find('.popup-content').addClass(settings.anim+'In');
-      }
-      
-      $.fn.closePopup = function( settings ) {
-        var elem = $(this);
-        var settings = $.extend({
-          anim: 'fade'
-        }, settings);
-        elem.find('.popup-content').removeClass(settings.anim+'In').addClass(settings.anim+'Out');
-        
-        setTimeout(function(){
-            elem.hide();
-            elem.find('.popup-content').removeClass(settings.anim+'Out')
-          }, 400);
-      }
 
-    }(jQuery));
 
     var liveVideoIdAtChannel="";
     function snapshotShow(camIp){
       const url = window.location.href.toString().split("//");
       const colonSplit = url[1].split(":");
       var ip = colonSplit[0];
-      $(".pre-loading1").show()
-        liveVideoIdAtChannel = liveVideoIdAtChannel + '<img id="liveVideo-channel-live" src="https://' + ip +':5000/' + camIp + '">';
+      $(".livevideo-preloding").show()
+        liveVideoIdAtChannel = liveVideoIdAtChannel + '<img class="img-fluid" id="liveVideo-channel-live" src="https://' + ip +':5000/' + camIp + '">';
         $("#liveVideoIdAtChannel").html(liveVideoIdAtChannel);
-        $('#popup_default').openPopup({ anim: 'fade' });
+        $("#testModel").modal('show');
+       // $('#popup_default').openPopup({ anim: 'fade' });
         setTimeout(function(){
-          $(".pre-loading1").hide();
+          $(".livevideo-preloding").hide();
         },2000)
     }
 
-     $('.close-popup').click(function(){
-      liveVideoIdAtChannel= "";
-      $('#popup_default').closePopup({ anim: 'fade' });
-    });
 
 
 function startChannel(id){
@@ -968,22 +977,61 @@ $("#channelForm").hide();
 }
 
 $('#userFilter').on('change', function() {
+  filterChennalList();
+});
+
+
+function getChannelList(){
+  var channelList = [];
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "/api/v1/channels/list",
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+    type: "GET",
+    async: false,
+    success: function (data){     
+      for(i = 0; i < data.length; i++){ 
+        channelList.push(data[i].ip);
+       // console.log(data[i].ip); 
+      }   
+    }    
+   });
+   return channelList;
+}
+
+function filterChennalList(data){
   $(".pre-loading").show();
-  var status=this.value;
   $("#channelList").empty();
   $("#mobileList").empty();
+  var status=$("#userFilter").val();
+  var ip=$("#searchBox").val();
+  console.log(ip);
+  if(ip==""){
+    ip="null";
+  }
+  if(data){
+    ip=data;
+  }
   var channelFilterVO={
-  status: status
-  }
-
+    status: status,
+    ip:ip
+  } 
   if ( windowsize < 500 ){
-    mobileListFun(pageNumber,channelFilterVO);
+    paging(status,channelFilterVO,ip);
   }else{
-    pageTable(pageNumber,channelFilterVO);
+    paging(status,channelFilterVO,ip);
   }
-  var filterKey=status;
-  paging(filterKey,channelFilterVO);
+}
 
+$('#searchBox').on('search', function () {
+  filterChennalList();
+});
+
+$("#searchBox").keyup(function(){
+  var ip=$("#searchBox").val();
+  if(ip==""){
+    filterChennalList();
+  }
 })
 
 </script>

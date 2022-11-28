@@ -13,31 +13,44 @@
     </div>
     <div id="server_table" class="main-table zoom">
         <div class="col-md-12 pb-12 row m-0">
-            <div class="col-md-12">
-                 <input class="input-search" type="text" name="hostname" id="hostname" onkeydown="inputStop()" value="192.168.0.x" />
-                 <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Please enter the ip range to start staring , Can keep last one can keep empty or .x”" ></i>
-                <button onclick="filterIp()" class="button-scan">
-                    <i class="loading-icon fa fa-spinner fa-spin hide"></i>
-                    <span class="btn-txt">Scan for devices</span>
-                </button>
-                <span id="processing_devices">Please wait it will take some time</span>
-                <div class="navStyle">            
-                  <div>
-                    <nav aria-label="Page navigation example" class="pagination-nav" id="pagination">
-                        <ul class="pagination" id="tablePagination">
-                        </ul>
-                    </nav>
-                  </div>
-              </div>
-                <div class="dropdown">
-                  <select id="userFilter" name="" class="dropBtn">
-                    <option value="All" selected>All</option>
-                    <option value="true">Active</option>
-                    <option value="false">In Active</option>
-                </select>
-                <a onclick="addChannel()"><button id="addUser" class="new-button button-position">New<i class="fa fa-plus-circle" aria-hidden="true"></i></button></a>    
+          <div class="col-lg-12 row p-0">
+            <div class="col-lg-4">
+              <input class="input-search" type="text" name="hostname" id="hostname" onkeydown="inputStop()" value="192.168.0.x" />
+              <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Please enter the ip range to start staring , Can keep last one can keep empty or .x”" ></i>
+              <button onclick="filterIp()" class="button-scan">
+                <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                <span class="btn-txt">Scan for devices</span>
+              </button>
+             <span id="processing_devices">Please wait it will take some time</span>
+            </div>
+            <div class="col-lg-4 sm-mt-4">
+              <div class="input-group mb-3">
+                <input type="search" class="form-control search-input pr-1" placeholder="Search IP" aria-label="Search By Ip"  id="searchBox">
+                <div class="input-group-append">
+                  <span class="input-group-text serch-button"><i class="fa fa-search"></i></span>
+                </div>
               </div>
             </div>
+            <div class="col-lg-4">
+              <div class="navStyle">            
+                <div>
+                  <nav aria-label="Page navigation example" class="pagination-nav" id="pagination">
+                    <ul class="pagination" id="tablePagination"></ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-12">
+              <div class="dropdown">
+                <select id="userFilter" name="" class="dropBtn">
+                  <option value="All" selected>All</option>
+                  <option value="true">Active</option>
+                  <option value="false">In Active</option>
+              </select>
+              <a onclick="addChannel()"><button id="addUser" class="new-button button-position">New<i class="fa fa-plus-circle" aria-hidden="true"></i></button></a>    
+            </div>
+            </div>
+          </div>
         </div>
         <br>
         <div class="col-md-12 row">
@@ -117,17 +130,17 @@
       var userlist=[];
       $(".pre-loading").show();
       $(document).ready(function () {
-        var channelFilterVO={ status: "All" }
+        var channelFilterVO={ status: "All",ip:"null"}
         if ( windowsize < 500 ){
           $("#channelList").hide();
           $("#mobileList").show();
-          mobileListFun(pageNumber,channelFilterVO);
+          //mobileListFun(pageNumber,channelFilterVO);
         }else{
           $("#channelList").show();
           $("#mobileList").hide();
-          pageTable(pageNumber,channelFilterVO);
+          //pageTable(pageNumber,channelFilterVO);
         }
-        paging("All",channelFilterVO);
+         filterChennalList();
         $('[data-toggle="tooltip"]').tooltip({
         placement : 'right'
         });
@@ -154,6 +167,14 @@
           $(".loading-icon").removeClass("hide");
           $(".button-scan").attr("disabled", true);
           $(".btn-txt").text("Scanning...");
+        });
+        $("#searchBox").aircomplete({
+          data: getChannelList(),
+          minSearchStringLength : 1, // show results after a single character is entered
+          onSelect: function(data){
+            filterChennalList(data);
+            return data;
+          },  
         });
   });
   $(window).on('load', function() {
@@ -573,11 +594,11 @@ function inputStop(){
 
 var totalPages = 0;
 var totalCount = 0;
-function paging(filterKey,channelFilterVO){
+function paging(filterKey,channelFilterVO,ip){
   itemsPerPage=10;
   $.ajax({
     contentType: "application/json;charset=UTF-8",
-    url: "api/v1/channels/pageCount/"+filterKey,
+    url: "api/v1/channels/pageCount/"+filterKey+"/"+ip,
     dataType: "json",
     headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},    
     type: "GET",
@@ -606,6 +627,11 @@ function paging(filterKey,channelFilterVO){
                 }
             }
         }).on("page",function(event,num){});
+      }else{
+        $(".records").html("No Records Found");
+        $('#pagination').hide();
+        $(".records").show();
+        $(".pre-loading").hide();
       }
       }
   });
@@ -951,22 +977,61 @@ $("#channelForm").hide();
 }
 
 $('#userFilter').on('change', function() {
+  filterChennalList();
+});
+
+
+function getChannelList(){
+  var channelList = [];
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "/api/v1/channels/list",
+    headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+    type: "GET",
+    async: false,
+    success: function (data){     
+      for(i = 0; i < data.length; i++){ 
+        channelList.push(data[i].ip);
+       // console.log(data[i].ip); 
+      }   
+    }    
+   });
+   return channelList;
+}
+
+function filterChennalList(data){
   $(".pre-loading").show();
-  var status=this.value;
   $("#channelList").empty();
   $("#mobileList").empty();
+  var status=$("#userFilter").val();
+  var ip=$("#searchBox").val();
+  console.log(ip);
+  if(ip==""){
+    ip="null";
+  }
+  if(data){
+    ip=data;
+  }
   var channelFilterVO={
-  status: status
-  }
-
+    status: status,
+    ip:ip
+  } 
   if ( windowsize < 500 ){
-    mobileListFun(pageNumber,channelFilterVO);
+    paging(status,channelFilterVO,ip);
   }else{
-    pageTable(pageNumber,channelFilterVO);
+    paging(status,channelFilterVO,ip);
   }
-  var filterKey=status;
-  paging(filterKey,channelFilterVO);
+}
 
+$('#searchBox').on('search', function () {
+  filterChennalList();
+});
+
+$("#searchBox").keyup(function(){
+  var ip=$("#searchBox").val();
+  if(ip==""){
+    filterChennalList();
+  }
 })
 
 </script>

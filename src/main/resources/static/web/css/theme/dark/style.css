@@ -658,7 +658,7 @@ header .main-menu li.drop:hover > ul.drop-down {
 .button-scan {
   position: relative;
   left: 5px;
-  width: 200px;
+  width: 165px;
   cursor: pointer;
   background-color: #1e384800;
   padding: 4px;
@@ -3328,7 +3328,7 @@ a.dropdown-item {
 }
 .dropdown {
   width: 100%;
-  top: 16px;
+  /* top: 16px; */
 }
 .disableIc{
   margin-top: -69px;
@@ -3663,9 +3663,9 @@ span.crop1 {
   .tableHead{
     display: none;
   }
-  .pagination-nav {
+  /* .pagination-nav {
     margin-bottom: -33px;
-  }
+  } */
   .navStyle {
     display: block;
     float: right;
@@ -3982,12 +3982,12 @@ input#text-date {
   #attendanceList td {
       font-size: 12px;
   }
-  .search-box {
+  /* .search-box {
     width: 52%;
-  }
-  .search-input {
+  } */
+  /* .search-input {
     width: 117px;
-  }
+  } */
   .move-chart {
     top: -66px;
   }
@@ -5059,3 +5059,45 @@ p.profile-head {
     max-width: 80%;
   }
 }
+.serch-button{
+  text-align: center;
+  outline: none;
+  color: #e9ecef;
+  cursor: pointer;
+  border: 2px solid #6a6851;
+  border-radius: 0 10px 10px 0;
+  border-left: none;
+  background: #3a5362;
+  font-size: 20px;
+  border-left: 2px solid #686751;
+}
+input.form-control.search-input:focus {
+  background: #3a5362;
+  outline: none;
+  border: 1px solid #a08852;
+  box-shadow: none;
+  color: #f9c631;
+}
+
+input[type="search" i]:enabled:read-write:-webkit-any(:focus, :hover)::-webkit-search-cancel-button {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  height: 1em;
+  width: 1em;
+  border-radius: 50em;
+  background: url(/web/images/closeIcon.svg) no-repeat 50% 50%;
+  background-size: contain;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 990px) {
+  .sm-mt-4{
+    margin-top: 1rem !important;
+  } 
+}
+

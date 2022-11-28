@@ -13,7 +13,7 @@
   </div>
 	<div class="main-table zoom3">
         <div class="col-md-12 pb-10 row m-0">
-          <div class="col-md-12 row p-0">
+          <div class="col-md-12 row p-0 justify-content-between">
             <div class="col-3 p-0">
               <div class="lens_select">
                 <div class="input-group date" id="datepicker">
@@ -22,16 +22,15 @@
                  </div>
              </div>
             </div>
-            <div  class="col-6 text-center p-0">
-              <div class="search-box">
-                <input  class="search-input" placeholder="Search By Name/Id" id="usersFilter">
-                  <button class="search-button" id="search">
-                  <i class="fa fa-search"></i>
-                </button>
-                <span class="clearicon"><i class="fa fa-times" aria-hidden="true" id="clearIcon"></i></span>
-             </div>
+            <div  class="col-lg-5 text-center p-0 sm-mt-4">
+              <div class="input-group mb-3">
+                <input type="search" class="form-control search-input pr-1" placeholder="Search By Name/Id" aria-label="Search By Ip"  id="usersFilter">
+                <div class="input-group-append">
+                  <span class="input-group-text serch-button"><i class="fa fa-search"></i></span>
+                </div>
+              </div>
             </div>
-            <div  class="col-3">
+            <div  class="col-lg-3 col-md-12 mt-md-2">
               <nav aria-label="Page navigation example" class="pagination-nav1" id="attendancePage">
                 <ul class="pagination" id="attendancePagination">
                 </ul>
@@ -209,8 +208,8 @@ $("#usersFilter").keyup(function(data){
   }else{
     $(".clearicon").css('opacity', '1');
   }
-})
-$("#clearIcon").on("click",function(){
+});
+$("#usersFilter").on('search', function () {
   $("#usersFilter").val("");
   $(".clearicon").css('opacity', '0');
   $("#usersFilter").focus();

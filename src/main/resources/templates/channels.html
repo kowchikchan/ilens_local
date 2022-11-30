@@ -8,7 +8,7 @@
     <div class="pre-loading">
       <img class="loader" src="/web/images/loader.png" />
     </div>
-    <div class="heading">
+    <div class="heading" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
         <span class="heading-text fs-30">Channel Configuration</span>
     </div>
     <div id="server_table" class="main-table zoom">
@@ -40,7 +40,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-lg-12">
+            <div class="col-lg-12 mt-1">
               <div class="dropdown">
                 <select id="userFilter" name="" class="dropBtn">
                   <option value="All" selected>All</option>
@@ -279,14 +279,12 @@ function filterIp(){
             channelList=channelList+'</tr>';
           }
           if(data == 0){
-             $(".records").html("No Records Found");
-             $('#pagination').hide();
-             $(".records").show();
+            filterChennalList();
           }else{
             var channelFilterVO = {
               status: "All"
             }
-            paging("All",channelFilterVO);
+            filterChennalList();
             $("#channelList").html(channelList);
             $(".records").hide();
             $('#pagination').show();
@@ -567,7 +565,7 @@ function save(){
         async: false,
         data: JSON.stringify(vo),
         success:function(data){
-          paging(filterKey,channelFilterVO);
+          filterChennalList();
           setTimeout(function(){ toastr.success("Configuration updated.."); }, 1000);
         },
         error:function(err){

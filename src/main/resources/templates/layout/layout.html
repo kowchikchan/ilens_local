@@ -43,8 +43,8 @@
 <body>
 <div id="sidebar">
     <header class="sidebar-section">
-        <div class="navbar-vertical">
-            <div class="user row">
+        <div class="navbar-vertical" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
+            <div class="user row" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
                 <img src="/web/images/profile.png">
                 <div class="ml-10">
                     <span class="username">[[${session.USER.userId}]]</span><br>
@@ -87,7 +87,7 @@
                 <li>
                     <a href="#Adms" id="navadms" data-toggle="collapse" aria-expanded="false"> <i class="fas fa-user-cog nav-icon ex" data-toggle="tooltip" data-original-title="Administration"></i><span>Administration  </span>
                     </a>
-                    <ul id="Adms" class="nav nav-second collapse mk">
+                    <ul id="Adms" class="nav nav-second collapse mk" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
                         <!-- <li class="sec_li"><a href="/data_api"  id="dataapi"><i class="fa fa-cloud" data-toggle="tooltip" data-original-title="Data API"></i> <span>Data API</span>
                         </a></li> -->
                         <li class="sec_li"><a href="/licence"  id="licence"><i class="fa fa-newspaper-o" data-toggle="tooltip" data-original-title="Licence"></i> <span>Licence</span>
@@ -118,7 +118,7 @@
         </div>
     </header>
 </div>
-<div class="top-nav d-flex justify-content-between">
+<div class="top-nav d-flex justify-content-between" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
     <span class="navbar-icon"><i class="fa fa-bars" aria-hidden="true"></i></span>
     <div class=" Date-time-div pl-0">
         <span class="Date-time fs-30"></span><span class="am_pm fs-30"></span>
@@ -130,7 +130,7 @@
 <!--<div class="pre-loading">
     <img class="loader" src="/web/images/loader.png"/>
 </div>-->
-<div layout:fragment="content">
+<div layout:fragment="content" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
 
 </div>
 <script>

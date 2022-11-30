@@ -1,5 +1,5 @@
 <div class="content">
-  <div class="heading">
+  <div class="heading" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
       <span class="heading-text fs-30">Channel Configuration</span>
   </div>
   <div class="main-table zoom5">
@@ -28,8 +28,8 @@
         </label>
         <div class="camera_view">
           <div class="camera_head mb-10">
-            <span>Live</span><span class="pull-right"> <a onclick="resetCrop()" title="Resresize original size."><i class="fa-solid fa-arrows-rotate mr-3 y-clr c-p"></i></a>
-              <a onclick="cropImage(this)" title="You can choose a specific region to process."><i class="fa-solid fa-crop y-clr c-p" id="crop"></i></a> 
+            <span>Live</span><span class="pull-right"> <a onclick="resetCrop()" title="Resize original."><i class="fa-solid fa-arrows-rotate mr-3 y-clr c-p"></i></a>
+              <a onclick="cropImage(this)" title="Click to save cropped window."><i class="fa-solid fa-crop y-clr c-p" id="crop"></i></a> 
               <!-- <i class="fa fa-camera y-clr" aria-hidden="true"></i> -->
             </span>
           </div>

@@ -1,6 +1,6 @@
 var Status=[];
 $(document).ready(function(){
-  onLoadMenu();
+  //onLoadMenu();
 	$(".date-move").on("click",function(){
 		$(".Date-time-div").toggleClass("close-div");
     $(this).toggleClass("fa-chevron-down");
@@ -29,7 +29,7 @@ $(".navbar-icon .fa").on("click",function(){
          type: 'POST', 
          data: JSON.stringify(data),
          async: false,
-         success: function(data){ 
+         success: function(){ 
            toggleMenu();
          },
          error: function(err){

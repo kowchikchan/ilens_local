@@ -8,7 +8,7 @@
 	<div class="pre-loading">
     	<img class="loader" src="/web/images/loader.png" />
   	</div>
-      <div class="heading">
+      <div class="heading" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
         <span class="heading-text fs-30">Unknown Registry</span>
     </div>
     <!-- <span>

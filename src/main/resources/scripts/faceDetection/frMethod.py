@@ -53,6 +53,7 @@ def featuresAndLabels():
 modelFeatures, modelLabels = featuresAndLabels()
 unknownEncodings = []
 CONFIDENCE = .5
+resizeRatio = 50
 
 
 def postUnknown(dataLocation, dt_string, frame, apiToken, postURL, json_values):
@@ -82,15 +83,18 @@ class FRMethod:
         self.startTime = startTime
 
     def liveMethod(self):
-        # global faceEncode
         global unknownEncodings
         now, json_values, emp_name = datetime.now(), {}, "----"
         dt_string = now.strftime("%d%m%Y%H%M%S")
+
+        # brightness adjustment.
         img = adjustGamma(self.frame, gamma=1.7)
-        img = cv2.resize(img, (0, 0), fx=0.30, fy=0.30)
-        imgResized = cv2.resize(self.frame, (0, 0), fx=0.30, fy=0.30)
+
+        # resize part.
+        dim = (int(img.shape[1] * resizeRatio / 100), int(img.shape[0] * resizeRatio / 100))
+        img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+
         faces = face_locations(img)
-        # diff
         diff = datetime.now() - self.startTime
         if len(faces) != 0:
             encodesCurFrame = face_encodings(img, faces, model="large")
@@ -116,10 +120,10 @@ class FRMethod:
                         json_values["entryViolationVos"] = None
                         json_values["npr"] = None
                         json_values["socialViolation"] = None
-                        cv2.rectangle(imgResized, (left, top), (right, bottom), (252, 3, 3), 2)
-                        cv2.putText(imgResized, emp_name, (left - 10, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                        cv2.rectangle(img, (left, top), (right, bottom), (252, 3, 3), 2)
+                        cv2.putText(img, emp_name, (left - 10, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                                     (252, 3, 3), 1, cv2.LINE_AA)
-                        cv2.imwrite(face_file_name, cv2.resize(cv2.cvtColor(imgResized, cv2.COLOR_BGR2RGB), (490, 334),
+                        cv2.imwrite(face_file_name, cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (490, 334),
                                                                interpolation=cv2.INTER_AREA))
                         try:
                             headers = {'Content-type': 'application/json', 'Accept': 'text/plain',
@@ -131,33 +135,36 @@ class FRMethod:
                             print("[INFO]: Captured Information Post Response : {}", response.status_code)
                         except ConnectionError as e:
                             raise ConnectionError("Server Connection Exception {}", e)
-                else:
-                    json_values["snapshot"] = dt_string
-                    if unknownEncodings is None or len(unknownEncodings) == 0:
-                        try:
-                            postUnknown(self.dataLocation, dt_string, self.frame, self.apiToken, self.postURL, json_values)
-                            unknownEncodings = [encodeFace]
-                        except ConnectionError as e:
-                            raise ConnectionError("Server Connection Exception {}", e)
-                    else:
-                        checkConfidence = np.linalg.norm(unknownEncodings - encodeFace) < CONFIDENCE
-                        if not checkConfidence:
-                            try:
-                                postUnknown(self.dataLocation, dt_string, self.frame, self.apiToken, self.postURL, json_values)
-                                unknownEncodings = [encodeFace]
-                            except ConnectionError as e:
-                                raise ConnectionError("Server Connection Exception {}", e)
+                        '''
+            #                 else:
+            #                     json_values["snapshot"] = dt_string
+            #                     if unknownEncodings is None or len(unknownEncodings) == 0:
+            #                         try:
+            #                             postUnknown(self.dataLocation, dt_string, img, self.apiToken, 
+            #                             self.postURL, json_values)
+            #                             unknownEncodings = [encodeFace]
+            #                         except ConnectionError as e:
+            #                             raise ConnectionError("Server Connection Exception {}", e)
+            #                     else:
+            #                         checkConfidence = np.linalg.norm(unknownEncodings - encodeFace) < CONFIDENCE
+            #                         if not checkConfidence:
+            #                             try:
+            #                                 postUnknown(self.dataLocation, dt_string, img, self.apiToken, 
+            #                                 self.postURL, json_values)
+            #                                 unknownEncodings = [encodeFace]
+            #                             except ConnectionError as e:
+            #                                 raise ConnectionError("Server Connection Exception {}", e)
             json_values.clear()
         # else:
         #     # cv2.rectangle(img, (left, top), (right, bottom), (255, 0, 0), 2)
         #     # cv2.putText(img, 'unknown', (left - 10, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0),
         #     #            2, cv2.LINE_AA)
         #     face_file_name = "".join([self.dataLocation, "/", dt_string, ".jpg"])
-        #     cv2.imwrite(face_file_name, cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB))
+        #     cv2.imwrite(face_file_name, cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         # print(f'{json_values}')
         # print(f'fps at fr, {int(self.fps)}')
         # json_values.clear()
         # img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         # cv2.putText(img, f'fps : {int(self.fps)}', (25, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
         # cv2.imshow("Output Image", img)
-        # cv2.waitKey(1)
+        # cv2.waitKey(1)'''

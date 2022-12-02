@@ -17,19 +17,32 @@ def adjustGamma(image, gamma=1.0):
     return cv2.LUT(image, table)
 
 
-def checkContiguousOccurrence(matches):
-    maximumCount = 0
-    count = 0
-    cntList = []
-    for i in range(len(matches) - 1):
-        if 'True' == matches[i] and matches[i] == matches[i + 1]:
-            count += 1
-            cntList.append(count + 1)
+def checkContiguousOccurrence(matches, distances, labels):
+    maxCount, currentCount = 0, 0
+    max_matches, current_matches, max_index, current_index, distance, labelsLst = [], [], [], [], [], []
+    for i in range(len(matches)):
+        if matches[i] == 'True':
+            currentCount += 1
+            current_matches.append(matches[i])
+            current_index.append(i)
+            if i == len(matches) - 1:
+                maxCount = max(currentCount, maxCount)
+                if len(current_matches) == maxCount:
+                    max_matches = current_matches
+                    max_index = current_index
         else:
-            count = 0
-    if len(cntList) > 0:
-        maximumCount = max(cntList)
-    return maximumCount
+            maxCount = max(currentCount, maxCount)
+            if len(current_matches) == maxCount:
+                max_matches = current_matches
+                max_index = current_index
+            currentCount = 0
+            current_matches = []
+            current_index = []
+
+    for ind in max_index:
+        distance.append(distances[ind])
+        labelsLst.append(labels[ind])
+    return maxCount, max_matches, distance, labelsLst
 
 
 def featuresAndLabels():
@@ -102,7 +115,7 @@ class FRMethod:
                 matches = (np.linalg.norm(modelFeatures - encodeFace, axis=1) <= CONFIDENCE)
                 faceDistance = np.linalg.norm(modelFeatures - encodeFace, axis=1)
                 matchList = [f'{str(i)}' for i in matches]
-                contCount = checkContiguousOccurrence(matchList)
+                contCount, matches, faceDistance, labels = checkContiguousOccurrence(matchList, faceDistance, modelLabels)
                 print(f'contCount, {contCount}')
                 (top, right, bottom, left) = faceLoc
                 json_values["channelId"] = self.cameraId
@@ -112,7 +125,7 @@ class FRMethod:
                 if contCount >= 2:  # based on Training image quantity
                     matchIndex = np.argmin(faceDistance)
                     if matches[matchIndex]:
-                        emp_id = modelLabels[matchIndex]
+                        emp_id = labels[matchIndex]
                         if data['usersList'].get(emp_id): emp_name = data['usersList'].get(emp_id)
                         face_file_name = "".join([self.dataLocation, "/", dt_string + "_" + emp_id, ".jpg"])
                         json_values["snapshot"] = dt_string + "_" + emp_id
@@ -135,7 +148,7 @@ class FRMethod:
                             print("[INFO]: Captured Information Post Response : {}", response.status_code)
                         except ConnectionError as e:
                             raise ConnectionError("Server Connection Exception {}", e)
-                        '''
+            #
             #                 else:
             #                     json_values["snapshot"] = dt_string
             #                     if unknownEncodings is None or len(unknownEncodings) == 0:
@@ -154,7 +167,7 @@ class FRMethod:
             #                                 unknownEncodings = [encodeFace]
             #                             except ConnectionError as e:
             #                                 raise ConnectionError("Server Connection Exception {}", e)
-            json_values.clear()
+                json_values.clear()
         # else:
         #     # cv2.rectangle(img, (left, top), (right, bottom), (255, 0, 0), 2)
         #     # cv2.putText(img, 'unknown', (left - 10, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0),
@@ -167,4 +180,4 @@ class FRMethod:
         # img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         # cv2.putText(img, f'fps : {int(self.fps)}', (25, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
         # cv2.imshow("Output Image", img)
-        # cv2.waitKey(1)'''
+        # cv2.waitKey(1)

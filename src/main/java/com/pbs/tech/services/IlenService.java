@@ -171,9 +171,9 @@ public class IlenService {
             return new ArrayList<Long>(Arrays.asList(0L, 0L, 0L, 0L));
         }
         List<Long> convertedValues = new ArrayList<>();
-        convertedValues.add((croppedValue.get(0) * 3) + 150);
+        convertedValues.add((croppedValue.get(0) * 3) + 100);
         convertedValues.add((croppedValue.get(1) * 4) + 20);
-        convertedValues.add((croppedValue.get(2) * 3) + 90);
+        convertedValues.add((croppedValue.get(2) * 3) + 36);
         convertedValues.add((croppedValue.get(3) * 4) + 30);
         return convertedValues;
     }
@@ -1598,6 +1598,8 @@ public class IlenService {
 
     public List<EntryExitEntity> getNotificationsList(EntryExitFilter entryExitFilter){
         List<EntryExitEntity> listOfValues = this.getNotifications(entryExitFilter);
+        Collections.sort(listOfValues, new AttendanceSort());
+        Collections.reverse(listOfValues);
         int itemsPerPage = Integer.parseInt(entryExitFilter.getId());
         List<EntryExitEntity> entities = new ArrayList<>();
         int sizeOfList = listOfValues.size();

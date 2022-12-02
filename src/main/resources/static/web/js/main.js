@@ -48,9 +48,9 @@ function onLoadMenu(){
     type: 'GET',
     async: false,
     success: function(data){ 
-      if(data.status==true){
-        toggleMenu();
-      }
+//      if(data.status==true){
+//        toggleMenu();
+//      }
       Status.push(data.status);
     },
     error: function(err){

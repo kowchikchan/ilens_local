@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/v1/menuStatus")
@@ -15,8 +16,8 @@ public class MenuStatusRest {
 
     @PostMapping("/save")
     public ResponseEntity<Object> saveMenuStatus(@RequestHeader("CLIENT_KEY") String clientKey,
-                                                   @RequestBody MenuStatus menuStatus) throws Exception {
-        menuStatusServices.save(menuStatus);
+                                                   @RequestBody MenuStatus menuStatus, HttpServletRequest request) throws Exception {
+        menuStatusServices.save(menuStatus, request);
         return new ResponseEntity<Object>(HttpStatus.ACCEPTED);
     }
 

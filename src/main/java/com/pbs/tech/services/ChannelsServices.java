@@ -343,7 +343,7 @@ public class ChannelsServices {
         Pageable page = PageRequest.of(pageNumber, 10);
         try {
             if(channelFilterVO.getStatus().equalsIgnoreCase("All") && StringUtils.equalsIgnoreCase(channelFilterVO.getIp(), "null")) {
-                channelList = channelRepo.findAllByOrderByCreatedDtDesc();
+                channelList = channelRepo.findAllByOrderByCreatedDtDesc(page);
             }else if(!channelFilterVO.getStatus().equalsIgnoreCase("All") && StringUtils.equalsIgnoreCase(channelFilterVO.getIp(), "null")) {
                 channelList = channelRepo.findAllByStatus(Boolean.parseBoolean(channelFilterVO.getStatus()), page);
             } else if(channelFilterVO.getStatus().equalsIgnoreCase("All") && !StringUtils.equalsIgnoreCase(channelFilterVO.getIp(), "null")){

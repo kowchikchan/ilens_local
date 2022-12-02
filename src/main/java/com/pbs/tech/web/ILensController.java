@@ -2,7 +2,9 @@ package com.pbs.tech.web;
 
 import com.pbs.tech.common.exception.AuthenticationException;
 import com.pbs.tech.model.DataApi;
+import com.pbs.tech.model.MenuStatus;
 import com.pbs.tech.repo.DataApiRepo;
+import com.pbs.tech.services.MenuStatusServices;
 import com.pbs.tech.services.UserService;
 import com.pbs.tech.vo.UserVo;
 import org.slf4j.Logger;
@@ -38,6 +40,9 @@ public class ILensController {
     @Autowired
     DataApiRepo dataApiRepo;
 
+    @Autowired
+    MenuStatusServices menuStatusServices;
+
     @GetMapping("/")
     public String home(){
         return "home";
@@ -51,6 +56,11 @@ public class ILensController {
     @PostMapping("/auth")
     @ResponseBody
     public String authenticate(HttpServletRequest request, HttpServletResponse response, @RequestBody UserVo userVo) throws AuthenticationException {
+        MenuStatus ms = menuStatusServices.getList();
+        long mStatus = 1;
+        if (ms.isStatus()){
+            mStatus = 0;
+        }
         try {
             UserVo user = userService.authUser(userVo);
             if (user != null) {
@@ -68,6 +78,7 @@ public class ILensController {
                 session.setAttribute("ROLE", userVo.getRole());
                 session.setAttribute("USER_ID", userVo.getUserId());
                 session.setAttribute("APP_NAME", "iLens");
+                session.setAttribute("menuStatus", mStatus);
                 session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
                 DataApi dataApi;
                 try {

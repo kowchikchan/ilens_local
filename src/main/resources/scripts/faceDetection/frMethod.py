@@ -17,19 +17,32 @@ def adjustGamma(image, gamma=1.0):
     return cv2.LUT(image, table)
 
 
-def checkContiguousOccurrence(matches):
-    maximumCount = 0
-    count = 0
-    cntList = []
-    for i in range(len(matches) - 1):
-        if 'True' == matches[i] and matches[i] == matches[i + 1]:
-            count += 1
-            cntList.append(count + 1)
+def checkContiguousOccurrence(matches, distances, labels):
+    maxCount, currentCount = 0, 0
+    max_matches, current_matches, max_index, current_index, distance, labelsLst = [], [], [], [], [], []
+    for i in range(len(matches)):
+        if matches[i] == 'True':
+            currentCount += 1
+            current_matches.append(matches[i])
+            current_index.append(i)
+            if i == len(matches) - 1:
+                maxCount = max(currentCount, maxCount)
+                if len(current_matches) == maxCount:
+                    max_matches = current_matches
+                    max_index = current_index
         else:
-            count = 0
-    if len(cntList) > 0:
-        maximumCount = max(cntList)
-    return maximumCount
+            maxCount = max(currentCount, maxCount)
+            if len(current_matches) == maxCount:
+                max_matches = current_matches
+                max_index = current_index
+            currentCount = 0
+            current_matches = []
+            current_index = []
+
+    for ind in max_index:
+        distance.append(distances[ind])
+        labelsLst.append(labels[ind])
+    return maxCount, max_matches, distance, labelsLst
 
 
 def featuresAndLabels():
@@ -53,6 +66,7 @@ def featuresAndLabels():
 modelFeatures, modelLabels = featuresAndLabels()
 unknownEncodings = []
 CONFIDENCE = .5
+resizeRatio = 50
 
 
 def postUnknown(dataLocation, dt_string, frame, apiToken, postURL, json_values):
@@ -82,15 +96,18 @@ class FRMethod:
         self.startTime = startTime
 
     def liveMethod(self):
-        # global faceEncode
         global unknownEncodings
         now, json_values, emp_name = datetime.now(), {}, "----"
         dt_string = now.strftime("%d%m%Y%H%M%S")
+
+        # brightness adjustment.
         img = adjustGamma(self.frame, gamma=1.7)
-        img = cv2.resize(img, (0, 0), fx=0.30, fy=0.30)
-        imgResized = cv2.resize(self.frame, (0, 0), fx=0.30, fy=0.30)
+
+        # resize part.
+        dim = (int(img.shape[1] * resizeRatio / 100), int(img.shape[0] * resizeRatio / 100))
+        img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+
         faces = face_locations(img)
-        # diff
         diff = datetime.now() - self.startTime
         if len(faces) != 0:
             encodesCurFrame = face_encodings(img, faces, model="large")
@@ -98,7 +115,7 @@ class FRMethod:
                 matches = (np.linalg.norm(modelFeatures - encodeFace, axis=1) <= CONFIDENCE)
                 faceDistance = np.linalg.norm(modelFeatures - encodeFace, axis=1)
                 matchList = [f'{str(i)}' for i in matches]
-                contCount = checkContiguousOccurrence(matchList)
+                contCount, matches, faceDistance, labels = checkContiguousOccurrence(matchList, faceDistance, modelLabels)
                 print(f'contCount, {contCount}')
                 (top, right, bottom, left) = faceLoc
                 json_values["channelId"] = self.cameraId
@@ -108,7 +125,7 @@ class FRMethod:
                 if contCount >= 2:  # based on Training image quantity
                     matchIndex = np.argmin(faceDistance)
                     if matches[matchIndex]:
-                        emp_id = modelLabels[matchIndex]
+                        emp_id = labels[matchIndex]
                         if data['usersList'].get(emp_id): emp_name = data['usersList'].get(emp_id)
                         face_file_name = "".join([self.dataLocation, "/", dt_string + "_" + emp_id, ".jpg"])
                         json_values["snapshot"] = dt_string + "_" + emp_id
@@ -116,10 +133,10 @@ class FRMethod:
                         json_values["entryViolationVos"] = None
                         json_values["npr"] = None
                         json_values["socialViolation"] = None
-                        cv2.rectangle(imgResized, (left, top), (right, bottom), (252, 3, 3), 2)
-                        cv2.putText(imgResized, emp_name, (left - 10, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                        cv2.rectangle(img, (left, top), (right, bottom), (252, 3, 3), 2)
+                        cv2.putText(img, emp_name, (left - 10, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                                     (252, 3, 3), 1, cv2.LINE_AA)
-                        cv2.imwrite(face_file_name, cv2.resize(cv2.cvtColor(imgResized, cv2.COLOR_BGR2RGB), (490, 334),
+                        cv2.imwrite(face_file_name, cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (490, 334),
                                                                interpolation=cv2.INTER_AREA))
                         try:
                             headers = {'Content-type': 'application/json', 'Accept': 'text/plain',
@@ -131,29 +148,32 @@ class FRMethod:
                             print("[INFO]: Captured Information Post Response : {}", response.status_code)
                         except ConnectionError as e:
                             raise ConnectionError("Server Connection Exception {}", e)
-                else:
-                    json_values["snapshot"] = dt_string
-                    if unknownEncodings is None or len(unknownEncodings) == 0:
-                        try:
-                            postUnknown(self.dataLocation, dt_string, self.frame, self.apiToken, self.postURL, json_values)
-                            unknownEncodings = [encodeFace]
-                        except ConnectionError as e:
-                            raise ConnectionError("Server Connection Exception {}", e)
-                    else:
-                        checkConfidence = np.linalg.norm(unknownEncodings - encodeFace) < CONFIDENCE
-                        if not checkConfidence:
-                            try:
-                                postUnknown(self.dataLocation, dt_string, self.frame, self.apiToken, self.postURL, json_values)
-                                unknownEncodings = [encodeFace]
-                            except ConnectionError as e:
-                                raise ConnectionError("Server Connection Exception {}", e)
-            json_values.clear()
+            #
+            #                 else:
+            #                     json_values["snapshot"] = dt_string
+            #                     if unknownEncodings is None or len(unknownEncodings) == 0:
+            #                         try:
+            #                             postUnknown(self.dataLocation, dt_string, img, self.apiToken, 
+            #                             self.postURL, json_values)
+            #                             unknownEncodings = [encodeFace]
+            #                         except ConnectionError as e:
+            #                             raise ConnectionError("Server Connection Exception {}", e)
+            #                     else:
+            #                         checkConfidence = np.linalg.norm(unknownEncodings - encodeFace) < CONFIDENCE
+            #                         if not checkConfidence:
+            #                             try:
+            #                                 postUnknown(self.dataLocation, dt_string, img, self.apiToken, 
+            #                                 self.postURL, json_values)
+            #                                 unknownEncodings = [encodeFace]
+            #                             except ConnectionError as e:
+            #                                 raise ConnectionError("Server Connection Exception {}", e)
+                json_values.clear()
         # else:
         #     # cv2.rectangle(img, (left, top), (right, bottom), (255, 0, 0), 2)
         #     # cv2.putText(img, 'unknown', (left - 10, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0),
         #     #            2, cv2.LINE_AA)
         #     face_file_name = "".join([self.dataLocation, "/", dt_string, ".jpg"])
-        #     cv2.imwrite(face_file_name, cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB))
+        #     cv2.imwrite(face_file_name, cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         # print(f'{json_values}')
         # print(f'fps at fr, {int(self.fps)}')
         # json_values.clear()

@@ -106,7 +106,6 @@ body{
 .contant{
   margin-left: 40px;
   padding: 20px;
-  margin-top: 2%;
   transition: 1s;
 }
 .row{
@@ -738,7 +737,6 @@ header .main-menu li.drop:hover > ul.drop-down {
 .Date-time {
   font-size: 20px;
   font-weight: 200;
-  width: 261px;
   display: inline-block;
   color: #fff;
 }
@@ -1365,13 +1363,13 @@ input:disabled{
 }
 .top-nav{
   margin-left: 40px;
-  position: fixed;
+  position: sticky;
   padding: 10px 20px;
   top: 0;
   transition: 1s;
   z-index: 100;
   width: calc(100% - 40px);
-  height: 45px;
+  /* height: 45px; */
   background-color: #062e51;  
 }
 .top-nav.active{
@@ -2537,21 +2535,18 @@ fa-warning:before, .fa-exclamation-triangle:before {
 
 /*top contant media query*/
 
-@media only screen and (max-width: 940px){
+/* @media only screen and (max-width: 940px){
   .contant{
     margin-top: 6%;
   }
-}
+} */
 
 /*datetime media query*/
 
 @media only screen and (max-width: 720px){
   .fs-30{
-    font-size: 17px;
+    font-size: 14px;
   }
-  .Date-time {
-    width: 176px;
-}
 }
 
 .input-labels{
@@ -2563,12 +2558,9 @@ fa-warning:before, .fa-exclamation-triangle:before {
 /*Page heading*/
 
 .heading {
-  position: fixed;
-  top: .5rem;
-  left: 7%;
-  height: 35px;
+  position: relative;
+  margin-left: 15%;
   background-color: #062e51;
-  z-index: 101;
   transition: 1s;
 }
 
@@ -2585,16 +2577,8 @@ fa-warning:before, .fa-exclamation-triangle:before {
   letter-spacing: 0.05rem;
 }
 
-@media only screen and (max-width: 1250px){
-  .heading{
-    left: 8%;
-  }
-}
 
 @media only screen and (max-width: 875px){
-  .heading{
-    left: 11%;
-  }
    .confic-panal{
     display: flex;
     flex-direction: column;
@@ -2622,16 +2606,9 @@ fa-warning:before, .fa-exclamation-triangle:before {
   }
 }
 
-@media only screen and (max-width: 650px){
-  .heading{
-    left: 14%;
-  }
-}
+
 
 @media only screen and (max-width: 500px){
-  .heading{
-    left: 19%;
-  }
   .plus-button{
     top: 13px;
     right: 3px;
@@ -2735,11 +2712,6 @@ button.btn.btn-outline-warning {
   width: 40px;
   height: 30px;
   background: #abc4d6;
-  filter: grayscale(100%);
-  -webkit-filter: grayscale(100%);
-  -moz-filter: grayscale(100%);
-  -ms-filter: grayscale(100%);
-  -o-filter: grayscale(100%);
   border-radius: 10px;
 }
 
@@ -3839,12 +3811,9 @@ input#text-date {
     height: 100%;
     width: 140%;
   }
-  .Date-time {
-    margin-top: 7px;
-}
-  .contant {
+  /* .contant {
     margin-top: 6%;
-  }
+  } */
   /* .nav-icon {
     margin-bottom: 83px;
   }
@@ -3860,9 +3829,6 @@ input#text-date {
   .heading.active {
     transition: 1s;
     margin-left: 35px;
-  }
-  .heading{
-    left: 49px;
   }
   .navbar-vertical {
     width: 38px;
@@ -4143,9 +4109,9 @@ input#text-date {
     height: 191px;
     width: 33vw;
 }
-  .main-table {
+  /* .main-table {
     margin-top: 30px;
-  }
+  } */
   
 }
 button#trace {
@@ -4783,9 +4749,9 @@ span.progress{
   color:var(--blue) !important;
   background:white !important;
 }
-@media only screen and (min-width: 940px) and (max-width: 1700px) {
-  button.btn.btn-outline-warning {
-    margin-top: 30px;
+@media only screen and (min-width: 720px) and (max-width: 790px) {
+  .fs-30 {
+      font-size: 17px;
   }
 }
 .inactive1 i {
@@ -5101,5 +5067,11 @@ input[type="search"]::-webkit-search-cancel-button {
   .sm-mt-4{
     margin-top: 1rem !important;
   } 
+}
+a {
+  cursor: pointer;
+}
+ul.main-menu.visble-menu.active i {
+  pointer-events: none;
 }
 

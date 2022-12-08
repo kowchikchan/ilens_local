@@ -16,18 +16,18 @@
                 <nav aria-label="Page navigation example" class="pagination-nav">
                     <ul class="pagination">
                         <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Previous">
+                            <a class="page-link"  aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
                                 <span class="sr-only">Previous</span>
                             </a>
                         </li>
                         <li class="page-item active">
-                            <a class="page-link" href="#">1</a>
+                            <a class="page-link" >1</a>
                         </li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" >2</a></li>
+                        <li class="page-item"><a class="page-link" >3</a></li>
                         <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next">
+                            <a class="page-link"  aria-label="Next">
                                 <span aria-hidden="true">&raquo;</span>
                                 <span class="sr-only">Next</span>
                             </a>
@@ -153,15 +153,15 @@
               if(data[i].mappings == false){
                   channelList=channelList+'<td class="mapped_class"><i class="fa fa-check inactive" aria-hidden="true"></i></td>';
                   channelList=channelList+'<td class="database-icon">';
-                  channelList=channelList+'<a href="#" data-placement="right" data-toggle="tooltip" data-html="true" title="<div onClick=\'javascript:call(3)\'><a class=\'start_tool\' href=\'#\'>Start</a></div>">';
+                  channelList=channelList+'<a  data-placement="right" data-toggle="tooltip" data-html="true" title="<div onClick=\'javascript:call(3)\'><a class=\'start_tool\' >Start</a></div>">';
                   channelList=channelList+'<i class="fa fa-database"></i><i class="fa fa-play-circle rotation-3" aria-hidden="true"></i></a></td>';
               }else{
                   channelList=channelList+'<td class="mapped_class"><i class="fa fa-check active" aria-hidden="true"></i></td>';
                   channelList=channelList+'<td class="database-icon">';
-                  channelList=channelList+'<a href="#"';
+                  channelList=channelList+'<a ';
                   channelList=channelList+'data-placement="right" data-toggle="tooltip" data-html="true" ';
-                  channelList=channelList+'title="<div onClick=\'javascript:call(1)\'><a class=\'restart_tool\'href=\'#\'>Restart</a></div>';
-                  channelList=channelList+'<div onClick=\'javascript:call(2)\'><a class=\'stop_tool\' href=\'#\'>Stop</a></div>">';
+                  channelList=channelList+'title="<div onClick=\'javascript:call(1)\'><a class=\'restart_tool\'>Restart</a></div>';
+                  channelList=channelList+'<div onClick=\'javascript:call(2)\'><a class=\'stop_tool\' >Stop</a></div>">';
                   channelList=channelList+'<i class="fa fa-database"></i><i class="fa fa-refresh rotation-1" aria-hidden="true"></i><i class="fa fa-stop-circle-o rotation-2" aria-hidden="true"></i></a></td>';
                   }
               channelList=channelList+'<td><i class="fa fa-pencil-square-o edit-confi" aria-hidden="true"></i></td>';

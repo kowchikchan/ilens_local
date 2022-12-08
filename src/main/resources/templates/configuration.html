@@ -1,7 +1,4 @@
 <div class="content">
-  <div class="heading" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
-      <span class="heading-text fs-30">Channel Configuration</span>
-  </div>
   <div class="main-table zoom5">
     <div class="confic-panal">
       <div class="camera_detail">
@@ -277,6 +274,7 @@
   var boundy="";
   var sessionToken=""
   $(".pre-loading").show();
+  $("#heading").html("Channel Configuration");
 $(document).ready(function(){
   sessionToken = "[[${session.USER.sessionToken}]]";
   $("#cropChannelId").val($("#channelId").val());

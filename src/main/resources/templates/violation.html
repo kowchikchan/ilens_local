@@ -8,9 +8,6 @@
 	<div class="pre-loading">
     	<img class="loader" src="/web/images/loader.png" />
   	</div>
-      <div class="heading" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
-        <span class="heading-text fs-30">Violation</span>
-    </div>
     <!-- <span>
         <button class="btn btn-outline-warning" onclick="back()">Go Back</button>
     </span> -->
@@ -49,19 +46,25 @@
     			</table>
     		</div>
     	</div>
-        <div id="popup_default" class="popup">
-            <div class="popup-overlay"></div>
-            <div class="popup-content">
-              <a href="#" class="close-popup" data-id="popup_default">&times;</a>
-             <table id="imageId">
-                 
-             </table>
+        <div class="modal" id="testModel" data-backdrop="static">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content live-model mr-md-3">
+              <a class="close-popup c-p" data-dismiss="modal" aria-label="Close">&times;</a>
+              <!-- Modal body -->
+              <div class="modal-body p-2 mt-sm-0">
+                  <div class="row">
+                      <div class="col p-0">
+                        <div id="imageId"></div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
     </div>
 	<div class="records"></div>
 <script>
-
+ $("#heading").html("Violation");
 $(function() {
   $("#text-date").datetimepicker({
     toolbarPlacement: 'bottom',
@@ -182,44 +185,15 @@ $(function() {
 		return bs64EncodedString;
 	}
 
-	    // popup open and close.
-
-	(function($) {
-      $.fn.openPopup = function( settings ) {
-        var elem = $(this);
-        var settings = $.extend({
-          anim: 'fade'
-        }, settings);
-        elem.show();
-        elem.find('.popup-content').addClass(settings.anim+'In');
-      }
-      
-      $.fn.closePopup = function( settings ) {
-        var elem = $(this);
-        var settings = $.extend({
-          anim: 'fade'
-        }, settings);
-        elem.find('.popup-content').removeClass(settings.anim+'In').addClass(settings.anim+'Out');
-        
-        setTimeout(function(){
-            elem.hide();
-            elem.find('.popup-content').removeClass(settings.anim+'Out')
-          }, 500);
-      }
-        
-    }(jQuery));
 
 	var imageId="";
     function snapshotShow(encodeString){
-        imageId = imageId + "<img src='data:image/png;base64," + encodeString + "'>"
+        imageId = imageId + "<img class='img-fluid' src='data:image/png;base64," + encodeString + "'>"
         $("#imageId").html(imageId);
-        $('#popup_default').openPopup({ anim: 'fade' });
+        $("#testModel").modal("show");
         imageId = "";
     }
 
-     $('.close-popup').click(function(){
-      $('#popup_default').closePopup({ anim: 'fade' });
-    });
 
   var totalPages = 0;
   var totalCount = 0;

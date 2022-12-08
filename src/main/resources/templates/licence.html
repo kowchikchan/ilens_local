@@ -8,9 +8,6 @@
 	<div class="pre-loading">
     	<img class="loader" src="/web/images/loader.png" />
   	</div>
-      <div class="heading" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
-        <span class="heading-text fs-30">Licence</span>
-    </div>  	
     <div style="margin-top: 1vw;">
       <button  class="LicenceBtn" onclick="importlicence()">Import</button>
     </div>
@@ -34,6 +31,7 @@
     		</div>
         <div class="records" id="licence-record"></div>
 <script>
+  $("#heading").html("Licence");
   $(document).ready(function(){    
       $("#navadms").addClass('active');
       $("#licence").addClass('active');

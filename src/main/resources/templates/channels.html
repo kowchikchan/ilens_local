@@ -8,9 +8,6 @@
     <div class="pre-loading">
       <img class="loader" src="/web/images/loader.png" />
     </div>
-    <div class="heading" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
-        <span class="heading-text fs-30">Channel Configuration</span>
-    </div>
     <div id="server_table" class="main-table zoom">
         <div class="col-md-12 pb-12 row m-0">
           <div class="col-lg-12 row p-0 justify-content-between">
@@ -129,6 +126,7 @@
       var windowsize = $(window).width();
       var userlist=[];
       $(".pre-loading").show();
+      $("#heading").html("Channel Configuration");
       $(document).ready(function () {
         var channelFilterVO={ status: "All",ip:"null"}
         if ( windowsize < 500 ){
@@ -253,29 +251,29 @@ function filterIp(){
 
 
           if(rL.includes(data[i].id.toString())){
-            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+            channelList=channelList+'<a  class="tooltipMenu-color">';
 
             channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><span class="channelStart"><span class="fa fa-circle"></span></span><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
 
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Restart</a></li>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' >Restart</a></li>';
 
-            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' >Stop</a></li></ul></div></li></ul></a>';
 
           }else{
             if(data[i].status==false){
               channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li disable" title="This channel is disabled.&#013;You can enable this channel in the settings."><i class="fa fa-play fa-sm"></i></li></td>';
             }else{
-              channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+              channelList=channelList+'<a  class="tooltipMenu-color">';
               channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm"></i>';
               channelList=channelList+'<div class="tooltipMenu rightSide">';
-              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Start</a></li></ul></div></li></ul></a></td>';
+              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color tootipText\' >Start</a></li></ul></div></li></ul></a></td>';
             }
           }
 
             channelList=channelList+'<td class="personEnteries"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></td>';
-            channelList=channelList+'<td><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  href=\'#\'></i></div></td>';
+            channelList=channelList+'<td><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  ></i></div></td>';
             channelList=channelList+'</tr>';
           }
           if(data == 0){
@@ -689,29 +687,29 @@ $("#channelForm").hide();
 
 
           if(rL.includes(data[i].id.toString())){
-            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+            channelList=channelList+'<a  class="tooltipMenu-color">';
 
             channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><span class="channelStart"><span class="fa fa-circle"></span></span><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
 
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Restart</a></li>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' >Restart</a></li>';
 
-            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' >Stop</a></li></ul></div></li></ul></a>';
 
           }else{
             if(data[i].status==false){
               channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li disable" title="This channel is disabled.&#013;You can enable this channel in the settings."><i class="fa fa-play fa-sm"></i></li></ul></td>';
             }else{
-              channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+              channelList=channelList+'<a  class="tooltipMenu-color">';
               channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm"></i>';
               channelList=channelList+'<div class="tooltipMenu rightSide">';
-              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Start</a></li></ul></div></li></ul></a></td>';
+              channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color tootipText\' >Start</a></li></ul></div></li></ul></a></td>';
             }
           }
 
           channelList=channelList+'<td class="personEnteries"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></td>';
-          channelList=channelList+'<td><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  href=\'#\'></i></div></td>';
+          channelList=channelList+'<td><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  ></i></div></td>';
           channelList=channelList+'</tr>';
         }
         if(data == 0){
@@ -777,15 +775,15 @@ function startChannel(id){
     async: true,
     success: function(data){
     var startserver="";
-    startserver=startserver+'<a href="#" class="tooltipMenu-color">';
+    startserver=startserver+'<a  class="tooltipMenu-color">';
 
     startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><span class="channelStart"><span class="fa fa-circle"></span></span><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
 
     startserver=startserver+'<div class="tooltipMenu rightSide">';
 
-    startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Restart</a></li>';
+    startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' >Restart</a></li>';
 
-    startserver=startserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+    startserver=startserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' >Stop</a></li></ul></div></li></ul></a>';
     if ( windowsize < 500 ){
     $("#server1_"+id).html(startserver);
     }else{
@@ -819,11 +817,11 @@ function restartchannel(id){
         async: true,
         success: function(data){
           var restartserver="";
-          restartserver=restartserver+'<a href="#" class="tooltipMenu-color">';
+          restartserver=restartserver+'<a  class="tooltipMenu-color">';
           restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><span class="channelStart"><span class="fa fa-circle"></span></span><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
           restartserver=restartserver+'<div class="tooltipMenu rightSide">';
-          restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Restart</a></li>';
-          restartserver=restartserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+          restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' >Restart</a></li>';
+          restartserver=restartserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' >Stop</a></li></ul></div></li></ul></a>';
 
           if ( windowsize < 500 ){
             $("#server1_"+id).html(restartserver);
@@ -852,13 +850,13 @@ function stopChannel(id){
     async: false,
     success: function(data){
     var stopserver="";
-    stopserver=stopserver+'<a href="#" class="tooltipMenu-color">';
+    stopserver=stopserver+'<a  class="tooltipMenu-color">';
 
     stopserver=stopserver+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm" aria-hidden="true"></i></i>';
 
     stopserver=stopserver+'<div class="tooltipMenu rightSide">';
 
-    stopserver=stopserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Start</a></li></ul></div></li></ul></a>';
+    stopserver=stopserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+id+');\' class=\'tooltipMenu-color tootipText\' >Start</a></li></ul></div></li></ul></a>';
 
     if ( windowsize < 500 ){
       $("#server1_"+id).html(stopserver);
@@ -927,18 +925,18 @@ $("#channelForm").hide();
           
           channelList=channelList+'<div id="server1_'+data[i].id+'" class="database-icon">';
 
-          channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+          channelList=channelList+'<a  class="tooltipMenu-color">';
 
           if(rL.includes(data[i].id.toString())){
-            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+            channelList=channelList+'<a  class="tooltipMenu-color">';
 
             channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips tooltips_li"><span class="channelStart"><span class="fa fa-circle"></span></span><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
 
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Restart</a></li>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color tootipText\' >Restart</a></li>';
 
-            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color tootipText\' >Stop</a></li></ul></div></li></ul></a>';
 
           }else{
             if(data[i].status==false){
@@ -950,10 +948,10 @@ $("#channelForm").hide();
 
           channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-          channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color  tootipText\' href=\'#\'>Start</a></li></ul></div></li></ul></a></div>';
+          channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color  tootipText\' >Start</a></li></ul></div></li></ul></a></div>';
 
           channelList=channelList+'<div class="personEnteries"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></div>';
-          channelList=channelList+'<div><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  href=\'#\'></i></div></div>';
+          channelList=channelList+'<div><div class="alt"> <i onClick=\'javascript:snapshotShow('+'"'+data[i].ip+'"'+');\' class=\'fa fa-video-camera open-popup\' data-id=\'popup_default\'  ></i></div></div>';
           channelList=channelList+'</div>';
         }
         if(data == 0){

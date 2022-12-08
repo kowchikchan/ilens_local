@@ -8,20 +8,17 @@
 	<div class="pre-loading">
     	<img class="loader" src="/web/images/loader.png" />
   	</div>
-  	<div class="heading" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
-      <span class="heading-text fs-30" id="traceHeading"></span>
-    </div>
-    <span>
-        <button class="btn btn-outline-warning" onclick="back()">Go Back</button>
-    </span>
     <div class="main-table">
+      <div class="col-12 text-right">
+        <button class="new-button" onclick="back()">Go Back</button>
+      </div>
     	<div class="col-md-12 pb-10 row m-0">
-    		<div class="col-md-12">
+    		<!-- <div class="col-md-12">
     			<nav aria-label="Page navigation example" class="pagination-nav" id="attendancePage">
               		<ul class="pagination" id="attendancePagination"></ul>
             	</nav>
     			
-    		</div>
+    		</div> -->
     		<div class="col-md-12 row table-responsive">
     			<table class="clr-txt">
     				<thead>
@@ -225,7 +222,7 @@
               $('.pagination-nav').hide();
           	}else{
           		$(".records").hide();
-               $("#traceHeading").html(traceHeading).show(); 
+               $("#heading").html(traceHeading);
                $("#traceList").html(traceList).show();
                $('.pagination-nav').show();
           	}

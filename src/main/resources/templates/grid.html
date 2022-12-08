@@ -28,9 +28,9 @@
                 Select filter
               </button>
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#" id="fil"  onclick="allList()">All</a>
-                <a class="dropdown-item" href="#" id="fil" onclick="activeList()">Active</a>
-                <a class="dropdown-item" href="#" id="fil" onclick="inActiveList()" >In Active</a>
+                <a class="dropdown-item"  id="fil"  onclick="allList()">All</a>
+                <a class="dropdown-item"  id="fil" onclick="activeList()">Active</a>
+                <a class="dropdown-item"  id="fil" onclick="inActiveList()" >In Active</a>
               </div>
             </div>
         </div>
@@ -64,7 +64,7 @@
   <div id="popup_default" class="popup">
           <div class="popup-overlay"></div>
           <div class="popup-content">
-            <a href="#" class="close-popup" data-id="popup_default">&times;</a>
+            <a  class="close-popup" data-id="popup_default">&times;</a>
            <table id="liveId">
             <div class="camera_live">
               <div class="fp-Video" id="ch" >
@@ -190,19 +190,19 @@ function filterIp(){
             
             channelList=channelList+'<div id="server_'+data[i].id+'" class="database-icon">';
 
-            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+            channelList=channelList+'<a  class="tooltipMenu-color">';
 
               if(rL.includes(data[i].id.toString())){
 
-            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+            channelList=channelList+'<a  class="tooltipMenu-color">';
 
             channelList=channelList+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
 
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' >Restart</a></li>';
 
-            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' >Stop</a></li></ul></div></li></ul></a>';
 
             }else{
               if(data[i].status==false){
@@ -214,7 +214,7 @@ function filterIp(){
 
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a></div>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color\' >Start</a></li></ul></div></li></ul></a></div>';
 
             channelList=channelList+'<p class="dm"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></p>';
             channelList=channelList+'</div>';
@@ -584,20 +584,20 @@ $("#channelForm").hide();
           
           channelList=channelList+'<div id="server_'+data[i].id+'" class="database-icon">';
 
-          channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+          channelList=channelList+'<a  class="tooltipMenu-color">';
 
 
           if(rL.includes(data[i].id.toString())){
 
-            channelList=channelList+'<a href="#" class="tooltipMenu-color">';
+            channelList=channelList+'<a  class="tooltipMenu-color">';
 
             channelList=channelList+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
 
             channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+            channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' >Restart</a></li>';
 
-            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+            channelList=channelList+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' >Stop</a></li></ul></div></li></ul></a>';
 
           }else{
             if(data[i].status==false){
@@ -609,7 +609,7 @@ $("#channelForm").hide();
 
           channelList=channelList+'<div class="tooltipMenu rightSide">';
 
-          channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a></div>';
+          channelList=channelList+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+data[i].id+');\' class=\'tooltipMenu-color\' >Start</a></li></ul></div></li></ul></a></div>';
 
           channelList=channelList+'<p class="dm"><i class="fa fa-cog fa-sm" aria-hidden="true" onclick="getForm('+id+')"></i></p>';
           channelList=channelList+'</div>';
@@ -652,15 +652,15 @@ function startChannel(id){
     async: true,
     success: function(data){
     var startserver="";
-    startserver=startserver+'<a href="#" class="tooltipMenu-color">';
+    startserver=startserver+'<a  class="tooltipMenu-color">';
 
     startserver=startserver+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
 
     startserver=startserver+'<div class="tooltipMenu rightSide">';
 
-    startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
+    startserver=startserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' >Restart</a></li>';
 
-    startserver=startserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+    startserver=startserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' >Stop</a></li></ul></div></li></ul></a>';
     //$("#hide_"+id).addClass('hide');
     $("#server_"+id).html(startserver);
     setTimeout(function(){ toastr.info("Server started successfully.."); }, 1000); 
@@ -691,11 +691,11 @@ function restartchannel(id){
         async: true,
         success: function(data){
           var restartserver="";
-          restartserver=restartserver+'<a href="#" class="tooltipMenu-color">';
+          restartserver=restartserver+'<a  class="tooltipMenu-color">';
           restartserver=restartserver+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li"><i class="fa fa-pause fa-sm" aria-hidden="true"></i>';
           restartserver=restartserver+'<div class="tooltipMenu rightSide">';
-          restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Restart</a></li>';
-          restartserver=restartserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Stop</a></li></ul></div></li></ul></a>';
+          restartserver=restartserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:restartchannel('+id+');\' class=\'tooltipMenu-color\' >Restart</a></li>';
+          restartserver=restartserver+'<li class="tooltips_li"><a onClick=\'javascript:stopChannel('+id+');\' class=\'tooltipMenu-color\' >Stop</a></li></ul></div></li></ul></a>';
           $("#server_"+id).html(restartserver);
           setTimeout(function(){ toastr.info("Channel Restarted successfully."); }, 1000);
         },
@@ -723,13 +723,13 @@ function stopChannel(id){
     async: true,
     success: function(data){
       var stopserver="";
-      stopserver=stopserver+'<a href="#" class="tooltipMenu-color">';
+      stopserver=stopserver+'<a  class="tooltipMenu-color">';
 
       stopserver=stopserver+'<ul class="tooltips_ul ic"><li class="tooltips tooltips_li"><i class="fa fa-play fa-sm" aria-hidden="true"></i></i>';
 
       stopserver=stopserver+'<div class="tooltipMenu rightSide">';
 
-      stopserver=stopserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+id+');\' class=\'tooltipMenu-color\' href=\'#\'>Start</a></li></ul></div></li></ul></a>';
+      stopserver=stopserver+'<ul class="tooltips_ul"><li class="tooltips_li"><a onClick=\'javascript:startChannel('+id+');\' class=\'tooltipMenu-color\' >Start</a></li></ul></div></li></ul></a>';
 
        $("#server_"+id).html(stopserver);
        setTimeout(function(){ toastr.info("Server stopped successfully.."); }, 1000); 

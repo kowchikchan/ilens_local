@@ -8,9 +8,6 @@
 <div class="pre-loading">
   <img class="loader" src="/web/images/loader.png" />
 </div>
-<div class="heading" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
-    <span class="heading-text fs-30">Data API</span>
-</div>
 <div class="main-table zoom2">  
 	<div class="data_api">
 		<div class="apisty">			
@@ -34,6 +31,7 @@
      </div>
   </div>
   <script>
+    $("#heading").html("Data API");
   	$(document).ready(function(){
       $("#navadms").addClass('active');
       $("#Adms").addClass('show');

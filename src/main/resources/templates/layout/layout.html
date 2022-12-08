@@ -51,7 +51,7 @@
                     <span id="UserRole">[[${session.ROLE}]]</span>
                 </div>
             </div>
-            <ul class="main-menu visble-menu">
+            <ul class="main-menu visble-menu" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
                 <li>
                     <a href="/" id="home"><i class="fa fa-home nav-icon" data-toggle="tooltip" data-original-title="Home" aria-hidden="true"></i>
                         <span>Home</span>
@@ -100,17 +100,17 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="/notification" id="notification"><em class="fa-solid fa-bell nav-icon fa-lg" data-toggle="Notification" data-original-title="Notification"></em><span>Notification</span>
+                    <a href="/notification" id="notification"><i class="fa-solid fa-bell nav-icon fa-lg" data-toggle="tooltip" data-original-title="Notification"></i><span>Notification</span>
                     </a>
                 </li>
                 <li>
-                    <a href="/profile" id="profile"><em class="fas fa-user-circle nav-icon fa-lg" data-toggle="tooltip" data-original-title="Profile"></em><span>Profile</span>
+                    <a href="/profile" id="profile"><i class="fas fa-user-circle nav-icon fa-lg" data-toggle="tooltip" data-original-title="Profile"></i><span>Profile</span>
                     </a>
                 </li>
                 <img src="/web/images/Asset 1.png" class="nav-logo">
                 <li class="logout">
                     <a href="/logout">
-                        <em class="fa fa-power-off nav-icon ex" data-toggle="tooltip" data-original-title="Logout"></em><span>Logout</span>
+                        <i class="fa fa-power-off nav-icon ex" data-toggle="tooltip" data-original-title="Logout"></i><span>Logout</span>
                     </a>
                 </li>
 
@@ -119,12 +119,17 @@
     </header>
 </div>
 <div class="top-nav d-flex justify-content-between" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
-    <span class="navbar-icon"><i class="fa fa-bars" aria-hidden="true"></i></span>
-    <div class=" Date-time-div pl-0">
-        <span class="Date-time fs-30"></span><span class="am_pm fs-30"></span>
+    <span class="navbar-icon d-flex col-lg-4">
+        <i class="fa fa-bars" aria-hidden="true"></i>
+        <div class="heading">
+            <span class="heading-text fs-30" id="heading"></span>
+        </div>
+    </span>
+    <div class=" Date-time-div pl-0 col-lg-4 text-center">
+        <span class="Date-time fs-30"></span>
         <!-- <div><i class="fa fa-chevron-up date-move" aria-hidden="true"></i></div> -->
     </div>
-    <div class="ivProLogo"><img src="/web/images/ivpro.png"></div>
+    <div class="ivProLogo col-lg-4 text-right"><img src="/web/images/ivpro.png"></div>
 </div>
 
 <!--<div class="pre-loading">

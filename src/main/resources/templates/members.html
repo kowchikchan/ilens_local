@@ -8,9 +8,6 @@
   <div class="pre-loading">
     <img class="loader" src="/web/images/loader.png"/>
   </div>
-  <div class="heading" th:classappend="${#strings.toString(session[menuStatus]) == '1' ? 'active' : ''}">
-    <span class="heading-text fs-30">Members</span>
-  </div>
   <div class="main-table zoom1">
     <div class="col-md-12 pb-10 row m-0">
       <div class="col-md-12">
@@ -64,6 +61,7 @@
 <script>
   var windowsize = $(window).width();
   var userTrainedList=[];
+  $("#heading").html("Members");
 $(document).ready(function(){
   if ( windowsize < 500 ){
           $("#userList").hide();

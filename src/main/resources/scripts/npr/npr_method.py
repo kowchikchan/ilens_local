@@ -156,6 +156,19 @@ def detect(ksize1, ksize2, minimum_area, maximum_area, frame, postURL, place, ca
     possible_plates = findPlate.find_possible_plates(img)
     if possible_plates is not None:
         plate = possible_plates[0]
+        #print("-------------------")
+        img_src = cv2.imread(plate)
+        gray = cv2.cvtColor(img_src, cv2.COLOR_BGR2GRAY)
+        ret, thresh1 = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
+        rect_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (18, 18))
+        dilation = cv2.dilate(thresh1, rect_kernel, iterations=1)
+        contours, hierarchy = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        for cnt in contours:
+            x, y, w, h = cv2.boundingRect(cnt)
+            rect = cv2.rectangle(img_src, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cropped = img_src[y:y + h, x:x + w]
+            text = pytesseract.image_to_string(cropped)
+            print("PLATE NUMBER=", text)
         text = pytesseract.image_to_string(plate, config='--psm 11')
         reg_exp1 = '\w{2}\d{2}\w{2}\d{4}'
         reg_exp2 = '\w{2} \d{2} \w{2} \d{4}'

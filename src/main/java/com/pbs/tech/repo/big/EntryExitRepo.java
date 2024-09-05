@@ -27,6 +27,23 @@ public interface EntryExitRepo extends CrudRepository<EntryExitEntity,String> {
     @Query("SELECT * FROM EntryExit WHERE time > ?0 AND time <= ?1 ALLOW FILTERING")
     List<EntryExitEntity> findAllByFromAndTo(Date startDate, Date endDate);
 
+   /* @Query("SELECT id, name FROM EntryExit WHERE id = ?0 LIMIT ?1")
+    Iterable<EntryExitEntity> findByUser(String user, Integer limit);
+
+    @Query("SELECT id, name FROM EntryExit WHERE time >= ?0 group by id, name ALLOW FILTERING")
+    Slice<EntryExitEntity> getTodayAttendance(Date today, Pageable page);
+
+    @Query("SELECT id, name FROM EntryExit WHERE time > ?0 AND time <= ?1  AND type='entry' group by id, name ALLOW FILTERING")
+    List<EntryExitEntity> findAllByFromAndToTime(Date startDate, Date endDate);
+
+    @Query("SELECT id, name FROM EntryExit WHERE time >= ?0 AND time <= ?1 group by id, name ALLOW FILTERING")
+    Iterable<EntryExitEntity> getLastHourEntryOrOnTimeEntry(Date pastOneHourOrToday, Date PresentHourOrOnTime);
+
+    @Query("SELECT id, name FROM EntryExit WHERE time > ?0 AND time <= ?1 ALLOW FILTERING")
+    List<EntryExitEntity> findAllByFromAndTo(Date startDate, Date endDate);
+
+
+
 /*    @Query("SELECT * FROM EntryExit WHERE time >= ?0 AND time < ?1 group by id ALLOW FILTERING")
     Iterable<EntryExitEntity> getEveryTenMinutes(Date pastOneHourOrToday, Date PresentHourOrOnTime);
 

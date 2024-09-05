@@ -5,9 +5,8 @@ import org.apache.catalina.LifecycleState;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
-
-import javax.persistence.Entity;
 import java.util.Date;
+import javax.persistence.*;
 
 @Table("entryviolation")
 public class EntryViolation {

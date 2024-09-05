@@ -139,7 +139,7 @@ public class SystemConfig {
             reportPeriod = new ReportPeriod();
             reportPeriod.setId(1L);
             reportPeriod.setReportPeriod(1);
-            reportPeriod.setMail("ilens.logicfocus@logicfocus.com");
+            reportPeriod.setMail("kowchik2002@gmail.com");
             reportPeriod.setPreviousDate(new Date());
             reportPeriod.setWeekDays("monday,tuesday,wednesday,thursday,friday");
             reportPeriod.setCreatedBy(user);
@@ -176,7 +176,7 @@ public class SystemConfig {
         // Start RTSP Server.
         try {
             String error = null;
-            String scriptPath = System.getProperty("SCRIPT_PATH");
+            String scriptPath = "/Users/helloabc/Documents/ilensLatestB/src/main/resources/scripts";
 
             //script executing command.
             String executeCmd = pythonPath + " " + scriptPath + "/rtspServer/server.py";

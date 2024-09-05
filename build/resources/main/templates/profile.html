@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+    <title>[[${session.APP_NAME}]] - Profile</title>
+</head>
+<body>
+<div layout:fragment="content" class="contant">	
+<div class="pre-loading">
+  <img class="loader" src="/web/images/loader.png" />
+</div>
+<div class="main-table">
+  <div class="col-md-12 row table-responsive">
+	<div class="container-div">
+		<div class="left-div profile">
+			<p class="profile-head">Profile Details</p>
+			    <div class="col-md-12 p-0">
+			      <label class="input-labels">First Name</label>
+	              <input type="text" id="profile-Fname" name="" maxlength="10" class="lens_input" placeholder="First Name" />
+	            </div>
+	            <div class="col-md-12 p-0">
+	              <label class="input-labels">Last Name</label>
+	              <input type="text" id="profile-Lname" name="" maxlength="8" class="lens_input" placeholder="Last Name" />
+	            </div>
+	            <div class="col-md-12 p-0">
+	              <label class="input-labels">Email</label>
+	              <input type="email" id="profile-Email" name="" class="lens_input" placeholder="Email"  value="ilens@gmail.com"/>
+	            </div>
+	            <div class="col-md-12 p-0">
+	              <label class="input-labels">Department</label>	
+	              <input type="text" id="profile-Dept" name="" maxlength="11" class="lens_input" placeholder="Department" />
+	            </div>
+			    <div>
+				   <button type="button" id="update_profile" class="profile-button" onclick="userProfileUpdate();">Update</button>
+			    </div>
+	    </div>
+<!--   		<div class="right-div">
+  			<p class="profile-head">Change Password:</p>
+				<div class="col-md-12 p-0">
+				  <label class="input-labels">New Password</label>
+	              <input type="password" id="NewPassword" name="" class="lens_input password-show pr-40" maxlength="12" placeholder="New Password" /><i id="password_show" class="fa fa-eye show-password"></i>
+	       </div>
+          <div class="col-md-12 p-0">
+            <label class="input-labels">Re-enter Password</label>
+            <input type="password" id="Re-Password" name="" class="lens_input password-shows pr-40" maxlength="12" placeholder="Re-enter Password" /><i id="newPassword_show" class="fa fa-eye show-password"></i>
+          </div>
+  			<div>
+  			  <button type="button" id="btnSubmit" class="profile-button" onclick="updatePassword();">Change password</button>
+  			</div>
+  	 </div> -->
+	</div>
+  </div>
+</div>
+<div class="modal fade modal-blur" id="exampleModalCenter-2" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div id="popup-pro-bg" class="modal-content popup-wh">
+      <div id="remove-modal" class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Invalid profile credentials</h5>
+      </div>
+    <div class="modal-body">
+       <div id="profile-credentials">
+          <i id="warn-ProInvalid" class="fa fa-exclamation-triangle warning-config" aria-hidden="true"><div id="validProfileInput"></div></i>
+       </div>
+    </div>
+    <div id="profile-footer" class="modal-footer">
+      <button type="button" class="ok-btn" data-dismiss="modal" onclick="popupCancel()">Ok</button>
+    </div>
+  </div>
+</div>
+</div>
+<input id="location" type="hidden" name="">
+<input id="role" type="hidden" name="">
+<input id="UserID" type="hidden" name="">
+<input id="value" type="hidden" name="" value="1889">
+
+<script>
+  $("#heading").html("Profile");
+	$(document).ready(function(){
+    userProfile();
+    $("#profile").addClass('active');
+    $("#profile").on("click",function(){
+      $(".pre-loading").show();
+        window.setInterval(function(){
+          $(".pre-loading").hide();
+        }, 2000);
+    });
+	   $("#password_show").click(function(event){
+	   	$(this).toggleClass('fa-eye-slash');
+	   	var x = $(".password-show").attr("type");
+	   	if(x == "password"){
+          $(".password-show").attr("type","text");
+	   	}else{
+	   		$(".password-show").attr("type","password");
+	   	}
+	});
+	$("#newPassword_show").click(function(event){
+	   	$(this).toggleClass('fa-eye-slash');
+	   	var y = $(".password-shows").attr("type");
+	   	if(y == "password"){
+          $(".password-shows").attr("type","text");
+	   	}else{
+	   		$(".password-shows").attr("type","password");
+	   	}
+	});
+});
+$(window).on('load', function() {
+  $(".pre-loading").hide();
+});
+
+function userProfile(){
+      var reportApi = "[[${session.REPORT_API}]]";
+  		var sessionToken = "[[${session.USER.sessionToken}]]";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+  		var apiUrl = urlSlashCheck + "api/v1/user/"+"[[${session.USER.id}]]"; 
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
+  $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url:"api/v1/iLensApiClient" ,
+      dataType: "json",
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "POST",
+      data: JSON.stringify(ilensApiClientVO),
+      async: false,
+      success: function (data){
+          $("#profile-Fname").val(data.firstName);
+          $("#profile-Lname").val(data.lastName);
+          $("#profile-Dept").val(data.department);
+      }
+  });
+}
+
+ function userProfileUpdate(){ 
+    toastr.options = {
+      debug: false,
+      newestOnTop: false,
+      positionClass: "toast-bottom-right",
+      closeButton: true,
+      progressBar: false,
+    }
+    if($.trim($('#profile-Fname').val()) == ""){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("First Name should not be empty");
+      return false;
+    }else if($.trim($('#profile-Fname').val()) == 0){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("First Name should not be 0");
+      return false;
+    }else if($.trim($('#profile-Fname').val()).length < 3){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("First Name should be atleast 3 characters");
+      return false;
+    }else if($.trim($('#profile-Lname').val()) == ""){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("Last Name should not be empty");
+      return false;
+    }else if($.trim($('#profile-Lname').val()) == 0){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("Last Name should not be 0");
+      return false;
+    }else if($.trim($('#profile-Lname').val()).length < 1){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("Last Name should be atleast 1 characters");
+      return false;
+    }else if($.trim($('#profile-Email').val()) == ""){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("Email should not be empty");
+      return false;
+    }else if($.trim($('#profile-Email').val()) == 0){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("Email should not be 0");
+      return false;
+    }else if($.trim($('#profile-Email').val()).length < 8){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("Email should be atleast 8 characters");
+      return false;
+    }else if($.trim($('#profile-Dept').val()) == ""){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("Department should not be empty");
+      return false;
+    }else if($.trim($('#profile-Dept').val()) == 0){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("Department should not be 0");
+      return false;
+    }else if($.trim($('#profile-Dept').val()).length < 2){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("Department should be atleast 2 characters");
+      return false;
+    }
+    var user = {
+          active: true,
+          createBy: "string",
+          createdDt: "2021-04-16T06:08:27.803Z",
+          dateOfBirth: "2021-04-16T06:08:27.803Z",
+          department:$("#profile-Dept").val(),
+          firstName:$("#profile-Fname").val(),
+          id: "[[${session.USER.id}]]",
+          lastName:$("#profile-Lname").val(),
+          location:$("#location").val(),
+          role:$("#role").val(),
+          updatedBy: "string",
+          updatedDt: "2021-04-16T06:08:27.803Z",
+          userId: $("#UserID").val(),
+          userSecrect: $("#UserID").val()
+      };
+      var reportApi = "[[${session.REPORT_API}]]";
+  		var sessionToken = "[[${session.USER.sessionToken}]]";
+  		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+  		var apiUrl = urlSlashCheck + "api/v1/user"; 
+
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: user,
+        method: "PUT"
+      }
+
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url:"api/v1/iLensApiClient" ,
+        //dataType: "json",
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "POST",
+        async: false,
+        data: JSON.stringify(ilensApiClientVO),
+        success:function(data){
+          //usersPageList();
+          setTimeout(function(){ toastr.info("Successfully upadated the user.."); }, 1000);
+         },
+         error:function(err){
+            setTimeout(function(){ toastr.error("Error found.."); }, 1000);          }
+      });
+    } 
+
+function popupCancel(){
+ $("#exampleModalCenter-2").hide();
+}
+
+function updatePassword(){
+    if($.trim($('#NewPassword').val()) == ""){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("New Password should not be empty");
+      return false;
+    }else if($.trim($('#NewPassword').val()) == 0){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("New Password should not be 0");
+      return false;
+    }else if($.trim($('#NewPassword').val()).length < 5){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("New Password should be atleast 5 characters");
+      return false;
+    }else if($.trim($('#Re-Password').val()) == ""){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("Re-enter Password should not be empty");
+      return false;
+    }else if($.trim($('#Re-Password').val()) == 0){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("Re-enter Password should not be 0");
+      return false;
+    }else if($.trim($('#Re-Password').val()).length < 5){
+      $("#exampleModalCenter-2").show();
+      $("#warn-ProInvalid").show();
+      $('#validProfileInput').html("Re-enter Password should be atleast 5 characters");
+      return false;
+    }
+    var password = $("#NewPassword").val();
+	  var confirmPassword = $("#Re-Password").val();
+	  if (password != confirmPassword) {
+	    alert("Passwords do not match.");
+	    return false;
+	  }
+	  return true;
+      var user = {
+        active: true,
+        createBy: "string",
+        createdDt: "2021-04-16T06:08:27.803Z",
+        dateOfBirth: "2021-04-16T06:08:27.803Z",
+        department:$("#profile-Dept").val(),
+        firstName:$("#profile-Fname").val(),
+        id: $("#value").val(),
+        lastName:$("#profile-Lname").val(),
+        location:$("#location").val(),
+        role:$("#role").val(),
+        updatedBy: "string",
+        updatedDt: "2021-04-16T06:08:27.803Z",
+        userId: $("#UserID").val(),
+        userSecrect: confirmPassword
+      };
+      var reportApi = "[[${session.REPORT_API}]]";
+      var sessionToken = "[[${session.USER.sessionToken}]]";
+      var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+      var apiUrl = urlSlashCheck + "api/v1/user/changePassword"; 
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: user,
+        method: "PUT"
+      }
+
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url:"api/v1/iLensApiClient" ,
+        dataType: "json",
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "POST",
+        async: false,
+        data: JSON.stringify(ilensApiClientVO),
+        success:function(data){
+        clearInput();
+        }
+      });    
+}
+
+
+function clearInput(){
+  var value = $('#NewPassword').val();
+  var value = $('#Re-Password').val();
+  if (value.length > 0) {
+        $('#NewPassword').val("");
+        $('#Re-Password').val("");
+    }
+    else{
+    console.log(error);
+    }
+}
+</script>	
+</div>
+</body>
+</html>

@@ -241,7 +241,7 @@ public class UserService {
 
     public long startUserDataTraining(String id, HttpServletRequest request) {
         log.info("LOG {}", trainDataPath);
-        String scriptPath = System.getProperty("SCRIPT_PATH");
+        String scriptPath = "/Users/helloabc/Documents/ilensLatestB/src/main/resources/scripts";
         log.info("SCRIPTPATH:" + scriptPath);
         String trainSrcLocation = trainDataPath + File.separator + "." + id;
         HttpSession session = request.getSession();
@@ -292,7 +292,7 @@ public class UserService {
     public List<String> getTrainedLabels() throws IOException {
         try {
             String error = null;
-            String scriptPath = System.getProperty("SCRIPT_PATH");
+            String scriptPath = "/Users/helloabc/Documents/ilensLatestB/src/main/resources/scripts";
 
             //script executing command.
             String executeCmd = pythonPath + " " + scriptPath + "/pickling/readPickle.py";

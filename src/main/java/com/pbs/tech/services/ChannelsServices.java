@@ -172,8 +172,10 @@ public class ChannelsServices {
         }
 
         LicenceVo licenceVo = isValidLicence(licence.getLicenceStr());
-        if(vo.isStatus() && runningChannels.size() >= Long.parseLong(licenceVo.getServerCount()) && !runningChannels.contains(vo.getId())){
-            throw new Exception("Server count exceed");
+        if(licenceVo.getServerCount()!=null) {
+            if (vo.isStatus() && runningChannels.size() >= Long.parseLong(licenceVo.getServerCount()) && !runningChannels.contains(vo.getId())) {
+                throw new Exception("Server count exceed");
+            }
         }
 
         //now save channelConfig

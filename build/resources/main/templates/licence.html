@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+	<title>[[${session.APP_NAME}]] - Licence</title>
+</head>
+<body>
+<div layout:fragment="content" class="contant">
+	<div class="pre-loading">
+    	<img class="loader" src="/web/images/loader.png" />
+  	</div>
+    <div style="margin-top: 1vw;">
+      <button  class="LicenceBtn" onclick="importlicence()">Import</button>
+    </div>
+    <div class="main-table zoom3">
+    	<div class="col-md-12 pb-10 row m-0">
+    		
+    		<div class="col-md-12 row table-responsive">
+    			<table class="clr-txt">
+    				<thead>
+    					<tr>
+    						<th width="300"> Company Name </th>
+    						<th width="300"> No of Channels</th>
+    						<th width="300"> Start Date </th>
+    						<th width="300"> Type </th>
+                <th width="300">Expire Date</th>
+    					</tr>
+    				</thead>
+            <tbody class="" id="licenceLst"></tbody>
+    			</table>
+          <div id="Licence"></div>
+    		</div>
+        <div class="records" id="licence-record"></div>
+<script>
+  $("#heading").html("Licence");
+  $(document).ready(function(){    
+      $("#navadms").addClass('active');
+      $("#licence").addClass('active');
+      $("#Adms").addClass('show');
+      getLicenceDetails();
+    
+  })
+  function importlicence(){  
+     $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url:"/import_licence" ,
+      type: "GET",
+      async: false,
+      success: function (data){             
+        $("#Licence").html(data);
+        setTimeout(function(){ toastr.warning("licence will be override"); }, 1000);
+
+      }
+   })
+}
+
+function getLicenceDetails(){
+  var licenceLst = "";
+  $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      dataType: "json",
+      headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+      url:"/api/v1/license" ,
+      type: "GET",
+      async: false,
+      success: function (data){
+        if(data == null){
+          console.log("null");
+          $("#licenceLst").hide();
+          $(".records").html("No Licence Found <div id='licence-warn'>Please contact Administrator! </div>").show();
+        }else{
+          licenceLst = licenceLst + '<tr>';
+          licenceLst = licenceLst + '<td>' + data.clientName + '</td>';
+          licenceLst = licenceLst + '<td>' + data.serverCount + '</td>';
+          licenceLst = licenceLst + '<td>' + data.startDate + '</td>';
+          licenceLst = licenceLst + '<td>' + data.type + '</td>';
+          licenceLst = licenceLst + '<td>' + data.validTo + '</td>';
+          $(".records").hide();
+          $("#licenceLst").html(licenceLst).show();
+        }
+      }
+   });
+
+}
+
+</script>

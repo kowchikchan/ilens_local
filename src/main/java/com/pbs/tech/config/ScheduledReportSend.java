@@ -234,7 +234,7 @@ public class ScheduledReportSend {
         cal.add(Calendar.DATE, -(int)days);
 
         ReportVO reportVO = ilenService.totalEntries(reportPeriod.getReportPeriod(), type);
-        String scriptPath = System.getProperty("SCRIPT_PATH");
+        String scriptPath = "/Users/helloabc/Documents/ilensLatestB/src/main/resources/scripts";
 
         // initialize document.
         Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 45, BaseColor.WHITE);

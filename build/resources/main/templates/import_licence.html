@@ -1,0 +1,77 @@
+<div class="modal fade" id="TrainingModalCenter" tabindex="-1" role="dialog" aria-labelledby="TrainingModalCenterTitle" aria-hidden="true">
+  <div class="pre-loading">
+    <img class="loader" src="/web/images/loader.png" />
+  </div>
+    <div id="modal-box" class="modal-dialog modal-dialog-centered" role="document">
+      <div id="modal-color" class="modal-content">               
+        <div class="im">
+            <div class="icon"><i class="fa fa-cloud-upload" aria-hidden="true"></i></div>
+            <header>Import Licence</header>
+            <br>
+             <form id="upload-file-form" class="hide-ele">
+                <div class="col-lg-12 upload-file-model">
+                    <label class="btn btn-submit chaos-btn ml-0 upload_btn" for="upload-file-input">
+                        <input id="import-file-input" type="file" name="file" >
+                    </label>
+                  </div>       
+               
+             </form>
+          </div>
+          <div class="import_btn">
+             <button type="button" id="clickButton" class="cancel-button button-fit">Import</button>
+              <span class='label label-default hide' id="upload-file-info"></span>            
+             <button type="button" class="cancel-button button-fit" data-dismiss="modal" onclick="cancelModal()">Cancel</button>
+            </div>
+        </div>
+</div>
+<script>
+  $(document).ready(function(){
+    $(".pre-loading").hide();
+    $("#Title").show();
+     toastr.options = {
+          debug: false,
+          newestOnTop: false,
+          positionClass: "toast-bottom-right",
+          closeButton: true,
+          progressBar: false,
+        }
+  });
+  
+function cancelModal(){
+  $("#TrainingModalCenter").hide();
+}
+
+$("#clickButton").click(function(){
+  var form = new FormData();
+  var files = $('#import-file-input')[0].files;
+  if (files.length > 0){
+    form.append('File', files[0]);
+  }
+  $(".pre-loading").show();
+  	var sessionToken = "[[${session.USER.sessionToken}]]";
+  	var apiUrl = "api/v1/license/upload"; 
+
+  $.ajax({
+      url:apiUrl ,
+      headers:{'CLIENT_KEY':sessionToken},
+      type: 'POST',
+      data: form,
+      enctype: 'multipart/form-data',
+      contentType: false,
+      processData: false,
+      cache: false,
+      async: false,
+      success: function(data){              
+         setTimeout(function(){ toastr.success("Success.."); }, 1000);
+         cancelModal();
+         getLicenceDetails();
+      },
+      error: function(err){
+        setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+      }
+   });
+   window.setInterval(function(){
+    $(".pre-loading").hide();
+    }, 2000);
+})
+ </script>

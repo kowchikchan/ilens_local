@@ -28,4 +28,6 @@ public interface EntryViolationRepo extends CrudRepository<EntryViolation,String
     @Query("SELECT * FROM EntryViolation WHERE time >= ?0 AND time < ?1 ALLOW FILTERING")
     List<EntryViolation> getViolationList(Date time1, Date time2);
 
+
+
 }

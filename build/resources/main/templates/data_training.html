@@ -1,0 +1,369 @@
+<div class="modal fade" id="TrainingModalCenter" tabindex="-1" role="dialog" aria-labelledby="TrainingModalCenterTitle" aria-hidden="true">
+  <div id="modal-box" class="modal-dialog modal-dialog-centered" role="document">
+    <div id="modal-color" class="modal-content">
+      <div class="pre-loading" style="display: none;">
+        <span class="progress">
+          <span class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%">Processing...</span>
+        </span>
+      </div>
+      <div>
+        <span class="userId">Id: <span class="formId" id="trainUserId"></span></span>
+        <span class="studentName">Name: <span class="formId" id="trainUserName"></span></span>
+        <div class="container-switch po">
+          <div class="inner-container" id="toggle-7" enable="false">
+              <div id="tg-9"  class="toggle toggle-btn one" flag="one">
+                  <p>Upload</p>
+              </div>
+              <div id="tg-" class="toggle toggle-btn active one" flag="one">
+                  <p>Live</p>
+                  <i class="fa fa-check-circle df"></i>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body row col-md-12">
+        <div class="col-md-6">
+          <div id="scanFace">
+            <div class="renlian"></div>
+            <div class="fcDetactText">Show front face</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+            <div class="camera" id="container">
+              <span id="clock" class="clockCounter">3</span>
+              <div id="video"></div>
+            </div>
+            <div class="training_process">
+              <i class="loading-icon fa fa-spinner fa-spin"></i>
+              <span class="">Streaming...</span>
+            </div>
+            <div class="mobile-progress-div">
+              <div class="mobile-progress-bar" style="--value:0" aria-valuemax="100"></div>
+            </div>
+            <canvas id='canvas' width='750' height='1000'></canvas>
+            <div id="savedImage">
+
+            </div> 
+        </div>
+        <span id="finished_trainData">Train data finished..</span>
+      </div>
+      <div id="remove-footer" class="row row-footer">
+        <div class="floating-1 d-none">
+            <input id="hostname" type="text" class="input-floating floating-color" name="hostname" placeholder=" " value="15" autocomplete="off" onkeydown="input_not">
+            <label class="label-floating">Number of images</label>
+            <span class="required-image" id="error-required"></span>
+        </div>
+        <button class="train-button" onclick="start();">Start Training</button>
+        <button class="train-button" onclick="stopBtn();">Stop Training</button>
+        <button type="button" class="cancel-button button-fit" data-dismiss="modal" onclick="cancelModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+ var windowsize = $(window).width();
+$(document).ready(function(){
+  $("#finished_trainData").hide();
+  $("#trainUserId").html($("#trainId").val());
+  var name=($("#trainName").val()+" "+$("#trainLastname").val());
+  $("#trainUserName").html(name);
+});
+var width = 750;    // We will scale the photo width to this
+var height = 1000;   // This will be computed based on the input stream
+
+var streaming = false;
+
+var video = null;
+var canvas = null;
+var photo = null;
+var startbutton = null;
+var outputImage =document.getElementById('savedImage');
+function startup() {
+  Webcam.set({
+   image_format: 'png',
+   jpeg_quality: 90
+  });
+  Webcam.attach( '#video' ); 
+  Webcam.on( 'load', function() {
+    $("#clock").show();
+    var count=3;
+    var counter=setInterval(function(){
+      count=count-1;
+      $("#clock").html(count);
+      if(count == 0){
+        clearInterval(counter); 
+        $(".training_process").css("opacity",1);
+        $("#clock").hide();
+        faceDetaction();
+      }
+    },1000);
+  });
+
+  Webcam.on('error', function(err) {
+    var error=err.toString();
+      if(error.includes("Permission denied")){
+				alert("Allow camera permission");
+			}else{
+				console.log("Error: " + error);
+			}
+	}); 
+}
+
+function enableMethod(id,name){
+   $("#trainId").val(id);
+   $("#trainName").val(name);
+   $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "/upload",
+    type: "GET",
+    async: false,
+    success: function (data){
+        $("#adminForm").html(data);
+    }
+  });
+}
+$('#tg-9').click(function() {
+    $('#toggle-7').find('.toggle').toggleClass('active');      
+    var uploadId= $("#trainId").val();
+    var uploadName =  $("#trainName").val();
+    enableMethod(uploadId,uploadName);
+});
+
+function start(){
+   if ($("#hostname").val() == ""){
+    $("#error-required").show();
+    $("#error-required").html("Validation error: Input should not be empty");
+    return false;
+  }else if ($("#hostname").val() < 15){
+    $("#error-required").show();
+    $("#error-required").html("Validation error: Minimum Required 15");
+    return false;
+  }
+  $("#error-required").html("");
+  $("#error-required").hide();
+  // startup();
+  startup();
+}
+      
+function takepicture(count) {
+  var count=5;
+  for(i=1; i <= count; i++){
+      setTimeout(function() {
+        var video=document.getElementById("video1");
+          Webcam.snap( function(base64img) {
+          var canvas = document.getElementById("canvas");
+          var ctx = canvas.getContext("2d");
+          ctx.drawImage(video, 0, 0,750,1000);
+          var base64img = canvas.toDataURL('image/png');
+          startTraining(base64img);   
+         } );
+      }, i * 500);
+  } 
+}
+
+function stop() {
+  Webcam.reset();
+  $(".training_process").css("opacity",0);
+  $("#scanFace").hide();
+  $(".mobile-progress-div").css("opacity",0);
+}
+
+function stopBtn(){
+  clearTimeout(timeout1);
+  clearTimeout(timeout2);
+  clearTimeout(timeout3);
+  clearTimeout(timeout4);
+  Webcam.reset();
+  $(".training_process").css("opacity",0);
+  $("#scanFace").hide();
+  $(".mobile-progress-div").css("opacity",0);
+  removeUnknowData();
+}
+
+function base64ToBlob(base64, mime) {
+  mime = mime || '';
+  var sliceSize = 1024;
+  var byteChars = window.atob(base64);
+  var byteArrays = [];
+
+  for (var offset = 0, len = byteChars.length; offset < len; offset += sliceSize) {
+      var slice = byteChars.slice(offset, offset + sliceSize);
+
+      var byteNumbers = new Array(slice.length);
+      for (var i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+      }
+
+      var byteArray = new Uint8Array(byteNumbers);
+
+      byteArrays.push(byteArray);
+  }
+
+  return new Blob(byteArrays, {type: mime});
+}
+
+function startTraining(image){
+  var base64ImageContent = image.replace(/^data:image\/(png|jpg);base64,/, "");
+  var blob = base64ToBlob(base64ImageContent, 'image/png');                
+  var formData = new FormData();
+  formData.append('file', blob, ".png");
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+   $.ajax({
+        url: "api/v1/user/loadTraining/"+$("#trainId").val(),
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "PUT",
+        enctype: 'multipart/form-data',
+        data: formData,
+        processData: false,
+        contentType: false,
+        cache: false,
+        async: false,
+        complete:function(xhr){
+        console.log(xhr.status);
+      },
+        error:function(){
+          setTimeout(function(){ toastr.error("Error found.."); }, 1000); 
+      }
+   });
+}
+
+
+function trainingId(id){
+  stop();
+  $(".pre-loading").show();
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: "api/v1/user/starTraining/"+id,
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "PUT",
+      async: true,
+      success: function(data){
+        if(data != 0){
+          $(".pre-loading").hide();
+          $("#finished_trainData").show();
+          setTimeout(function(){ toastr.success("Train data finished.."); }, 1000);
+          setTimeout(function(){ cancelModal(); location.reload();},2000);
+        }else{
+          $(".pre-loading").hide();
+          setTimeout(function(){ toastr.error("Error found.."); }, 1000); 
+          location.reload();
+        }
+      },
+      error:function(){
+        setTimeout(function(){ toastr.error("Error found.."); }, 1000); 
+      }
+    });
+    // setTimeout(cancelModal, 2000);
+}
+var counter=0;
+function faceDetaction(){
+  var sound= new Audio("/web/images/sound.mp3");
+  /*front side*/
+  $("#scanFace").show();
+    $(".mobile-progress-div").css("opacity",1);
+  timeout1=setTimeout(function(){
+    takepicture($("#hostname").val());
+    intervel=setInterval(function(){
+      if(counter==25){
+          clearInterval(intervel);
+      }else{
+      counter+=5;
+      $("#progressbar").attr("style","--value:"+counter);
+      $(".mobile-progress-bar").attr("style","--value:"+counter).css("width",+counter+"%");
+      }
+    },1000)
+  },2000)
+    /*leftside*/
+    timeout2=setTimeout(function(){
+      $("#finished_trainData").hide();
+     // $(".renlian").css({"background": "url('/web/images/left-side.gif') no-repeat","background-size":"100% 100%"});
+     // $(".fcDetactText").html("Turn left side");
+     // sound.play();
+      setTimeout(function(){
+        takepicture($("#hostname").val());
+        clearInterval();
+        counter=25;
+        intervel1 = setInterval(function(){ 
+          if(counter==50){
+              clearInterval(intervel1);
+          }else{
+          counter+=5;
+          $("#progressbar").attr("style","--value:"+counter);
+          $(".mobile-progress-bar").attr("style","--value:"+counter).css("width",+counter+"%");
+          }
+        },1000);
+      },2000);
+    },7000);
+    /*look up*/
+    timeout3=setTimeout(function(){
+      $("#finished_trainData").hide();
+    //  $(".renlian").css({"background": "url('/web/images/right-side.gif') no-repeat","background-size":"100% 100%"});
+    //  $(".fcDetactText").html("Turn right side");
+    //  sound.play();
+      setTimeout(function(){
+        takepicture($("#hostname").val());
+        counter=50;
+        intervel2=setInterval(function(){
+          if(counter==75){
+              clearInterval(intervel2);
+          }else{
+          counter+=5;
+          $("#progressbar").attr("style","--value:"+counter);
+          $(".mobile-progress-bar").attr("style","--value:"+counter).css("width",+counter+"%");
+          }
+        },1000);
+      },2000);
+    },14000); 
+    /*rightside*/
+    timeout4=setTimeout(function(){
+      $("#finished_trainData").hide();
+    //  $(".renlian").css({"background": "url('/web/images/front.gif') no-repeat","background-size":"100% 100%"});
+    //  $(".fcDetactText").html("Look up");
+    // sound.play();
+      setTimeout(function(){
+        takepicture($("#hostname").val());
+        counter=75;
+        intervel3=setInterval(function(){
+          if(counter>=100){
+              stop();
+              clearInterval(intervel3);
+              $("#scanFace").hide();
+              $(".mobile-progress-div").css("opacity",0);
+              trainingId($("#trainId").val());
+          }else{
+          counter+=5;
+          $("#progressbar").attr("style","--value:"+counter);
+          $(".mobile-progress-bar").attr("style","--value:"+counter).css("width",+counter+"%");
+          }
+        },1000);
+      },2000);
+    },22000); 
+}
+
+function removeUnknowData(){
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+   $.ajax({
+        url: "api/v1/ilens/delete/directory/"+$("#trainId").val(),
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "DELETE",
+        success:function(xhr){
+         console.log(xhr.status);
+      },
+        error:function(){
+          setTimeout(function(){ toastr.error("Error found.."); }, 1000); 
+      }
+   });
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+      

@@ -8,7 +8,7 @@
 ##############################################################################
 
 # starting Cassandra
-nohup sh $HOME/ilens/data/apache-cassandra-3.11.4/bin/cassandra
+nohup sh /home/user/apache-cassandra-5.0/bin/cassandra
 # Attempt to set APP_HOME
 # Resolve links: $0 may be a link
 PRG="$0"
@@ -71,7 +71,7 @@ case "`uname`" in
 esac
 
 JARPATH=$APP_HOME/lib/@name@-@version@.jar
-JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
@@ -203,7 +203,7 @@ echo "--------------------------------------------------------------"
 echo " POWERED By LOGICFOCUS TECH."
 echo "--------------------------------------------------------------"
 # Starting Queue
-nohup $HOME/ilens/queue/apache-activemq-5.16.4/bin/activemq start
+nohup /home/user/apache-activemq-5.18.0/bin/activemq start
 nohup $JAVACMD $@ > /dev/null  2>&1 &
 
 echo $! > pid.out

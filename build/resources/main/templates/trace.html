@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+	<title>[[${session.APP_NAME}]] - Agents</title>
+</head>
+<body>
+<div layout:fragment="content" class="contant">
+	<div class="pre-loading">
+    	<img class="loader" src="/web/images/loader.png" />
+  	</div>
+    <div class="main-table">
+      <div class="col-12 text-right">
+        <button class="new-button" onclick="back()">Go Back</button>
+      </div>
+    	<div class="col-md-12 pb-10 row m-0">
+    		<!-- <div class="col-md-12">
+    			<nav aria-label="Page navigation example" class="pagination-nav" id="attendancePage">
+              		<ul class="pagination" id="attendancePagination"></ul>
+            	</nav>
+    			
+    		</div> -->
+    		<div class="col-md-12 row table-responsive">
+    			<table class="clr-txt">
+    				<thead>
+    					<tr>
+    						<th width="300"> Time </th>
+    						<th width="300"> Type </th>
+    						<th width="300"> Location </th>
+    						<th width="300"> Snapshot </th>
+    					</tr>
+    				</thead>
+    				<tbody class="" id="traceList"></tbody>
+    			</table>
+    		</div>
+    	</div>
+<!-- model -->
+        <div class="modal" id="testModel" data-backdrop="static">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content live-model mr-md-3">
+              <a class="close-popup c-p" data-dismiss="modal" aria-label="Close">&times;</a>
+              <!-- Modal body -->
+              <div class="modal-body p-2 mt-sm-0">
+                  <div class="row">
+                      <div class="col p-0">
+                        <div id="imageId"></div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+<script>
+  var dateString=null;
+  $(".pre-loading").show();
+	$(document).ready(function(){
+    $("#attendance").addClass('active');
+
+		var pageNumber = 0;
+		var entryExitFilter = "";
+
+        const url = window.location.href.toString().split("?");
+        const splittedString = url[1].split("&");
+        const idString = splittedString[0].split("=");
+        dateString = splittedString[1].split("=");
+
+        // convert epoch into human readable date.
+        epoch = dateString[1];
+        epoch = epoch*1000;
+        var epoch = epoch + (new Date().getTimezoneOffset() * -1);
+        var dateInHumanRFormat = new Date(epoch);
+
+        var id = idString[1];
+        var date = dateInHumanRFormat;
+
+    	entryExitFilter={
+        date:date,
+        id: id,
+        location:"",
+        name:""
+    }
+		getTraceById(entryExitFilter, pageNumber);
+	});
+
+  function back(){
+    location.href="/attendance?date="+dateString[1];
+  }
+
+	var totalPages = 0;
+    var totalCount = 0;
+
+	function totalPagesMethod(dataLength){
+		   itemsPerPage=10;
+		   totalCount=dataLength;
+           totalPages=Math.ceil(totalCount/itemsPerPage);
+           $('#attendancePagination').empty();
+            $('#attendancePagination').removeData("twbs-pagination");
+            $('#attendancePagination').unbind("page");
+            window.pagObj = $('#attendancePagination').twbsPagination({
+                totalPages: totalPages,
+                visiblePages: 5,
+                next: '&raquo;',
+                last: 'Last',
+                prev: '&laquo;',
+                first:'First',
+                initiateStartPageClick: false,
+                onPageClick: function (event, page) {
+                    pageNumber = (page - 1);
+                }
+            }).on("page",function(event,num){});
+	}
+
+
+	function getSnapshotString(snapshotValue){
+		var bs64EncodedString = "";
+    var reportApi = "[[${session.REPORT_API}]]";
+    var sessionToken = "[[${session.USER.sessionToken}]]";
+    var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+    var type="Registry"
+    var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/snapshot/"+snapshotValue+"/"+type; 
+    var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
+		$.ajax({
+			contentType:"application/json;charset=UTF-8",
+			url:"api/v1/iLensApiClient",
+			headers:{'CLIENT_KEY':sessionToken},
+            type: "POST",
+            data: JSON.stringify(ilensApiClientVO),
+            async:false,
+            success:function(data){
+            	bs64EncodedString = data;
+            },
+            error:function(err) {
+            	console.log(err)
+            }
+		});
+		return bs64EncodedString;
+	}
+
+
+    var imageId="";
+    function snapshotShow(encodeString){
+        imageId = imageId + "<img class='img-fluid' src='data:image/png;base64," + encodeString + "'>"
+        $("#imageId").html(imageId);
+       // $('#popup_default').openPopup({ anim: 'fade' });
+       $("#testModel").modal("show");
+        imageId = "";
+    }
+
+
+	function getTraceById(entryExitFilter, pageNumber){
+		var traceHeading = "";
+		var traceList = "";
+		var snapshot = "";
+		var encodedString = "";
+        var swapVariable = "";
+    var reportApi = "[[${session.REPORT_API}]]";
+    var sessionToken = "[[${session.USER.sessionToken}]]";
+    var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+    var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/"+pageNumber;
+    var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: entryExitFilter,
+        method: "POST"
+      }
+		$.ajax({
+		  contentType: "application/json;charset=UTF-8",
+          url: "api/v1/iLensApiClient",
+          dataType: "json",
+          headers:{'CLIENT_KEY':sessionToken},
+          type: "POST",
+          async: false,
+          data: JSON.stringify(ilensApiClientVO),
+          success: function(data){
+          	//totalPagesMethod(data.trace.length);
+          	traceHeading = traceHeading + "Id : " +data.id + '<br>' + "Name : " + data.name + '</br>'+"Total spent hours : "+data.hourSpent;
+          	for(i=0;i<data.trace.length;i++){
+                var traceTime = moment(data.trace[i].time).format("DD-MM-YYYY hh:mm:ss A");
+          		encodedString = getSnapshotString(data.trace[i].snapshot);
+                if(encodedString.toString().length === 0){
+                    encodedString = getSnapshotString("noImageAvailable");
+                }
+                if(i == 0){
+              		traceList = traceList + '<tr>';
+              		traceList = traceList + '<td>' + traceTime + '</td>';
+              		traceList = traceList + '<td>' + data.trace[i].type + '</td>';
+              		traceList = traceList + '<td>' + data.trace[i].channelId + '</td>';
+              		traceList = traceList + '<td>';
+              		traceList = traceList + "<div class='image'>";
+              		traceList = traceList + "<a href='#' class='open-popup' id='" + encodedString +"' data-id='popup_default' onclick='snapshotShow(this.id)'> <img src='data:image/png;base64," + encodedString + "'></a>";
+              		traceList = traceList + "</div>";
+              		traceList = traceList + "</td>";
+              		traceList = traceList + '</tr>';
+                    swapVariable = data.trace[i].type;
+
+                }else if(swapVariable != data.trace[i].type){
+                    traceList = traceList + '<tr>';
+                    traceList = traceList + '<td>' + traceTime + '</td>';
+                    traceList = traceList + '<td>' + data.trace[i].type + '</td>';
+                    traceList = traceList + '<td>' + data.trace[i].channelId + '</td>';
+                    traceList = traceList + '<td>';
+                    traceList = traceList + "<div class='image'>";
+                    traceList = traceList + "<a href='#' class='open-popup' id='" + encodedString +"' data-id='popup_default' onclick='snapshotShow(this.id)'> <img src='data:image/png;base64," + encodedString + "'></a>";
+                    traceList = traceList + "</div>";
+                    traceList = traceList + "</td>";
+                    traceList = traceList + '</tr>';
+                    swapVariable = data.trace[i].type;
+                }
+
+          		//encodedString = getSnapshotString(11012022100627);
+          		//console.log("Encoded string : " + encodedString);
+           	}
+          	if(data == 0){
+              $("#traceHeading").hide();
+              $("#traceList").hide();
+              $(".records").html("No Records Found").show();
+              $('.pagination-nav').hide();
+          	}else{
+          		$(".records").hide();
+               $("#heading").html(traceHeading);
+               $("#traceList").html(traceList).show();
+               $('.pagination-nav').show();
+          	}
+            setTimeout(function(){
+              $(".pre-loading").hide();
+            },2000);
+          },
+          error:function(data, err){
+            console.log(err);
+            setTimeout(function(){
+            $(".pre-loading").hide();
+            },2000);
+          }
+		});
+	}
+
+</script>
+
+</div>
+</body>
+</html>

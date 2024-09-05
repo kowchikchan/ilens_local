@@ -16,7 +16,7 @@ import com.pbs.tech.vo.runtime.EntryExitVo;
 import com.pbs.tech.vo.EntryViolationByLocationVo;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,7 +185,7 @@ public class IlenService {
         if (isRunning(id)) {
             throw new IlensException("Already Running");
         }
-        String scriptPath = System.getProperty("SCRIPT_PATH");
+        String scriptPath = "/Users/helloabc/Documents/ilensLatestB/src/main/resources/scripts";
         Channel channel = channelRepo.findById(Long.valueOf(id)).get();
         String entryOrExit = null;
         if (channel.isEntry()){

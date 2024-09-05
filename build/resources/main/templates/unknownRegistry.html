@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+	<title>[[${session.APP_NAME}]] - Unknown Registry</title>
+</head>
+<body>
+<div layout:fragment="content" class="contant">
+	<div class="pre-loading">
+    	<img class="loader" src="/web/images/loader.png" />
+  	</div>
+    <!-- <span>
+        <button class="btn btn-outline-warning" onclick="back()">Go Back</button>
+    </span> -->
+    <div class="main-table">
+    	<div class="col-md-12 pb-10 row m-0">
+    		<div class="col-md-12 row">
+				<div class="col-6 p-0">
+					<div class="lens_select">
+						<div class="input-group date" id="datepicker">
+							<input type="text" id="text-date" class="form-control">
+							  <span class="input-group-append"> </span>
+						 </div>
+					 </div>
+				</div>
+				<div class="col-6 p-0 text-end">
+					<div class="navStyle">
+						<nav aria-label="Page navigation example" class="pagination-nav1">
+							<ul class="pagination" id="unknownPagination">
+							</ul>
+						</nav>
+					</div>
+				</div>
+    			
+    		</div>
+    		<div class="col-md-12 row table-responsive">
+    			<table class="clr-txt">
+    				<thead>
+    					<tr>
+    						<th width="300"> Time </th>
+    						<th width="300"> Type </th>
+    						<th width="300"> Location </th>
+    						<th width="300"> Snapshot </th>
+    					</tr>
+    				</thead>
+    				<tbody class="" id="unknownList"></tbody>
+    			</table>
+    		</div>
+    	</div>
+       <!-- model -->
+	   <div class="modal" id="testModel" data-backdrop="static">
+		<div class="modal-dialog modal-dialog-centered">
+		  <div class="modal-content live-model mr-md-3">
+			<a class="close-popup c-p" data-dismiss="modal" aria-label="Close">&times;</a>
+			<!-- Modal body -->
+			<div class="modal-body p-2 mt-sm-0">
+				<div class="row">
+					<div class="col p-0">
+					  <div id="imageId"></div>
+					</div>
+				</div>
+			  </div>
+			</div>
+		  </div>
+		</div>
+    </div>
+	<div class="records"></div>
+<script>
+	$(".pre-loading").show();
+	$("#heading").html("Unknown Registry");
+	$(document).ready(function(){
+		$("#unknownRegistry").addClass('active');
+		date=($("#text-date").val())+" 00:00:01";
+		unknownPaging(date);	
+	})
+
+	$("#text-date").datetimepicker({
+		toolbarPlacement: 'bottom',
+		defaultDate: new Date(),
+		format: 'YYYY-MM-DD',
+		maxDate:new Date(),
+      });
+
+	$(function () {
+       $("#text-date").on("dp.change", function (e) {
+		var date=e.date.format(e.date._f)	
+		var st1=date;
+		var st2=" 00:01:01";
+		var date = st1.concat(st2);     
+		unknownPaging(date);
+       });
+    });
+
+	function UnknownRegistry(pageNumber,date){
+		pageNumber=pageNumber;
+		var reportApi = "[[${session.REPORT_API}]]";
+		var sessionToken = "[[${session.USER.sessionToken}]]";
+		var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+		var apiUrl = urlSlashCheck + "api/v1/ilens/unknown/getList/"+pageNumber;
+		unknownFilterVO={
+			date:date
+		}
+		var ilensApiClientVO  = {
+			api: apiUrl,
+			clientKey: sessionToken,
+			inputVo: unknownFilterVO,
+			method: "POST"
+		}
+	$("#unknownList").empty();
+		$.ajax({
+		contentType: "application/json;charset=UTF-8",
+		url: "api/v1/iLensApiClient",
+		dataType: "json",
+		headers:{'CLIENT_KEY':sessionToken},
+		type: "POST",
+		async: false,
+		data: JSON.stringify(ilensApiClientVO),
+		success: function(data){
+			var unknownList="";
+			for(i=0;i<data.length;i++){
+			var time = moment(data[i].time).format("DD-MM-YYYY hh:mm:ss A");
+			encodedString = getSnapshotString(data[i].snapshot);
+			if(encodedString.toString().length === 0){
+				encodedString = getSnapshotString("noImageAvailable");
+			}
+			unknownList=unknownList+'<tr>';
+			unknownList=unknownList+'<td>' +time+ '</td>';
+			unknownList=unknownList+'<td>'+data[i].type+'</td>';
+			unknownList=unknownList+'<td>'+data[i].channelId +'</td>';
+			unknownList = unknownList + '<td>';
+			unknownList = unknownList + "<div class='image'>";
+			unknownList = unknownList + "<a href='#' class='open-popup' id='" + encodedString +"' data-id='popup_default' onclick='snapshotShow(this.id)'> <img src='data:image/png;base64," + encodedString + "'></a>";
+			unknownList = unknownList + "</div>";
+			unknownList = unknownList + "</td>";
+			unknownList=unknownList+'</tr>';
+			}
+			if(data!=0){
+				$("#unknownList").html(unknownList);
+				$(".records").hide()
+			}
+			setTimeout(function(){
+				$(".pre-loading").hide();
+			  },2000);
+			},
+
+		error:function(err){
+			console.log(err);
+			setTimeout(function(){
+				$(".pre-loading").hide();
+			  },2000);
+			}
+		});
+	}
+
+	function getSnapshotString(snapshotValue){
+		var bs64EncodedString = "";
+    var reportApi = "[[${session.REPORT_API}]]";
+    var sessionToken = "[[${session.USER.sessionToken}]]";
+    var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+    var type="Unknown"
+    var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/snapshot/"+snapshotValue+"/"+type; 
+    var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
+		$.ajax({
+			contentType:"application/json;charset=UTF-8",
+			url:"api/v1/iLensApiClient",
+			headers:{'CLIENT_KEY':sessionToken},
+            type: "POST",
+            data: JSON.stringify(ilensApiClientVO),
+            async:false,
+            success:function(data){
+            	bs64EncodedString = data;
+            },
+            error:function(err) {
+            	console.log(err)
+            }
+		});
+		return bs64EncodedString;
+	}
+
+
+	var imageId="";
+    function snapshotShow(encodeString){
+        imageId = imageId + "<img class='img-fluid' src='data:image/png;base64," + encodeString + "'>"
+        $("#imageId").html(imageId);
+        $("#testModel").modal("show");
+        imageId = "";
+    }
+
+
+	var totalPages = 0;
+ 	var totalCount = 0;
+    function unknownPaging(date){
+      itemsPerPage=10;
+      var reportApi = "[[${session.REPORT_API}]]";
+      var sessionToken = "[[${session.USER.sessionToken}]]";
+      var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+      var apiUrl = urlSlashCheck + "api/v1/ilens/unknown/count/"+date;
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
+	  date=(date.split(" ")[0])+"T00:01:01.001Z";
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: "api/v1/iLensApiClient",
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "POST",
+        async: false,
+        data: JSON.stringify(ilensApiClientVO),
+        success:function(data){
+          if(data!=0){
+           totalCount=data;
+           totalPages=Math.ceil(totalCount/itemsPerPage);
+           $('#unknownPagination').empty();
+            $('#unknownPagination').removeData("twbs-pagination");
+            $('#unknownPagination').unbind("page");
+            window.pagObj = $('#unknownPagination').twbsPagination({
+                totalPages: totalPages,
+                visiblePages: 5,
+                next: '&raquo;',
+                last: 'Last',
+                prev: '&laquo;',
+                first:'First',
+				        onPageClick: function (event, page) {
+                var pageNumber = (page);
+					       UnknownRegistry(pageNumber,date);
+				    }
+            }).on("page",function(event,num){});
+            $(".records").hide();
+            $('.pagination-nav1').show();
+          }else{
+              $("#unknownList").empty();
+				$(".records").html("No Records Found").show();
+				$('.pagination-nav1').hide();
+				$(".pre-loading").hide();
+		      }
+        }
+      });
+    }
+</script>
+
+</div>
+</body>
+</html>

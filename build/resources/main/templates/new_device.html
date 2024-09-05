@@ -1,0 +1,99 @@
+<div class="modal fade exampleModalCenter1" id="newdevice" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div id="modal-color" class="content-form modal-content modal-width">
+        <div id="remove" class="modal-header">          
+          <label class="modal-title" id="Title">Add New Device</label>
+        </div>  
+        <div id="user-credentials">
+          <i id="warn-icon" class="fa fa-exclamation-triangle warning-icon" aria-hidden="true"><div id="validInput"></div></i>
+        </div>      
+        <div class="modal-body form-body" id="clear">
+          <div class="new_device m-left-5">
+            <input id="newName" type="text" class="floating-input input-form2" name="User ID" placeholder=" " autocomplete="off" maxlength="10">
+            <label class="floating-label">Name</label>
+          </div>
+          
+          <div class="new_device m-left-5">
+            <input id="newIp" type="text" class="floating-input input-form2" name="ip"  placeholder=" " autocomplete="off" >
+            <label class="floating-label">URL/IP</label>
+          </div>
+         
+          <div class="new_device m-left-5">
+            <input id="addcamType" type="text" class="floating-input input-form2" name="type"  placeholder=" " autocomplete="off" >
+            <label class="floating-label">Camera Type</label>
+          </div> 
+          <div class="new_device m-left-5">
+            <label class="as container-check">Is Entry
+                <input id="entryGate" name="location" type="radio">
+                <span class="ad checkmark"></span>
+              </label>
+              <label class="as container-check m-left">Is Exit
+                <input id="exitGate"  name="location" type="radio">
+                <span class="ad checkmark"></span>
+              </label>
+          </div>        
+      </div>
+      <div id="remove-footer" class="footer1">
+        <button type="button"  class="submit-button button-type" onclick="checkDevice()" >Submit</button>
+        <button type="button" class="cancel-button button-type" data-dismiss="modal" onclick="cancelnew_device()">Cancel</button>
+      </div>
+    </div>
+   </div>
+</div>
+<script>
+  $(document).ready(function(){
+    $("#Title").show();     
+  });
+
+function checkDevice(){
+if($.trim($('#newName').val()) == ""){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Name should not be empty");
+    return false;
+  }else if($.trim($('#newIp').val()) == ""){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("URL/IP should not be empty");
+    return false;
+  }else if($.trim($('#addcamType').val()) == ""){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Camera Type should not be empty");
+    return false;
+  }  
+  AddDevice();
+}
+
+
+
+  function AddDevice(){
+    var vo = {
+              camType: $("#addcamType").val(),             
+              entry: $("#entryGate").is(':checked') ? true : false,
+              exit: $("#exitGate").is(':checked') ? true : false,                 
+              ip: $("#newIp").val(),
+              name: $("#newName").val(),             
+            };  
+    var sessionToken = "[[${session.USER.sessionToken}]]";  
+   $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url:"api/v1/channels" ,
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "POST",
+        async: false,
+        data: JSON.stringify(vo),
+        success:function(data){                  
+          setTimeout(function(){ toastr.success("New channel added.."); }, 1000);
+          setTimeout(function(){cancelnew_device(); },2000);
+        },
+        error:function(err){
+          setTimeout(function(){ toastr.error("Error found.."); }, 1000);          }
+  });
+  }
+  
+  function cancelnew_device(){
+    location.href="/channels";  
+}
+ </script>
+  

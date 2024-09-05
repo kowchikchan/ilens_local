@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+	<title>[[${session.APP_NAME}]] - Report</title>
+</head>
+<body>
+<div layout:fragment="content" class="contant">
+	<div class="pre-loading">
+    	<img class="loader" src="/web/images/loader.png" />
+  	</div>
+    <div class="main-table">  
+        <div class="data_api">
+                <div class="apisty">
+                    <div class="row g-0">	
+                        <div class="col-md-12 row">
+                            <div class="col-md-2">
+                            <label class="config_labels">Report Generation Interval <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Ilens will send an attendance report for the chosen period to the specified report receipt email address." ></i></label>
+                            </div>
+                            <div class="col-md-8">
+                                <select class="retains_sec" id="interval" name="interval">                  
+                                    <option value="1">1 Day</option>
+                                    <option value="2">2 Days</option>
+                                    <option value="7">1 Week</option>
+                                    <option value="14">2 Weeks</option>
+                                    <option value="30">1 Month</option>
+                                </select>
+                            </div>
+                        </div>    
+                        <div class="col-md-12 row pt-3">
+                            <div class="col-md-2">
+                                <label class="config_labels">Report Recipient Email <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The attendance report will be sent to this email address." ></i></label>
+                            </div>
+                            <div class="col-md-8">
+                                <input type="text" id="receipt" data-role="tagsinput" value="" class="Report_receipt" name="receipt"/>
+                                <div id="mailSendBtn">
+                                    <div class="text-warning ml-3 errorDiv"><i class="fas fa-exclamation-triangle"><span id="errorMsg" class="text-white"></span></i></div>
+                                </div>
+                            </div>
+                        </div>   
+                        <div class="col-md-12 row pt-3">
+                            <div class="col-md-2">
+                                <label class="config_labels">Week Days <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Choose working days to customise the outcome." ></i></label>
+                            </div>
+                            <div class="col-md-8 reportCheck">
+                                <input type="checkbox" name="checkbox" id="sunday" class="save_check" value="sunday"><span>Sun</span>
+                                <input type="checkbox" name="checkbox" id="monday" class="save_check" value="monday"><span>Mon</span>
+                                <input type="checkbox" name="checkbox" id="tuesday" class="save_check" value="tuesday"><span>Tues</span>
+                                <input type="checkbox" name="checkbox" id="wednesday" class="save_check" value="wednesday"><span>Wed</span>
+                                <input type="checkbox" name="checkbox" id="thursday" class="save_check" value="thursday"><span>Thu</span>
+                                <input type="checkbox" name="checkbox" id="friday" class="save_check" value="friday"><span>Fri</span>
+                                <input type="checkbox" name="checkbox" id="saturday" class="save_check" value="saturday"><span>Sat</span>
+                                <div class="pt-2"><button class="emailButton" onclick="reportGenerate()">Generate Now</button></div>
+                            </div>
+                        </div>     
+                    </div>
+                 </div>
+        <div>
+            <button type="button"  class="api-button" id="update">Update</button>
+        </div>
+
+    </div>
+<script>
+    $("#heading").html("Report");
+    $(document).ready(function(){
+        $("#navadms").addClass('active');
+        $("#Adms").addClass('show');
+        $("#reportPeriod").addClass('active'); 
+        reportlist();
+        toastr.options = {
+          debug: false,
+          newestOnTop: false,
+          positionClass: "toast-bottom-right",
+          closeButton: true,
+          progressBar: false,
+        }
+        $('[data-toggle1="tooltip"]').tooltip({trigger:'click'}); 
+        $(".fa-question-circle").mouseleave(function(){
+                $('[data-toggle1="tooltip"]').tooltip('hide');
+        })  
+    });
+
+
+    $('#update').click(function() {
+        var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        var emailaddressVal = ($("#receipt").val()).split(",");
+        for(i=0;i<emailaddressVal.length;i++){
+            if(emailaddressVal[i] == '') {
+                $("#errorMsg").html('Please enter your email address.');
+                $(".errorDiv").css("opacity", "1");
+                return false;
+            }else if(!emailReg.test(emailaddressVal[i])) {
+                $("#errorMsg").html('Enter a valid email address.');
+                $(".errorDiv").css("opacity", "1");
+                return false;
+            }
+        };
+        $(".errorDiv").css("opacity", "0");
+        save();
+    });
+
+    function reportlist(){
+        var days = [];
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/report/list";  
+        $.ajax({
+                contentType: "application/json;charset=UTF-8",
+                url: apiUrl,
+                dataType:'json',      
+                headers:{'CLIENT_KEY': sessionToken},
+                type: 'GET',
+                async: false,
+                success: function(data){ 
+                    $("#interval").val(data.reportPeriod);
+                    $("#receipt").val(data.mail);
+                    $('#receipt').tagsinput('add', data.mail);
+                    days = data.weekDays.split(",");
+                    for(var i=0; i<days.length; i++){
+                        $("#"+days[i]).prop("checked", true);
+                    }
+                    /*
+                    if(data.weekDays.includes("sunday")){
+                        $("#checkbox1").prop("checked", true);
+                    }
+                    if(data.weekDays.includes("monday")){
+                        $("#checkbox2").prop("checked", true);
+                    }
+                    if(data.weekDays.includes("tuesday")){
+                        $("#checkbox3").prop("checked", true);
+                    }
+                    if(data.weekDays.includes("wednesday")){
+                        $("#checkbox4").prop("checked", true);
+                    }
+                    if(data.weekDays.includes("thursday")){
+                        $("#checkbox5").prop("checked", true);
+                    }
+                    if(data.weekDays.includes("friday")){
+                        $("#checkbox6").prop("checked", true);
+                    }
+                    if(data.weekDays.includes("saturday")){
+                        $("#checkbox7").prop("checked", true);
+                    }*/
+
+                },
+                error: function(err){
+                    setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+                }
+            });
+    }
+
+    
+    function save(){
+        var reportPeriod= $("#interval").val();
+        var mail= $("#receipt").val();
+        var weekDays = [];
+        $(':checkbox:checked').each(function(i){
+            weekDays[i] = $(this).val();
+        });
+        weekDays=weekDays.join()
+       var data={
+            reportPeriod:reportPeriod,
+            mail:mail,
+            weekDays:weekDays,
+            id:1
+        }
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/report/save";  
+        $.ajax({
+                contentType: "application/json;charset=UTF-8",
+                url: apiUrl,   
+                headers:{'CLIENT_KEY': sessionToken},
+                type: 'POST',
+                data: JSON.stringify(data),
+                async: false,
+                success: function(data){ 
+                    setTimeout(function(){ toastr.success("Configuration updated"); }, 1000);
+                },
+                error: function(err){
+                    setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+                }
+            });
+    }
+
+    function reportGenerate(){
+        $(".pre-loading").show();
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/report/generate";  
+        $.ajax({
+                contentType: "application/json;charset=UTF-8",
+                url: apiUrl,
+                headers:{'CLIENT_KEY': sessionToken},
+                type: 'GET',
+                async: true,
+                success: function(data){ 
+                    setTimeout(function(){ $(".pre-loading").hide();}, 2000);
+                    setTimeout(function(){ toastr.success("Report sent successfully"); }, 1000);
+                },
+                error: function(err){
+                    setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+                }
+            });
+    }
+
+</script>
+
+</div>
+</body>
+</html>

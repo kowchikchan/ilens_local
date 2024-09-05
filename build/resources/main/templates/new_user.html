@@ -1,0 +1,179 @@
+<div class="modal fade exampleModalCenter1" id="" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div id="modal-color" class="content-form modal-content modal-width">
+      <div id="remove" class="modal-header">
+        <label class="modal-title" id="title">New Member</label>
+        <label class="modal-title" id="updateTitle">Member edit details</label>
+      </div>
+      <div id="user-credentials">
+        <i id="warn-icon" class="fa fa-exclamation-triangle warning-icon" aria-hidden="true"><div id="validInput"></div></i>
+      </div>
+      <div class="modal-body form-body">
+        <div class="floating m-left-5">
+          <input id="UserID" type="text" class="floating-input input-form2" name="User ID" maxlength="10" placeholder=" " autocomplete="off">
+          <label class="floating-label">Member ID</label>
+        </div>
+        <div class="floating m-left-25">
+          <input id="firstName" type="text" class="floating-input input-form2" name="ip" maxlength="15" placeholder=" " autocomplete="off">
+          <label class="floating-label">First Name</label>
+        </div>
+        <div class="floating m-left-5">
+          <input id="lastName" type="text" class="floating-input input-form2" name="ip" maxlength="10" placeholder=" " autocomplete="off">
+          <label class="floating-label">Last Name</label>
+        </div>
+        <div class="floating m-left-25">
+          <input id="department" type="text" class="floating-input input-form2" maxlength="15" name="department" placeholder=" " autocomplete="off">
+          <label class="floating-label">Department</label>
+        </div>
+        <div class="floating m-left-5">
+          <input id="location" type="text" class="floating-input input-form2" name="type" maxlength="11" placeholder=" " autocomplete="off">
+          <label class="floating-label">Location</label>
+        </div>
+        <div class="label-dropdown">  
+          <select id="role" class="floating-select" onclick="this.setAttribute('value', this.value);" value="">
+            <option value="" class="userRole"></option>
+            <option value="User">User</option>
+            <option value="Admin">Admin</option>
+          </select>
+          <label class="userSelect floating-label">Select the Member role</label>
+        </div>
+    </div>
+    <div id="remove-footer" class="footer">
+      <button type="button" id="submit" class="submit-button button-type" onclick="updatedUser();">Submit</button>
+      <button type="button" class="cancel-button button-type" data-dismiss="modal" onclick="cancelForm2()">Cancel</button>
+    </div>
+  </div>
+ </div>
+</div>
+<script>
+$(document).ready(function(){
+  if($("#editForm").val() == 0){
+     $("#updateTitle").hide();
+     $("#title").show();
+   }else{
+    $("#title").hide();
+    $("#updateTitle").show();
+    $("#UserID").prop("readonly", true).attr("title","Edit is not allowed this field");
+   }
+});
+
+function updatedUser(){
+if($.trim($('#UserID').val()) == ""){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("User ID should not be empty");
+    return false;
+  }else if($.trim($('#UserID').val()) == 0){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("User ID should not be 0");
+    return false;
+  }else if($.trim($('#UserID').val()).length < 5){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("User ID should be atleast 5 characters");
+    return false;
+  }else if($.trim($('#UserID').val()).length > 10){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("User ID should not be more than 10 characters");
+    return false;
+  }else if($.trim($('#firstName').val()) == ""){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("First Name should not be empty");
+    return false;
+  }else if($.trim($('#firstName').val()) == 0){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("First Name should not be 0");
+    return false;
+  }else if($.trim($('#firstName').val()).length < 2){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("First Name should be atleast 2 characters");
+    return false;
+  }else if($.trim($('#firstName').val()).length > 15){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("First Name should not be more than 10 characters");
+    return false;
+  }else if($.trim($('#lastName').val()) == ""){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Last Name should not be empty");
+    return false;
+  }else if($.trim($('#lastName').val()) == 0){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Last Name should not be 0");
+    return false;
+  }else if($.trim($('#lastName').val()).length < 1){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Last Name should be atleast 1 characters");
+    return false;
+  }else if($.trim($('#lastName').val()).length > 10){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Last Name should not be more than 8 characters");
+    return false;
+  }else if($.trim($('#department').val()) == ""){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Department should not be empty");
+    return false;
+  }else if($.trim($('#department').val()) == 0){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Department should not be 0");
+    return false;
+  }else if($.trim($('#department').val()).length > 15){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Department should not be more than 10 characters");
+    return false;
+  }else if($.trim($('#location').val()) == ""){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Location should not be empty");
+    return false;
+  }else if($.trim($('#location').val()) == 0){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Location should not be 0");
+    return false;
+  }else if($.trim($('#location').val()).length < 2){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Location should be atleast 2 characters");
+    return false;
+  }else if($.trim($('#location').val()).length > 11){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Location should not be more than 11 characters");
+    return false;
+  }else if($.trim($('#role').val()) == ""){
+    $("#user-credentials").show();
+    $("#warn-icon").show();
+    $('#validInput').html("Role should not be empty");
+    return false;
+  }
+  $("#user-credentials").hide();
+  if($("#editForm").val() == 0){
+      saveUser();
+      $("#title").html("New User");
+  }else{
+      updateUser();
+  }
+}
+// $('#UserID').keyup(function(e) {
+//   if (/\D/g.test(this.value))
+//   {
+//     // Filter non-digits from input value.
+//     this.value = this.value.replace(/\D/g, '');
+//     $("#user-credentials").show();
+//     $('#validInput').html("Member ID only allow numeric");
+//   }
+// });
+</script>

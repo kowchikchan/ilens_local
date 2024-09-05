@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+    <title>[[${session.APP_NAME}]] - Attendance</title>
+</head>
+<body>
+<div layout:fragment="content" class="contant">
+  <div class="pre-loading">
+    <img class="loader" src="/web/images/loader.png" />
+  </div>
+	<div class="main-table zoom3">
+        <div class="col-md-12 pb-10 row m-0">
+          <div class="col-md-12 row p-0 justify-content-between">
+            <div class="col-3 p-0">
+              <div class="lens_select">
+                <div class="input-group date" id="datepicker">
+                    <input type="text" id="text-date" class="form-control">
+                      <span class="input-group-append"> </span>
+                 </div>
+             </div>
+            </div>
+            <div  class="col-lg-5 text-center p-0 sm-mt-4">
+              <div class="input-group mb-3">
+                <input type="search" class="form-control search-input pr-1" placeholder="Search By Name/Id" aria-label="Search By Ip"  id="usersFilter">
+                <div class="input-group-append">
+                  <span class="input-group-text serch-button"><i class="fa fa-search"></i></span>
+                </div>
+              </div>
+            </div>
+            <div  class="col-lg-3 col-md-12 mt-md-2">
+              <nav aria-label="Page navigation example" class="pagination-nav1" id="attendancePage">
+                <ul class="pagination" id="attendancePagination">
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 row table-responsive">
+          <table class="clr-txt">
+            <thead class="tableHead">
+              <tr>
+                <!-- 
+                    <th class="img-th"></th> -->
+                <th width="300">ID</th>
+                <th width="300">Name</th>
+                <th width="300">Entry Time</th>
+                <th width="300">Entry Location</th>
+                <th width="300">Exit Time</th>
+                <th width="300">Exit Location</th>
+              </tr>
+            </thead>
+            <tbody class="" id="attendanceList">
+
+            </tbody>
+            <tbody class="" id="mobileList">
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="records"></div>
+<script>
+  var windowsize = $(window).width();
+  $(".pre-loading").show();
+  $("#heading").html("Attendance");
+	$(document).ready(function(){
+    $("#attendance").addClass('active');
+      userFilter();
+	});
+
+
+
+  var res = "";
+  $(function() {
+    var selected = (new Date()).toISOString().split('T')[0];
+    $("#text-date").datetimepicker({
+		toolbarPlacement: 'bottom',
+		defaultDate: new Date(),
+		format: 'YYYY-MM-DD',
+		maxDate:new Date(),
+    });
+
+    var entryExitFilter = "";
+    var humanRF=null;
+    const url=window.location.href.toString();
+    if(url.includes("?")){
+      var dateString=url.split("?");
+      const idString=dateString[1];
+      var epoch=idString.split("=")[1];
+      epoch=epoch*1000;
+      epoch=epoch+(new Date().getTimezoneOffset() *-1);
+      var d = new Date(epoch); // The 0 there is the key, which sets the date to the epoch
+      $('#text-date').data("DateTimePicker").date(d);
+      var date1=$("#text-date").val();
+      entryExitFilter={
+        date:date1,
+        id:"",
+        location:"",
+        name:""
+      }
+    }else{
+    entryExitFilter={
+        date:selected,
+        id: "",
+        location:"",
+        name:""
+    }
+  }
+    var date=moment(entryExitFilter.date).format("YYYY-MM-DD hh:mm:ss");
+    attendancePaging(date,entryExitFilter);
+
+    $("#text-date").on("dp.change", function (e) {
+		var date=e.date.format(e.date._f)	
+		var selected1=date+"T00:01:01.001Z";
+
+    var pageNumber = 1;
+    entryExitFilter={
+      date:selected1, 
+      id:"",
+      location:"",
+      name:""
+    }
+    var date=date+" "+"00:00:01";
+    attendancePaging(date,entryExitFilter);
+     });
+  });
+
+
+
+  var totalPages = 0;
+  var totalCount = 0;
+    function attendancePaging(date,entryExitFilter){
+      itemsPerPage=10;
+      var reportApi = "[[${session.REPORT_API}]]";
+      var sessionToken = "[[${session.USER.sessionToken}]]";
+      var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+      var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/count/"+date; 
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: "api/v1/iLensApiClient",
+        dataType:'json',
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "POST",
+        async: false,
+        data: JSON.stringify(ilensApiClientVO),
+        success:function(data){
+          if(data!=0){
+           totalCount=data;
+           totalPages=Math.ceil(totalCount/itemsPerPage);
+           $('#attendancePagination').empty();
+            $('#attendancePagination').removeData("twbs-pagination");
+            $('#attendancePagination').unbind("page");
+            window.pagObj = $('#attendancePagination').twbsPagination({
+                totalPages: totalPages,
+                visiblePages: 5,
+                next: '&raquo;',
+                last: 'Last',
+                prev: '&laquo;',
+                first:'First',
+               // initiateStartPageClick: false,
+                onPageClick: function (event, page) {
+                    if ( windowsize < 500 ){
+                      mobileAttendance(entryExitFilter,page);
+                    }else{
+                    attendanceList(entryExitFilter,page);
+                    }
+                }
+            }).on("page",function(event,num){});
+          }else{
+            if ( windowsize < 500 ){
+              $("#mobileList").hide();
+            }else{
+              $("#attendanceList").hide();
+            }
+            $(".records").html("No Records Found").show();
+            $('.pagination-nav1').hide();
+            $(".pre-loading").hide();
+          }
+        }
+      });
+    }
+$("#usersFilter").keyup(function(data){
+        var date1=$("#text-date").val();
+        var date2="T00:01:01.001Z";        
+        var date=date1.concat(date2);
+        var pageNumber=1;
+        var entryExitFilter= {date:date,
+                             id:"",
+                            location:"",
+                            name:""
+                          }
+  data=$("#usersFilter").val();
+  if(data==""){
+    if ( windowsize < 500 ){
+      mobileAttendance(entryExitFilter, pageNumber);
+    }else{
+    attendanceList(entryExitFilter, pageNumber);
+    }
+    $(".clearicon").css('opacity', '0');
+  }else{
+    $(".clearicon").css('opacity', '1');
+  }
+});
+$("#usersFilter").on('search', function () {
+  $("#usersFilter").val("");
+  $(".clearicon").css('opacity', '0');
+  $("#usersFilter").focus();
+  var date1=$("#text-date").val();
+        var date2="T00:01:01.001Z";
+        var date=date1.concat(date2);
+        var pageNumber=1;
+        var entryExitFilter= {date:date,
+                             id:"",
+                            location:"",
+                            name:""
+                          }
+  data=$("#usersFilter").val();
+  if ( windowsize < 500 ){
+    mobileAttendance(entryExitFilter, pageNumber);
+  }else{
+  attendanceList(entryExitFilter, pageNumber);
+  }
+})
+
+  function userFilter(){
+  var reportApi = "[[${session.REPORT_API}]]";
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+  var apiUrl = urlSlashCheck + "api/v1/user/usersList";
+  var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: {},
+        method: "GET"
+      }
+  var userList = [];
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/iLensApiClient",
+    dataType: "json",
+    headers:{'CLIENT_KEY':sessionToken},
+    type: "POST",
+    data: JSON.stringify(ilensApiClientVO),
+    async: false,
+    success: function (data){     
+      for(i = 0; i < data.length; i++){    
+        if(i==0) continue;            
+        userList.push(data[i].userId+" ["+data[i].firstName+" "+data[i].lastName+"]");
+      }      
+    }    
+   });
+   $("#usersFilter").aircomplete({
+      data: userList,
+      minSearchStringLength : 1, // show results after a single character is entered
+      onSelect: function(data){
+        var split=data.split(" ");
+        var id=split[0];
+        var date1=$("#text-date").val();
+        var date2="T00:01:01.001Z";        
+        var date=date1.concat(date2);
+        var entryExitFilter= {date:date,
+                             id:id,
+                            location:"",
+                            name:""
+                          }
+    var reportApi = "[[${session.REPORT_API}]]";
+  	var sessionToken = "[[${session.USER.sessionToken}]]";
+  	var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+ 		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/filter";
+    var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: entryExitFilter,
+        method: "POST"
+      }
+     $.ajax({
+		  contentType: "application/json;charset=UTF-8",
+          url: "api/v1/iLensApiClient",
+          dataType: "json",
+          headers:{'CLIENT_KEY':sessionToken},
+          type: "POST",
+          async: false,
+          data: JSON.stringify(ilensApiClientVO),
+          success: function(data){
+            var attendanceList="";
+          	for(i=0;i<data.length;i++){
+              var entryTime = moment(data[i].entry_view.time).format("DD-MM-YYYY hh:mm:ss A");
+          	  attendanceList=attendanceList+"<tr onclick='getTraceMethod(\""+data[i].entry_view.id+"\",\""+entryExitFilter.date +"\")'>";
+          	  attendanceList=attendanceList+"<td>"+data[i].id+"</td>";
+              attendanceList=attendanceList+'<td>'+data[i].name+'</td>';
+              attendanceList=attendanceList+'<td class="width">'+ entryTime +'</td>';
+              attendanceList=attendanceList+'<td>'+data[i].entry_view.location+'</td>';
+              if(data[i].exit_view==0){
+                attendanceList=attendanceList+'<td>-----</td>';
+              }else{
+                var exitTime = moment(data[i].exit_view[0].time).format("DD-MM-YYYY hh:mm:ss A");
+                attendanceList=attendanceList+'<td class="width">'+ exitTime +'</td>';
+              }
+              if(data[i].exit_view==0){
+                attendanceList=attendanceList+'<td>-----</td>';
+              }else{
+                attendanceList=attendanceList+'<td>'+data[i].exit_view[0].location+'</td>';
+              }
+          		attendanceList=attendanceList+'</tr>';
+          	}
+            if(data == 0){
+              if ( windowsize < 500 ){
+                 $("#mobileList").hide();
+              }else{
+               $("#attendanceList").hide();
+              }
+               $(".records").html("No Records Found").show();
+               $('.pagination-nav1').hide();
+            }else{
+              if ( windowsize < 500 ){
+                 $("#mobileList").empty();
+                 $("#mobileList").html(attendanceList).show(); 
+              }else{
+               $("#attendanceList").empty();
+               $("#attendanceList").html(attendanceList).show();
+              }
+               $(".records").hide();
+               $('.pagination-nav1').show();
+            }
+
+          }
+    });
+    return data;
+      },
+     
+  });
+}
+
+  function getTraceMethod(id,date){
+      // const myArray = clickedValue.toString().split("_");
+
+      // convert human readable date into epoch.
+      var dateInEpoch = Math.round(new Date(date)/1000.0);
+      location.href = '/attendanceById?id='+id +'&date='+dateInEpoch;
+  }
+
+	function attendanceList(entryExitFilter, pageNumber){
+    var reportApi = "[[${session.REPORT_API}]]";
+  	var sessionToken = "[[${session.USER.sessionToken}]]";
+  	var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+ 		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/"+pageNumber; 
+    var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: entryExitFilter,
+        method: "POST"
+      }
+		$.ajax({
+		  contentType: "application/json;charset=UTF-8",
+          url: "api/v1/iLensApiClient",
+          dataType: "json",
+          headers:{'CLIENT_KEY':sessionToken},
+          type: "POST",
+          async: false,
+          data: JSON.stringify(ilensApiClientVO),
+          success: function(data){
+          	var attendanceList="";
+          	for(i=0;i<data.length;i++){
+              var entryTime = moment(data[i].entry_view.time).format("DD-MM-YYYY hh:mm:ss A");
+          	  attendanceList=attendanceList+"<tr onclick='getTraceMethod(\""+data[i].entry_view.id+"\",\""+entryExitFilter.date +"\")'>";
+          	  attendanceList=attendanceList+"<td>"+data[i].id+"</td>";
+              attendanceList=attendanceList+'<td>'+data[i].name+'</td>';
+              attendanceList=attendanceList+'<td class="width">'+ entryTime +'</td>';
+              attendanceList=attendanceList+'<td>'+data[i].entry_view.location+'</td>';
+              if(data[i].exit_view==0){
+                attendanceList=attendanceList+'<td>-----</td>';
+              }else{
+                var exitTime = moment(data[i].exit_view[0].time).format("DD-MM-YYYY hh:mm:ss A");
+                attendanceList=attendanceList+'<td class="width">'+ exitTime +'</td>';
+              }
+              if(data[i].exit_view==0){
+                attendanceList=attendanceList+'<td>-----</td>';
+              }else{
+                attendanceList=attendanceList+'<td>'+data[i].exit_view[0].location+'</td>';
+              }
+          		attendanceList=attendanceList+'</tr>';
+          	}
+            if(data != 0){
+              if ( windowsize < 500 ){
+                 $("#mobileList").empty();
+                 $("#mobileList").html(attendanceList).show(); 
+              }else{
+               $("#attendanceList").empty();
+               $("#attendanceList").html(attendanceList).show();
+              }
+              $(".records").hide();
+              $('.pagination-nav1').show();
+            }
+            setTimeout(function(){
+              $(".pre-loading").hide();
+            },2000);
+          },
+          error:function(err){
+            console.log(err);
+            setTimeout(function(){
+              $(".pre-loading").hide();
+            },2000);
+          }
+		});
+	}
+  //mobile view//
+var prevSize = $(window).width();
+$(window).resize(function() {
+    var windowsize = $(window).width();
+    if ( prevSize != windowsize && windowsize < 500 ){
+      $("#mobileList").show();
+      $("#attendanceList").hide();
+      mobileAttendance(entryExitFilter, pageNumber);
+      
+    }else if ( prevSize != windowsize){
+      $("#mobileList").hide();
+      $("#attendanceList").show();
+    }
+  }); 
+
+  function mobileAttendance(entryExitFilter, pageNumber){
+    var reportApi = "[[${session.REPORT_API}]]";
+  	var sessionToken = "[[${session.USER.sessionToken}]]";
+  	var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+ 		var apiUrl = urlSlashCheck + "api/v1/ilens/attendance/"+pageNumber; 
+    var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: entryExitFilter,
+        method: "POST"
+      }
+		$.ajax({
+		  contentType: "application/json;charset=UTF-8",
+          url: "api/v1/iLensApiClient",
+          dataType: "json",
+          headers:{'CLIENT_KEY':sessionToken},
+          type: "POST",
+          async: false,
+          data: JSON.stringify(ilensApiClientVO),
+          success: function(data){
+          	var attendanceList="";
+          	for(i=0;i<data.length;i++){
+              var entryTime = moment(data[i].entry_view.time).format("DD-MM-YYYY hh:mm:ss A");
+          	  attendanceList=attendanceList+'<div class="userHead1">';
+              attendanceList=attendanceList+"<div class='col-12 colSplit' onclick='getTraceMethod(\""+data[i].entry_view.id+"\",\""+entryExitFilter.date +"\")'>";
+          	  attendanceList=attendanceList+"<div class='col-4'><span class='ctext2'>ID: </span>"+data[i].id+"</div>";
+              attendanceList=attendanceList+'<div class="col-8 ctext3"><span class="ctext2">Name: '+'</span>'+data[i].name+'</div>';
+              attendanceList=attendanceList+'</div>';
+              attendanceList=attendanceList+'<div class="col-12 colSplit">';
+              attendanceList=attendanceList+'<div class="col-8"> <span class="ctext2">Entry Time: </span><br>'+ entryTime +'</div>';
+              attendanceList=attendanceList+'<div><span class="ctext2">Entry Location: </span><br>'+data[i].entry_view.location+'</div>';
+              attendanceList=attendanceList+'</div>';
+              attendanceList=attendanceList+'<div class="col-12 colSplit">';
+                if(data[i].exit_view==0){
+                attendanceList=attendanceList+'<div class="col-8"><span class="ctext2">Exit Time: </span>-----</div>';
+              }else{
+                var exitTime = moment(data[i].exit_view[0].time).format("DD-MM-YYYY hh:mm:ss A");
+                attendanceList=attendanceList+'<div class="col-8"> <span class="ctext2">Exit Time: </span><br>'+ exitTime +'</div>';
+              }
+              if(data[i].exit_view==0){
+                attendanceList=attendanceList+'<div><span class="ctext2">Exit Location: </span>-----</div>';
+              }else{
+                attendanceList=attendanceList+'<div><span class="ctext2">Exit Location: </span><br>'+data[i].exit_view[0].location+'</div>';
+              }
+              attendanceList=attendanceList+'</div>';
+          		attendanceList=attendanceList+'</div>';
+          	}
+            if(data == 0){
+               $("#mobileList").hide();
+               $(".records").html("No Records Found").show();
+               $('.pagination-nav1').hide();
+            }else{
+              $("#mobileList").empty();
+               $(".records").hide();
+               $("#mobileList").html(attendanceList).show(); 
+               $('.pagination-nav1').show();
+            }
+            setTimeout(function(){
+              $(".pre-loading").hide();
+            },2000);
+          },
+          error:function(err){
+            console.log(err);
+            setTimeout(function(){
+              $(".pre-loading").hide();
+            },2000);
+          }
+		});
+	}
+</script>
+</div>
+</body>
+</html>

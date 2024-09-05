@@ -1,0 +1,574 @@
+<div class="content">
+  <div class="main-table zoom5">
+    <div class="confic-panal">
+      <div class="camera_detail">
+        <label class="input-labels">Channel ID</label>
+        <input id="deviceId" type="text" name="DeviceId" class="lens_input" disabled="true" />
+        <label class="input-labels">Name</label>
+        <input id="name" type="text" name="Devicename" class="lens_input" placeholder="Name" maxlength="10" />
+        <label class="input-labels">URL/IP</label>
+        <input id="ip" type="text" name="DeviceIp" class="lens_input" value="192.168.0.192" disabled="true" />
+        <label class="input-labels">Status</label>
+        <select class="lens_input" id="Select">                  
+          <option selected="" value="true">Active</option>
+          <option value="false">In Active</option>
+        </select>
+        <label class="input-labels">Camera Type</label>
+        <input id="camType" type="text" name="Camera TYpe" class="lens_input" placeholder="Camera type" maxlength="10"/>
+        <label class="container-check">Is Entry
+          <input id="entryGate" name="location" type="radio">
+          <span class="checkmark"></span>
+        </label>
+        <label class="container-check m-left">Is Exit
+          <input id="exitGate"  name="location" type="radio">
+          <span class="checkmark"></span>
+        </label>
+        <div class="camera_view">
+          <div class="camera_head mb-10">
+            <span>Live</span><span class="pull-right"> <a onclick="resetCrop()" title="Resize original."><i class="fa-solid fa-arrows-rotate mr-3 y-clr c-p"></i></a>
+              <a onclick="cropImage(this)" title="Click to save cropped window."><i class="fa-solid fa-crop y-clr c-p" id="crop"></i></a> 
+              <!-- <i class="fa fa-camera y-clr" aria-hidden="true"></i> -->
+            </span>
+          </div>
+          <div class="camera_live">
+            <div class="fp-Video" id="liveVideoDiv">
+             </div>
+          </div>
+        </div>
+      </div>
+      <div class="preview_detail">
+        <div id="accordion"> 
+          <div class="card"> 
+            <div class="card-header"> 
+              <a class="collapsed card-link cardtxt" data-toggle="collapse" href="#description2" aria-expanded="true">  
+               <!-- <i class="fa fa-check" aria-hidden="true"></i> -->
+               Face Recogonization 
+               <i class="fa fa-compress bs-icon pull-right" aria-hidden="true"></i><!-- 
+               <i class="fa fa-compress" aria-hidden="true"></i> -->
+              </a>
+              <div class="container-switch">
+                <div class="inner-container" id="toggle-2" enable="false">
+                  <div id="tg-3" class="toggle toggle-btn two" flag="two">
+                    <p>Enable<span class="tick1 two" id="tick"></span></p>
+                    <i class="tick two" id="icon"></i>
+                  </div>
+                  <div id="tg-4" class="toggle toggle-btn active two" flag="two">
+                    <p>Disable<span class="tick1 two" id="tick2"></span></p>
+                    <i class=" tick two" id="icon1"></i>
+                  </div>
+                </div>
+              </div>
+            </div> 
+            <div id="description2" class="collapse  show main-coll" data-parent="#accordion"> 
+              <div class="card-body bodySty"> 
+                <div class="ratio_part">
+                  <div class="class-flex">
+                    <div class="ratio-txt">Min Ratio <i class="fa fa-question-circle " data-toggle="tooltip" data-placement="right" title="Minimum ratio of the screen to be captured.  This will help to reduce noise in image and keep focused areas. " id="tol"></i></div>
+                      <div class="range-slider slidecontainer">
+                        <span id="rs-bullet2" class="rs-label">0</span>
+                        <input id="rs-range-line2" class="rs-range" type="range" value="0" min="0" max="200">
+                      </div>
+                  </div>
+            <div class="class-flex">
+              <div class="ratio-txt">Max Ratio <i class="fa fa-question-circle " data-toggle="tooltip" data-placement="right" title="Maximum ratio of the screen to be captured.  This will help to reduce noise in image and keep focused areas. " id="tol"></i></div>
+                <div class="range-slider slidecontainer">
+                  <span id="rs-bullet3" class="rs-label">0</span>
+                  <input id="rs-range-line3" class="rs-range" type="range" value="0" min="0" max="200">
+                </div>
+            </div>
+            <div class="class-flex">
+              <div class="ratio-part">
+              <label class="count" >Minimum number of people <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="Minimum number of people required to be present at the place. If not the system will notify" ></i></label>
+                <input id="minimum-People" type="Number" name="people" class="count_input input-bg" placeholder="People required" value="" min="0" max="100" />
+              <label class="count">Maximum number of people <i  class="fa fa-question-circle " data-toggle="tooltip" data-placement="right" title="Maximum number of people allowed to be present at the place. If the people count crossed this number system will raise notification" ></i></label>
+                <input id="maximum-People" type="Number" name="people" class="count_input input-bg" placeholder="People required" value="" min="0" max="100" />
+            </div>
+             </div>
+
+          </div>
+          <div class="preview_part">
+            <div class="pull-right">
+              <div class="ratio-txt ml-10 mb-10 txt-colr">Preview</div>
+              <div class="preview_part_panal">
+                <div class="camera_live">
+                  <div class="fp-Video-2" id="liveVideoDivAtFR">
+                   </div>
+                </div>
+              </div>
+            </div>
+         </div>
+      </div> 
+  </div> 
+</div> 
+          <div class="card"> 
+            <div class="card-header">
+              <a class="card-link cardtxt" data-toggle="collapse"href="#description1" aria-expanded="false"> 
+                 <!-- <i class="fa fa-check" aria-hidden="true"></i> --> 
+                     Number Plate Detection
+                 <i class="fa fa-expand bs-icon pull-right" aria-hidden="true"></i>
+              </a>
+              <div class="container-switch">
+                <div class="inner-container" id="toggle-1" enable="false">
+                    <div id="tg-1"  class="toggle toggle-btn one" flag="one">
+                        <p>Enable<span class="tick1 one" id="tick3"></span></p>
+                        <i class=" tick one" id="icon2"></i>
+                    </div>
+                    <div id="tg-2" class="toggle toggle-btn active one" flag="one">
+                        <p>Disable<span class="tick1 one" id="tick4"></span></p>
+                        <i class="fa fa-check-circle tick one" id="icon3"></i>
+                    </div>
+                </div>
+              </div> 
+            </div> 
+          <div id="description1" class="collapse main-coll" data-parent="#accordion"> 
+            <div class="card-body bodySty"> 
+              <div class="ratio_part">
+                <div class="class-flex">
+                  <div class="ratio-txt">Min Ratio <i class="fa fa-question-circle " data-toggle="tooltip" data-placement="right" title="Minimum ratio of the screen to be captured.  This will help to reduce noise in image and keep focused areas. " ></i></div>
+                    <div class="range-slider slidecontainer">
+                      <span id="rs-bullet" class="rs-label">0</span>
+                      <input id="rs-range-line" class="rs-range" type="range" value="2000" min="0" max="5000">
+                    </div>
+                </div>
+          <div class="class-flex">
+            <div class="ratio-txt">Max Ratio <i class="fa fa-question-circle " data-toggle="tooltip" data-placement="right" title="Maximum ratio of the screen to be captured.  This will help to reduce noise in image and keep focused areas. " ></i></div>
+              <div class="range-slider slidecontainer">
+                <span id="rs-bullet1" class="rs-label">0</span>
+                <input id="rs-range-line1" class="rs-range" type="range" value="5000" min="0" max="5000">
+              </div>
+        </div>
+        <div class="class-flex">
+          <div class="ratio-txt">Min Kernel <i class="fa fa-question-circle " data-toggle="tooltip" data-placement="right" title="structuring rectangle element minimum ratio" ></i></div>
+            <div class="range-slider slidecontainer">
+              <span id="rs-bullet4" class="rs-label">0</span>
+              <input id="rs-range-line4" class="rs-range" type="range" value="3" min="0" max="50">
+            </div>
+        </div>
+        <div class="class-flex">
+          <div class="ratio-txt">Max Kernel <i class="fa fa-question-circle " data-toggle="tooltip" data-placement="right" title="structuring rectangle element maximum raio" ></i></div>
+            <div class="range-slider slidecontainer">
+              <span id="rs-bullet5" class="rs-label">0</span>
+              <input id="rs-range-line5" class="rs-range" type="range" value="23" min="0" max="50">
+            </div>
+        </div>
+        <!-- <div class="class-flex">
+          <div class="ratio-txt mt-20">Max Ratio <i  class="fa fa-question-circle " data-toggle="tooltip" data-placement="right" title="Maximum number of people allowed to be present at the place. If the people count crossed this number system will raise notification" ></i></div>
+            <div class="flex-half">
+              <div class="floating float-100 inner-addon right-addon">
+                <i class="fa fa-chevron-down"></i>
+                <input class="floating-input" type="text" id="appshow2" placeholder=" ">
+              </div>
+            </div>
+        </div> -->
+        <div class="class-flex">
+          <div class="flex-half mt-10"><span>Selected Patterns <i  class="fa fa-question-circle " data-toggle="tooltip" data-placement="right" title=" pattern of number plate" ></i></span>
+            <div class="Patterns-tag"><i class="fa fa-tag" aria-hidden="true"></i>AB 01 XY 1111</div>
+          </div>
+        </div>
+        </div>
+        <div class="preview_part">
+          <div class="pull-right">
+            <div class="ratio-txt ml-10 mb-10 txt-colr">Preview</div>
+            <div class="preview_part_panal">
+              <img src="/web/images/num.png" id="live_c1">
+            </div>
+          </div>
+        </div>
+      </div> 
+  </div> 
+</div>
+         <!-- <div class="card"> 
+              <div class="card-header"> 
+                  <a class="collapsed card-link cardtxt" data-toggle="collapse" href="#description3" aria-expanded="false">  
+                     <!-- <i class="fa fa-check" aria-hidden="true"></i> 
+                     Distance Configuration  
+                     <i class="fa fa-expand bs-icon pull-right" aria-hidden="true"></i><!-- 
+                     <i class="fa fa-compress" aria-hidden="true"></i> 
+                 </a>
+                  <div class="container-switch">
+                    <div class="inner-container" id="toggle-3" enable="false">
+                        <div id="tg-5" class="toggle toggle-btn three" flag="three">
+                            <p>Enable</p>
+                        </div>
+                        <div id="tg-6" class="toggle toggle-btn active three" flag="three">
+                            <p>Disable</p>
+                        </div>
+                    </div>
+                  </div>
+              </div> 
+              <div id="description3" class="collapse main-coll" data-parent="#accordion"> 
+                <div class="card-body bodySty">
+                   <div class="ratio_part">
+                   <label class="input-label">Maximum number of people:</label>
+                  <input id="" type="Number" name="people" class="lens_input input-bg" placeholder="People required" />
+                  <label class="input-label">Distance config in meters:</label>
+                  <input id="" type="number" name="distance" class="lens_input input-bg" placeholder="Distance required" />
+                   </div>
+                </div> 
+              </div> 
+          </div>-->
+          <div class="card"> 
+                <div class="card-header"> 
+                  <a class="collapsed card-link cardtxt" data-toggle="collapse" href="#description4" aria-expanded="false">  
+                     <!-- <i class="fa fa-check" aria-hidden="true"></i> -->
+                     Access restrictions  
+                     <i class="fa fa-expand bs-icon pull-right" aria-hidden="true"></i><!-- 
+                     <i class="fa fa-compress" aria-hidden="true"></i> -->
+                 </a>
+                 <div class="container-switch">
+                    <div class="inner-container" id="toggle-4" enable="false">
+                      <div id="tg-7" class="toggle toggle-btn four" flag="four">
+                          <p>Enable<span class="tick1 four" id="tick5"></span></p>
+                          <i class=" tick four" id="icon4"></i>
+                      </div>
+                      <div id="tg-8" class="toggle toggle-btn active four" flag="four">
+                          <p>Disable<span class="tick1 four" id="tick6"></span></p>
+                          <i class="tick four" id="icon5"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div> 
+                <div id="description4" class="collapse main-coll" data-parent="#accordion"> 
+                  <div id="drop-list" class="col-md-12 row card-body bodySty">
+                    <div class="col-md-5 userList">
+                      <label class="restrict-members"> Members</label>
+                        <select multiple="multiple" id="select1" class="select-box-1 custom-scroll">
+                        </select>
+                    </div>
+                    <div class="col-md-2 button-align">
+                       <button id="select_option" class="plus-button"><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+                       <button id="select_option2" class="minus-button"><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
+                    </div>
+                    <div class="col-md-5 userList">
+                      <label class="restrict-members">Permission granted members <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="The persons allowed to enter the premise. If any other entry recorded system will notify." ></i></label>
+                        <select multiple="multiple" id="select2" class="select-box-2 custom-scroll">
+                        </select>
+                    </div>
+                  </div> 
+                </div> 
+             </div> 
+          </div> 
+       </div>
+     </div>
+   </div>
+</div>
+<form class="inline-labels">
+  <input type="hidden"  id="cLeft" name="cLeft" />
+  <input type="hidden"  id="cTop" name="cTop" />
+  <input type="hidden"  id="cWidth" name="cWidth" />
+  <input type="hidden"  id="cHeight" name="cHeight" />
+  <input type="hidden"  id="id" name="id" value="0" />
+  <input type="hidden"  id="tHeight" name="tHeight" />
+  <input type="hidden"  id="tWidth" name="tWidth" />
+  <input type="hidden"  id="cropChannelId" name="channelId"/>
+</form>
+<div class=" row footer-row">
+  <div class="row-button">
+    <button type="button" class="cancel-button button-size" onclick="goBack()">Cancel</button>
+    <button type="button" class="submit-button button-size" onclick="save()">Submit</button>
+ </div>
+</div>
+<script>
+  var jcrop_api="";
+  var boundx="";
+  var boundy="";
+  var sessionToken=""
+  $(".pre-loading").show();
+  $("#heading").html("Channel Configuration");
+$(document).ready(function(){
+  sessionToken = "[[${session.USER.sessionToken}]]";
+  $("#cropChannelId").val($("#channelId").val());
+  var camIp = $('#ip').val();
+  var liveVideoDiv = "";
+  const url = window.location.href.toString().split("//");
+  const colonSplit = url[1].split(":");
+  var ip = colonSplit[0];
+  liveVideoDiv = liveVideoDiv + '<img id="liveVideoId" src="https://'+ ip +':5000/' + camIp + '">';
+  $("#liveVideoDiv").html(liveVideoDiv).show();
+
+  var liveVideoDivAtFR = "";
+  liveVideoDivAtFR = liveVideoDivAtFR + '<img id="liveVideoIdAtFr" src="https://'+ ip +':5000/' + camIp + '">'
+  $("#liveVideoDivAtFR").html(liveVideoDivAtFR).show();
+
+$('#liveVideoDiv').Jcrop({
+  bgOpacity: .3,
+  //bgColor:"#f9c631",
+  onChange:   crop,
+  onSelect:   crop,
+  onRelease:  clearCoords
+},function(){
+  jcrop_api = this;
+  var bounds = this.getBounds();
+      boundx = parseInt(bounds[0]);
+      boundy = parseInt(bounds[1]);
+      // Store the API in the jcrop_api variable
+      jcrop_api = this;
+
+      // Move the preview into the jcrop container for css positioning
+     // $preview.appendTo(jcrop_api.ui.holder);
+});
+
+  $preview = $('.camera_live'),
+  $pcnt = $('.camera_live #liveVideoDiv'),
+  $pimg = $('.camera_live #liveVideoDiv img'),
+  xsize = $pcnt.width(),
+  ysize = $pcnt.height();
+  $("#tHeight").val(ysize);
+  $("#tWidth").val(xsize);
+  getCropImage();
+userName();
+$(".card-link").on("click",function(){
+  $(".bs-icon").removeClass("fa-compress");
+  $(".bs-icon").addClass("fa-expand");
+  var expend=$(this).attr("aria-expanded");
+  if(expend=="true"){
+    $(this).children(".bs-icon").removeClass("fa-compress");
+    $(this).children(".bs-icon").addClass("fa-expand");
+  }else if(expend=="false"){
+    $(this).children(".bs-icon").addClass("fa-compress");
+    $(this).children(".bs-icon").removeClass("fa-expand");
+  }
+});
+
+
+  $('[data-toggle="tooltip"]').tooltip({trigger:'click'});
+  $(".fa-question-circle").mouseleave(function(){
+    $('[data-toggle="tooltip"]').tooltip('hide');
+  })  
+
+$('#select_option').click(function () {
+   var person = $('#select1').val();
+   if (jQuery.inArray(person[0], removedPersons) === -1) {  
+      addedPersons.push(person[0]);
+   }else {
+      removedPersons.splice( $.inArray(person[0], removedPersons), 1 );
+      //removedPersons.remove(person[0]);
+   }
+
+   return !$('#select1 option:selected').remove().appendTo('#select2');
+});
+
+$('#select_option2').click(function () {
+   var person = $('#select2').val();
+   if (jQuery.inArray(person[0], addedPersons) === -1) {  
+      removedPersons.push(person[0]);
+   }else {
+      addedPersons.splice( $.inArray(person[0], addedPersons), 1 );
+      //addedPersons.remove(person[0]);
+   }
+   
+   return !$('#select2 option:selected').remove().appendTo('#select1');
+});
+
+$('.toggle-btn').on('click', function(){
+    var id=$(this).attr('flag');
+    $('.toggle-btn.'+id).removeClass('active');
+    $(this).addClass('active');
+    $('.tick.'+id).removeClass('fa fa-check-circle');
+    $(this).find("i:first").addClass("fa fa-check-circle");
+    $(".tick1."+id).empty();
+    $(this).find("span").append("d"); 
+    
+    var toggleBtn = $(this).children().text();
+    if(toggleBtn=="Disabled"){
+      $(this).parent(".inner-container").attr("enable","false");
+    }else{
+      $(this).parent(".inner-container").attr("enable","true");
+    }
+  });
+  $(".pre-loading").hide();
+});
+
+
+// $('#coords').on('change','input',function(e){
+//   var x1 = $('#x1').val(),
+//       x2 = $('#x2').val(),
+//       y1 = $('#y1').val(),
+//       y2 = $('#y2').val();
+//   jcrop_api.setSelect([x1,y1,x2,y2]);
+// });
+
+
+// Simple event handler, called from onChange and onSelect
+// event handlers, as per the Jcrop invocation above
+function crop(c){
+  $('#cLeft').val(c.x);
+  $('#cTop').val(c.y);
+  $('#cWidth').val(c.x2);
+  $('#cHeight').val(c.y2);
+};
+
+function clearCoords(){
+$('#coords input').val('');
+};
+
+function cropImage(){
+  $(".fa-crop").removeClass("y-clr c-p");
+  var x = $('#cLeft').val(),
+      y = $('#cTop').val(),
+      w = $('#cWidth').val(),
+      h = $('#cHeight').val();
+
+  //changeImageSize(x,y,w,h);
+ // jcrop_api.release();
+  jcrop_api.disable();
+  saveCropImage();
+}
+
+var rangeSlider = document.getElementById("rs-range-line");
+var rangeBullet = document.getElementById("rs-bullet");
+
+rangeSlider.addEventListener("input", showSliderValue, false);
+
+function showSliderValue() {
+  rangeBullet.innerHTML = rangeSlider.value;
+  var bulletPosition = (rangeSlider.value /rangeSlider.max);
+  rangeBullet.style.left = (bulletPosition * 170) + "px";
+}
+
+var rangeSlider1 = document.getElementById("rs-range-line1");
+var rangeBullet1 = document.getElementById("rs-bullet1");
+
+rangeSlider1.addEventListener("input", showSliderValue1, false);
+function showSliderValue1() {
+  rangeBullet1.innerHTML = rangeSlider1.value;
+  var bulletPosition1 = (rangeSlider1.value /rangeSlider1.max);
+  rangeBullet1.style.left = (bulletPosition1 * 170) + "px";
+}
+var rangeSlider2 = document.getElementById("rs-range-line2");
+var rangeBullet2 = document.getElementById("rs-bullet2");
+
+rangeSlider2.addEventListener("input", showSliderValue2, false);
+function showSliderValue2() {
+  rangeBullet2.innerHTML = rangeSlider2.value;
+  var bulletPosition2 = (rangeSlider2.value /rangeSlider2.max);
+  rangeBullet2.style.left = (bulletPosition2 * 170) + "px";
+}
+
+var rangeSlider3 = document.getElementById("rs-range-line3");
+var rangeBullet3 = document.getElementById("rs-bullet3");
+
+rangeSlider3.addEventListener("input", showSliderValue3, false);
+function showSliderValue3() {
+  rangeBullet3.innerHTML = rangeSlider3.value;
+  var bulletPosition3 = (rangeSlider3.value /rangeSlider3.max);
+  rangeBullet3.style.left = (bulletPosition3 * 170) + "px";
+}
+
+var rangeSlider4 = document.getElementById("rs-range-line4");
+var rangeBullet4 = document.getElementById("rs-bullet4");
+
+rangeSlider4.addEventListener("input", showSliderValue4, false);
+function showSliderValue4() {
+  rangeBullet4.innerHTML = rangeSlider4.value;
+  var bulletPosition4 = (rangeSlider4.value /rangeSlider4.max);
+  rangeBullet4.style.left = (bulletPosition4 * 170) + "px";
+}
+
+var rangeSlider5 = document.getElementById("rs-range-line5");
+var rangeBullet5 = document.getElementById("rs-bullet5");
+
+rangeSlider5.addEventListener("input", showSliderValue5, false);
+function showSliderValue5() {
+  rangeBullet5.innerHTML = rangeSlider5.value;
+  var bulletPosition5 = (rangeSlider5.value /rangeSlider5.max);
+  rangeBullet5.style.left = (bulletPosition5 * 170) + "px";
+}
+var maximumPeople = document.getElementById("maximum-People").value;
+var minimumPeople = document.getElementById("minimum-People").value;
+
+function userName(){
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/user/usersList",
+    dataType: "json",
+    headers:{'CLIENT_KEY':sessionToken},
+    type: "GET",
+    async: false,
+    success: function(data){
+      var userName= "";
+      for(i=0;i<data.length;i++){
+        userName= "";
+        if (jQuery.inArray(data[i].id, access) === -1) { 
+          if(data[i].id!=1){
+            if(($.inArray((data[i].id),userlist)==-1)){
+              userName +='<option value='+data[i].id+'>'+data[i].userId+' ['+data[i].firstName+" "+data[i].lastName+']</option>';
+               $("#select1").append(userName);
+            }
+          }
+        }
+       }
+     }
+  });
+}
+
+function resetCrop(){
+  changeImageSize(0,0,xsize,ysize);
+  jcrop_api.enable();
+  $('#cLeft').val(0);
+  $('#cTop').val(0);
+  $('#cWidth').val(0);
+  $('#cHeight').val(0);
+  saveCropImage();
+  $(".fa-crop").addClass("y-clr c-p");
+}
+
+function saveCropImage(){
+  var formData = $("form").serializeArray();
+  var data = {};
+  $(formData).each(function(index, obj){
+    data[obj.name] = Math.round(obj.value);
+  });
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/channel/resize",   
+    headers:{'CLIENT_KEY': sessionToken},
+    type: 'POST',
+    data: JSON.stringify(data),
+    async: false,
+    success: function(data){ 
+     // console.log("success");
+    },
+    error: function(err){
+        setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+    }
+  });
+}
+
+function changeImageSize(x,y,w,h){
+  jcrop_api.release();
+  var rx = xsize / w;
+  var ry = ysize / h;
+
+  $pimg.css({
+    width: Math.round(rx * boundx) + 'px',
+    height: Math.round(ry * boundy) + 'px',
+    marginLeft: '-' + Math.round(rx * x) + 'px',
+    marginTop: '-' + Math.round(ry * y) + 'px'
+  });
+}
+
+function getCropImage(){
+  var id=$("#channelId").val();
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/channel/resize/"+id,   
+    headers:{'CLIENT_KEY': sessionToken},
+    type: 'GET',
+    async: false,
+    success: function(data){
+      jcrop_api.setSelect([data.cLeft,data.cTop,data.cWidth,data.cHeight]);
+      if((data.cWidth!=0 && data.cWidth!=data.tWidth) || (data.cHeight!=0 && data.cHeight!=data.tHeight) ){
+        $(".fa-crop").removeClass("y-clr c-p");
+        jcrop_api.disable();
+      }else{
+        jcrop_api.release();
+      }
+    },
+    error: function(err){
+        setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+    }
+  });
+}
+</script>

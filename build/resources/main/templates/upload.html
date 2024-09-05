@@ -1,0 +1,150 @@
+<div class="modal fade" id="TrainingModalCenter" tabindex="-1" role="dialog" aria-labelledby="TrainingModalCenterTitle" aria-hidden="true">
+  <div class="pre-loading">
+    <img class="loader" src="/web/images/loader.png" />
+  </div>
+  <div id="modal-box" class="modal-dialog modal-dialog-centered" role="document">
+    <div id="modal-color" class="modal-content">
+      <div>
+        <span class="userId">Id: <span class="formId" id="trainUserId"></span></span>
+        <span class="studentName">Name: <span class="formId" id="trainUserName"></span></span>
+        <div class="container-switch po">
+          <div class="inner-container" id="toggle-7" enable="false">
+              <div id="tg-9"  class="toggle toggle-btn active one" flag="one">
+                  <p>Upload</p>
+                  <i class="fa fa-check-circle df"></i>
+              </div>
+              <div id="tg-" class="toggle toggle-btn one" flag="one">
+                  <p>Live</p>
+              </div>
+          </div>
+        </div>
+<body>
+  <div class="im align">
+    <div class="icon"><i class="fa fa-cloud-upload" aria-hidden="true"></i></div>
+    <header>click here to Upload Image</header>
+    <br>
+     <form id="upload-file-form" class="hide-ele">
+        <div class="col-lg-12 upload-file-model">
+            <label class="btn btn-submit chaos-btn ml-0 upload_btn" for="upload-file-input">
+                <input id="upload-file-input" type="file" name="file" >
+            </label>
+          </div>       
+       
+     </form>
+  </div>
+  <button type="button" id="clickButton" class="cancel-button button-fit">Upload </button>
+  <span class='label label-default hide' id="upload-file-info"></span>            
+  <button type="button" class="cancel-button button-fit" data-dismiss="modal" onclick="cancelModal()">Cancel</button>
+</div>
+
+  <script>
+    $(document).ready(function(){
+  $(".training_process").hide();
+  $("#finished_trainData").hide();
+  $(".pre-loading").hide();
+  $("#trainUserId").html($("#trainId").val());
+  var name=($("#trainName").val()+" "+$("#trainLastname").val());
+  $("#trainUserName").html(name);
+});
+
+// $(function(){
+//          $("#upload-file-input").change(function(){
+//                if($(this).val() != null)
+//                {
+//                      $("#clickButton").trigger("click");
+//                 }
+//          });
+
+// })
+
+
+$("#clickButton").click(function(){
+  $(".pre-loading").show();
+  var form = new FormData();
+  var files = $('#upload-file-input')[0].files;
+  if (files.length > 0){
+    form.append('File', files[0]);
+  }
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  if(files.length!=0){
+  $.ajax({
+      url: "api/v1/imageUpload/imageUpload/"+($("#trainId").val()),
+      headers:{'CLIENT_KEY':sessionToken},
+      type: 'POST',
+      data: form,
+      enctype: 'multipart/form-data',
+      contentType: false,
+      processData: false,
+      success: function(data){
+        trainingId();
+
+         setTimeout(function(){ toastr.success("Success.."); }, 1000);
+
+      },
+      error: function(err){
+        setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+      }
+   });
+  }else{
+    setTimeout(function(){ toastr.error("Image file is empty"); }, 1000);
+  }
+  setTimeout(function(){
+    $(".pre-loading").hide();
+    }, 2000);
+})
+
+
+function trainingId(id){
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: "api/v1/user/starTraining/"+($("#trainId").val()),
+      dataType: "json",
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "PUT",
+      async: false,
+      success: function(data){
+      },
+      error:function(){
+        setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+      }
+    });
+    setTimeout(cancelModal, 1500);
+}
+
+
+
+
+  function disableMethod(id,name){
+    $("#trainId").val(id);
+    $("#trainName").val(name);
+    $.ajax({
+     contentType: "application/json;charset=UTF-8",
+     url: "/data_training",
+     type: "GET",
+     async: false,
+     success: function (data){
+       $("#adminForm").html("");
+         $("#adminForm").html(data);
+
+     }
+   });
+ }
+
+
+$('#tg-').click(function() {
+    $('#toggle-7').find('.toggle').toggleClass('active');
+    var uploadId1= $("#trainId").val();
+    var uploadName1 =  $("#trainName").val();
+    disableMethod(uploadId1, uploadName1);
+});
+
+function cancelModal(){
+  $("#TrainingModalCenter").hide();
+}
+
+
+</script>
+
+</body>
+

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+    <title>[[${session.APP_NAME}]] - Members</title>
+</head>
+<body>
+<div layout:fragment="content" class="contant">
+  <div class="pre-loading">
+    <img class="loader" src="/web/images/loader.png"/>
+  </div>
+  <div class="main-table zoom1">
+    <div class="col-md-12 pb-10 row m-0">
+      <div class="col-md-12">
+        <div class="navStyle1">
+          <a onclick="userEdit(0);"><button id="addUser" class="new-button">New<i class="fa fa-plus-circle" aria-hidden="true"></i></button></a>
+          <div>
+            <nav aria-label="Page navigation example" class="pagination-nav1">
+              <ul class="pagination" id="usersPagination">
+              </ul>
+            </nav>
+        </div>
+      </div>
+      </div>
+    </div>
+    <div class="col-md-12 row table-responsive">
+      <table class="clr-txt">
+        <thead class="tableHead">
+          <tr>
+            <th>Member ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Department</th>
+            <th>Location</th>
+            <th class="dataTraining">Data Training  <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="This action helps system to predict user with facial recognition, adding content in different combinations of angles " ></i></th>
+            <th width="140">Role</th>
+            <th width="60">Action</th>
+          </tr>
+        </thead>
+        <tbody class="" id="userList">
+
+        </tbody>
+        <tbody class="" id="mobileList">
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div id="adminForm">
+    
+  </div>
+  <div id="userForm">
+    
+  </div>
+  <div class="records"></div>
+  <input id="editForm" type="hidden" name="" >
+  <input id="trainId" type="hidden" name="" >
+  <input id="trainLastname" type="hidden" name="" >
+  <input id="trainName" type="hidden" name="" >
+  <input id="upadtedUsers" type="hidden" name="">
+  <input id="pageNo" type="hidden" name=""> 
+<script>
+  var windowsize = $(window).width();
+  var userTrainedList=[];
+  $("#heading").html("Members");
+$(document).ready(function(){
+  if ( windowsize < 500 ){
+          $("#userList").hide();
+          mobilePageList(pageNumber);
+        }else{
+          $("#userList").show();
+          $(".tooltip").css({"display":"none"});
+        }
+  $("#users").addClass('active');
+  $("#users").on("click",function(){
+    $(".pre-loading").show();
+      window.setInterval(function(){
+        $(".pre-loading").hide();
+      }, 2000);
+  });
+  dataTrainingCheck();
+  usersPaging();
+  $('[data-toggle1="tooltip"]').tooltip({trigger:'click'}); 
+  $(".fa-question-circle").mouseleave(function(){
+           $('[data-toggle1="tooltip"]').tooltip('hide');
+   })  
+  toastr.options = {
+          debug: false,
+          newestOnTop: false,
+          positionClass: "toast-bottom-right",
+          closeButton: true,
+          progressBar: false,
+  }
+  if($("#UserRole").text()=="Admin"){
+     $(".dataTraining").show();
+     $("#addUser").show();
+     $(".editUser").show();
+  }else{
+    $(".dataTraining").hide();
+    $("#addUser").hide();
+    $(".editUser").hide();
+  }
+});
+$(window).on('load', function() {
+  $(".pre-loading").hide();
+});  
+
+function adminEdit(id,name,lstName){
+   $("#trainId").val(id);
+   $("#trainName").val(name);
+   $("#trainLastname").val(lstName);
+   $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    //url: "/upload",
+    url: "/data_training",
+    type: "GET",
+    async: false,
+    success: function (data){
+        $("#adminForm").html(data);
+
+    }
+  });
+}
+
+function cancelModal(){
+  $("#TrainingModalCenter").hide();
+  stop();
+}
+
+function userEdit(id){
+   $("#editForm").val(id);
+     $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: "/new_user",
+      type: "GET",
+      async: false,
+      success: function (data){
+          $("#userForm").html(data);
+
+      }
+  });
+}
+
+function cancelForm2(){
+  $(".exampleModalCenter1").hide();
+}
+
+function usersEdit(id){
+  $("#editForm").val(id);
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: "/new_user",
+      type: "GET",
+      async: false,
+      success: function (data){
+        $("#userForm").html(data);
+      }
+  });
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+   $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/user/"+id,
+    dataType: "json",
+    headers:{'CLIENT_KEY':sessionToken},
+    type: "GET",
+    async: false,
+    success: function (data){
+        $("#UserID").val(data.userId);
+        $("#firstName").val(data.firstName);
+        $("#lastName").val(data.lastName);
+        $("#department").val(data.department);
+        $("#location").val(data.location);
+        $("#role").val(data.role);
+        $("#role").attr("value", data.role);
+    }
+   });
+}
+
+function cancelForm2(){
+  $(".exampleModalCenter1").hide();
+}
+
+
+function saveUser(){ 
+    toastr.options = {
+      debug: false,
+      newestOnTop: false,
+      positionClass: "toast-bottom-right",
+      closeButton: true,
+      progressBar: false,
+    }
+    var user = {
+        active: true,
+        createBy: "string",
+        createdDt: "2021-04-16T06:08:27.803Z",
+        dateOfBirth: "2021-04-16T06:08:27.803Z",
+        department:$("#department").val(),
+        firstName:$("#firstName").val(),
+        id:0,
+        lastName:$("#lastName").val(),
+        location:$("#location").val(),
+        role:$("#role").val(),
+        sessionToken: "string",
+        updatedBy: "string",
+        updatedDt: "2021-04-16T06:08:27.803Z",
+        userId: $("#UserID").val(),
+        userSecret: $("#UserID").val()
+      };
+      var sessionToken = "[[${session.USER.sessionToken}]]";
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: "api/v1/user",
+        //dataType: "json",
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "POST",
+        async: false,
+        data: JSON.stringify(user),
+        success:function(data){
+          usersPaging();
+          cancelForm2();
+          setTimeout(function(){ toastr.success("User successfully Saved"); }, 1000);
+         },
+         error:function(err){
+          if(err.responseText.includes("User details already exists")){
+            setTimeout(function(){ toastr.error("User details already exists."); }, 1000);
+          }else{
+            setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+          }
+         }
+      });
+};
+var currentPage = 1;
+function deleteUser(id){
+  currentPage = parseInt($("#pageNo").val())+1;
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url:"api/v1/user/"+id,
+    //dataType: "json",
+    headers:{'CLIENT_KEY':sessionToken},
+    type: "DELETE",
+    async: true,
+    success: function(data){
+      usersPaging();
+      setTimeout(function(){ toastr.info("User successfully deleted"); }, 1000);
+    },
+     error:function(err){
+       setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+     }
+  });
+};
+
+var totalPages = 0;
+var totalCount = 0;
+
+function usersPaging(){
+  itemsPerPage=10;
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/user/count",
+    dataType: "json",
+    headers:{'CLIENT_KEY':sessionToken},
+    type: "GET",
+    async: false,
+    success:function(data){
+      if(data==1){
+        totalCount=data;
+      }else{
+        var data1=data-1;
+        totalCount=data1;
+      }
+    
+       totalPages=Math.ceil(totalCount/itemsPerPage);
+       $('#usersPagination').empty();
+       $(userList).empty();
+       $("#mobileList").empty();
+        $('#usersPagination').removeData("twbs-pagination");
+        $('#usersPagination').unbind("page");
+        window.pagObj = $('#usersPagination').twbsPagination({
+            totalPages: totalPages,
+            visiblePages: 5,
+            next: '&raquo;',
+            last: 'Last',
+            prev: '&laquo;',
+            first:'First',
+            initiateStartPageClick: false,
+            onPageClick: function (event, page) {
+                pageNumber = (page - 1);
+                $("#pageNo").val(pageNumber);
+                if ( windowsize < 500 ){
+                  mobilePageList(pageNumber);
+                  }else{
+                    usersPageList(pageNumber);
+                }
+               
+            }
+        }).on("page",function(event,num){});
+        if(totalPages <= currentPage){
+          $('#usersPagination').twbsPagination('show', totalPages);
+        }else{
+          $('#usersPagination').twbsPagination('show', currentPage);
+        }
+      }
+  });
+}
+
+var pageNumber = 0;
+function usersPageList(pageNumber){
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url:"api/v1/user/list/"+pageNumber ,
+      dataType: "json",
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "GET",
+      async: false,
+      success: function(data) {
+      var userList = "";
+      for(i=0;i<data.length;i++){
+        if(data[i].id!=1){
+        userList=userList+'<tr value='+data[i].id+'>';
+        userList=userList+'<td>'+data[i].userId+'</td>';
+        userList=userList+'<td>'+data[i].firstName+'</td>';
+        userList=userList+'<td>'+data[i].lastName+'</td>';
+        userList=userList+'<td>'+data[i].department+'</td>';
+        userList=userList+'<td>'+data[i].location+'</td>';
+        if($.inArray((data[i].userId),userTrainedList) >= 0){
+          userList=userList+'<td class="dataTraining"><a onclick="adminEdit(\''+data[i].userId+'\',\''+data[i].firstName+'\',\''+data[i].lastName+'\');" id="id_'+data[i].id+'" class="hide_icon"><i onclick="" class="fa fa-desktop data-icon icon-size" data-toggle="tooltip" data-original-title="Train user profile" aria-hidden="true"></i></a><i class="fa-regular fa-circle-check ml-2 dataTringIcon" title="Member registered."></i></td>'; 
+        }else{
+          userList=userList+'<td class="dataTraining"><a onclick="adminEdit(\''+data[i].userId+'\',\''+data[i].firstName+'\',\''+data[i].lastName+'\');" id="id_'+data[i].id+'" class="hide_icon"><i onclick="" class="fa fa-desktop data-icon icon-size" data-toggle="tooltip" data-original-title="Train user profile" aria-hidden="true"></i></a></td>';
+        }
+        userList=userList+'<td>'+data[i].role+'</td>';
+        userList=userList+'<td class="align"><a onclick="usersEdit(\''+data[i].id+'\');"><i id="edit" class="fa fa-pencil-square-o edit-config icon-size editUser" aria-hidden="true"></i></a><a onclick="confirm(\''+data[i].id+'\');"><i class="fa fa-trash icon-size" aria-hidden="true"></i></a></td>';
+        userList=userList+'</tr>';
+      }
+    }
+      if(userList.length== 0){
+         $(".records").html("No Records Found");
+         $('.pagination-nav1').hide();
+         $(".records").show();
+      }else{
+         $("#userList").html(userList);
+         $(".records").hide();
+         $('.pagination-nav1').show();
+      }
+    },
+    error:function(err){
+         console.log(err);
+    }
+  });
+};
+
+
+function updateUser(){ 
+  toastr.options = {
+    debug: false,
+    newestOnTop: false,
+    positionClass: "toast-bottom-right",
+    closeButton: true,
+    progressBar: false,
+  }
+  var user = {
+        active: true,
+        createBy: "string",
+        createdDt: "2021-04-16T06:08:27.803Z",
+        dateOfBirth: "2021-04-16T06:08:27.803Z",
+        department:$("#department").val(),
+        firstName:$("#firstName").val(),
+        id:$("#editForm").val(),
+        lastName:$("#lastName").val(),
+        location:$("#location").val(),
+        role:$("#role").val(),
+        updatedBy: "string",
+        updatedDt: new Date(),
+        userId: $("#UserID").val(),
+        userSecret: $("#UserID").val()
+    };
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url: "api/v1/user",
+      //dataType: "json",
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "PUT",
+      data: JSON.stringify(user),
+      async: false,
+      //data: JSON.stringify(user),
+      success:function(data){
+        usersPaging();
+        cancelForm2();
+        setTimeout(function(){ toastr.info("User successfully updated"); }, 1000);
+       },
+       error:function(err){
+          setTimeout(function(){ toastr.error("Error found.."); }, 1000);          }
+    });
+};
+//mobile view//
+var prevSize = $(window).width();
+$(window).resize(function() {
+    var windowsize = $(window).width();
+    if ( prevSize != windowsize && windowsize < 500 ){
+      $("#mobileList").show();
+      $("#userList").hide();
+      mobilePageList(pageNumber);
+      
+    }else if ( prevSize != windowsize){
+      $("#mobileList").hide();
+      $("#userList").show();
+    }
+  }); 
+
+  function mobilePageList(pageNumber){
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+    $.ajax({
+      contentType: "application/json;charset=UTF-8",
+      url:"api/v1/user/list/"+pageNumber ,
+      dataType: "json",
+      headers:{'CLIENT_KEY':sessionToken},
+      type: "GET",
+      async: false,
+      success: function(data) {
+      var userList = "";
+      for(i=0;i<data.length;i++){
+        if(data[i].id!=1){
+        userList=userList+'<div class="userHead1" value='+data[i].id+'>';
+        userList=userList+'<div class="col-12 colSplit">';
+        userList=userList+'<div class="col-11"><span class="ctext2">Member ID: '+'</span>'+data[i].userId+'</div>';
+        userList=userList+'<div class="dataTraining col-1"><a onclick="adminEdit(\''+data[i].userId+'\',\''+data[i].firstName+'\');" id="id_'+data[i].id+'" class="hide_icon"><i onclick="" class="fa fa-desktop data-icon icon-size Align" data-toggle="tooltip" data-original-title="Train user profile" aria-hidden="true"></i></a></div>';
+        userList=userList+'</div>';
+        userList=userList+'<div class="col-12 colSplit">';
+        userList=userList+'<div class="col-6 margin"><span class="ctext2">Name: '+'</span><br>'+data[i].firstName+" "+data[i].lastName+'</div>';
+        userList=userList+'<div class="col-5"><span class="ctext2">Role: '+'</span><br>'+data[i].role+'</div>';
+        userList=userList+'<div class="col-1 iconAlign">';
+        userList=userList+'<div class="align"><a onclick="usersEdit(\''+data[i].id+'\');"><i id="edit" class="fa fa-pencil-square-o edit-config icon-size editUser" aria-hidden="true"></i></a></div>';
+        userList=userList+'</div>';
+        userList=userList+'</div>';
+        userList=userList+'<div class="col-12 colSplit">';
+        userList=userList+'<div class="col-6 margin1"><span class="ctext2">DEPT: </span><br>'+data[i].department+'</div>';
+        userList=userList+'<div class="col-5"><span class="ctext2">Location: </span><br>'+data[i].location+'</div>';
+        userList=userList+'<div class="col-1 align"><a onclick="confirm(\''+data[i].id+'\');"><i class="fa fa-trash icon-size" aria-hidden="true"></i></a></div>';
+        userList=userList+'</div>';
+        userList=userList+'</div>';
+      }
+    }
+      if(userList.length== 0){
+         $(".records").html("No Records Found");
+         $('.pagination-nav1').hide();
+         $(".records").show();
+      }else{
+         $("#mobileList").html(userList);
+         $(".records").hide();
+         $('.pagination-nav1').show();
+      }
+    },
+    error:function(err){
+         console.log(err);
+    }
+  });
+};
+
+function confirm(id){
+  $.confirm({ 
+    animation: 'none',
+    closeAnimation: 'none',
+    useBootstrap: false,
+    title:'Delete Member',
+    content: '<div class="confirmDiv"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>'+
+             '<p class="mb-0">In future, this member will no longer be accessible. This action cannot be reversed. Data may exist in some places for the future reference.</p></div>'+
+             '<div class="confirmDiv p-0 ml-35"><p>Are you sure want to delete?</p></div>',  
+    type: 'yellow',
+    buttons: {
+      no:{
+          btnClass: 'btn btn-sty',
+        },
+        delete:{
+          btnClass: 'btn btn-sty',
+          action: function(){
+            deleteUser(id);
+          }
+        },
+    }
+  });  
+} 
+
+function dataTrainingCheck(){
+  var sessionToken = "[[${session.USER.sessionToken}]]";
+  $.ajax({
+    contentType: "application/json;charset=UTF-8",
+    url: "api/v1/user/trained",   
+    headers:{'CLIENT_KEY': sessionToken},
+    type: 'GET',
+    async: false,
+    success: function(data){ 
+      for(i=0; i<data.length; i++){
+        userTrainedList.push(data[i]);
+      }
+    },
+    error: function(err){
+      setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+    }
+  });
+}
+</script>
+ </div>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+	<title>[[${session.APP_NAME}]] - Notification</title>
+</head>
+<body>
+<div layout:fragment="content" class="contant">
+	<div class="pre-loading">
+    	<img class="loader" src="/web/images/loader.png" />
+  	</div>
+    <div class="main-table zoom1">
+        <div class="col-md-12 pb-10 row m-2">
+          <div class="col-lg-12 row">
+            <div class="col-lg-2 p-0">
+              <select class="drop-Btn" id="typeFilter">
+                <option value="all">All</option>
+                <option value="entry">Entry</option>
+                <option value="exit">Exit</option>
+              </select>
+            </div> 
+            <div class="col-lg-10 row justify-content-end p-0">
+              <div class="mr-3">
+                <label class="config_labels">Notification Numbers to Show</label>
+                <select class="drop-Btn" id="pageFilter">
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="30">30</option>
+                </select>
+              </div> 
+              <div class="">
+                <label class="config_labels">Auto Reload Time</label>
+                <select class="drop-Btn" id="reloadFilter">
+                  <option value="1">10 sec</option>
+                  <option value="2">20 sec</option>
+                  <option value="3">30 sec</option>
+                </select>
+              </div> 
+              <!-- <div class="p-0">
+                <button id="addUser" class="new-button float-right">Clear All</button>
+              </div> -->
+            </div>
+          </div>
+          <div class="col-lg-12 p-0" id="notificationList">
+
+          </div>
+          <!-- <div class="col-md-12 mt-3">
+            <div class="card notification-card">
+                <div class="card-body">
+                    <div class="notification d-flex justify-content-between col-lg-12 p-0">
+                        <div class="col-lg-2 p-0 fs-6">16-11-2022 01:01 PM</div>
+                        <div class="col-lg-9 p-0 fs-5 text-center">murali m has registered a complaint. The complaint id : 45</div>
+                        <a class="col-1 text-end p-0 fs-6 text-right c-b" href="javascript:void(0)" onclick="adminDeletenotification(50)"><i class="fa-solid fa-xmark" title="Delete"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        </div>
+      </div>
+      <div class="records"></div>
+<script>
+var sessionToken ="";
+var reportApi="";
+$("#heading").html("Notification");
+$(document).ready(function(){
+  sessionToken="[[${session.USER.sessionToken}]]";
+  reportApi="[[${session.REPORT_API}]]";
+  notificationFilter();
+  notificationAutoReload();
+});
+
+function notificationFilter(){
+  var type=$("#typeFilter").val();
+  var pagecount=$("#pageFilter").val();
+  notification(type,pagecount);
+}
+function notification(type,pagecount){
+      var urlSlashCheck = reportApi.endsWith("/")?reportApi:reportApi+"/";
+      var apiUrl = urlSlashCheck + "api/v1/notifications/list";
+      var data={
+        date:moment().format("YYYY-MM-DD"),
+       //date:"2022-11-23",
+        name:type,
+        id:pagecount
+      }
+      var ilensApiClientVO  = {
+        api: apiUrl,
+        clientKey: sessionToken,
+        inputVo: data,
+        method: "POST"
+      }
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: "api/v1/iLensApiClient",
+        dataType:'json',
+        headers:{'CLIENT_KEY':sessionToken},
+        type: "POST",
+        async: false,
+        data: JSON.stringify(ilensApiClientVO),
+        success:function(data){
+          $("#notificationList").empty();
+          var list="";
+          if(data == 0){
+            $(".records").html("No Notification Found").show();
+          }else{
+            $(".records").hide();
+          }
+          for(i=0; i<data.length; i++){
+            list+="<div class='col-md-12 mt-3'>";
+            list+="<div class='card notification-card'>";
+            list+="<div class='card-body'>";
+            list+="<div class='notification d-flex justify-content-between col-lg-12 p-0'>";
+            list+="<div class='col-lg-2 p-0 fs-6'>"+fullTimeFormat(data[i].time)+"</div>";
+            if(data[i].type =="entry"){
+              list+="<div class='col-lg-10 p-0 fs-5'>["+data[i].id+"] "+data[i].name+" entered via the "+data[i].location.toLowerCase()+" camera at "+timeOnlyFormat(data[i].time)+"</div>";
+            }else{
+              list+="<div class='col-lg-10 p-0 fs-5'>["+data[i].id+"] "+data[i].name+" left via the "+data[i].location.toLowerCase()+" camera at "+timeOnlyFormat(data[i].time)+"</div>";
+            }
+            //list+="<a class='col-1 text-end p-0 fs-6 text-right c-b' href='javascript:void(0)'><i class='fa-solid fa-xmark' title='Delete'></i></a>";
+            list+="</div>";
+            list+="</div>";
+            list+="</div>";
+            list+="</div>";
+          }
+          $("#notificationList").append(list);
+        }
+      });
+    }
+    $("#typeFilter,#pageFilter").on("change",function(){
+      notificationFilter();
+    });
+
+    function notificationAutoReload(){
+      var time=$("#reloadFilter").val();
+      notificationIntervel=setInterval(notificationFilter,time*10000);
+    }
+
+    $("#reloadFilter").on("change",function(){
+      clearInterval(notificationIntervel);
+      notificationAutoReload();
+    });
+</script>

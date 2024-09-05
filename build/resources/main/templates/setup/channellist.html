@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+    <title>[[${session.APP_NAME}]] - Agents</title>
+</head>
+<body>
+<div layout:fragment="content" class="contant">
+    <div class="main-table">
+        <div class="col-md-12 row m-0">
+            <div class="col-md-12">
+                <input class="input-search" type="text" name="hostname" id="hostname"/>
+                <button onclick="filterIp()" class="button-scan">
+                    <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                    <span class="btn-txt">Scan for devices...</span>
+                </button>
+                <nav aria-label="Page navigation example" class="pagination-nav">
+                    <ul class="pagination">
+                        <li class="page-item">
+                            <a class="page-link"  aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" >1</a>
+                        </li>
+                        <li class="page-item"><a class="page-link" >2</a></li>
+                        <li class="page-item"><a class="page-link" >3</a></li>
+                        <li class="page-item">
+                            <a class="page-link"  aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="col-md-12 row table-responsive">
+            <table class="clr-txt">
+                <thead>
+                <tr>
+                    <!--
+                        <th class="img-th"></th> -->
+                    <th>Device ID</th>
+                    <th>Name</th>
+                    <th>URL/IP</th>
+                    <th>Type</th>
+                    <th width="160">Mapped Settings</th>
+                    <th width="70">Action</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody class="" id="channelList">
+
+                </tbody>
+            </table>
+        </div>
+        <script>
+      $(document).ready(function () {
+        toastr.options = {
+          debug: false,
+          newestOnTop: false,
+          positionClass: "toast-bottom-right",
+          closeButton: true,
+          progressBar: false,
+        }
+            $('[data-toggle="tooltip"]').tooltip();
+        // $(".restart_tool").on("click", function () {
+        //   toastr.info("Restart - Restarted Successfully");
+        // });
+
+        $(".button-scan").on("click", function () {
+          $(".loading-icon").removeClass("hide");
+          $(".button-scan").attr("disabled", true);
+          $(".btn-txt").text("Scanning...");
+
+          setTimeout(function () {
+
+            setTimeout(function () {
+
+            }, 500);
+          }, 3000);
+        });
+
+        // $(".button-scan").on("click", function (event) {
+        //   toastr.info("Info - This is a custom LUNA info notification");
+        // });
+
+        // $(".button-scan").on("click", function (event) {
+        //   toastr.success("Success - This is a LUNA success notification");
+        // });
+
+        // $(".button-scan").on("click", function (event) {
+        //   toastr.warning("Warning - This is a LUNA warning notification");
+        // });
+
+        // $(".button-scan").on("click", function (event) {
+        //   toastr.error("Error - This is a LUNA error notification");
+        // });
+      });
+      function call(type) {
+        if (type == 1) {
+             $(this).find(".fa-database").hide();
+          $(this).find(".rotation-1").show();
+          setTimeout(function(){
+              $(this).find(".fa-database").show();
+                $(this).find(".rotation-1").hide();
+                }, 3000);
+          toastr.success("Restarted Sucessfully..");
+        } else if (type == 2) {
+           $(this).find(".fa-database").hide();
+          $(this).find(".rotation-2").show();
+          setTimeout(function(){
+              $(this).find(".fa-database").show();
+                $(this).find(".rotation-2").hide();
+                }, 3000);
+          toastr.warning("Stopped Sucessfully..");
+        } else if (type == 3) {
+          $(this).find(".fa-database").hide();
+          $(this).find(".rotation-3").show();
+          setTimeout(function(){
+              $(this).find(".fa-database").show();
+                $(this).find(".rotation-3").hide();
+                }, 3000);
+          toastr.info("Started Successfully..");
+        }else {
+          toastr.error("Error required");
+        }
+      }
+
+      function filterIp() {
+        var filter = $("#hostname").val();
+          var dataApi = "[[${session.DATA_API}]]";
+          var sessionToken = "[[${session.USER.sessionToken}]]";
+          var urlSlashCheck = dataApi.endsWith("/")?dataApi:dataApi+"/";
+          var apiUrl = urlSlashCheck + "api/v1/channels/"+filter; 
+        $.ajax({
+          contentType: "application/json;charset=UTF-8",
+          url: apiUrl,
+          dataType: "json",
+          headers:{'CLIENT_KEY':sessionToken},
+          type: "GET",
+          async: true,
+          success: function (data) {
+            var channelList="";
+            for(i=0;i<data.length;i++){
+              channelList=channelList+'<tr>';
+              channelList=channelList+'<td>'+data[i].id+'</td>';
+              channelList=channelList+'<td>'+data[i].name+'</td>';
+              channelList=channelList+'<td>'+data[i].ip+'</td>';
+              channelList=channelList+'<td>'+data[i].type+'</td>';
+              if(data[i].mappings == false){
+                  channelList=channelList+'<td class="mapped_class"><i class="fa fa-check inactive" aria-hidden="true"></i></td>';
+                  channelList=channelList+'<td class="database-icon">';
+                  channelList=channelList+'<a  data-placement="right" data-toggle="tooltip" data-html="true" title="<div onClick=\'javascript:call(3)\'><a class=\'start_tool\' >Start</a></div>">';
+                  channelList=channelList+'<i class="fa fa-database"></i><i class="fa fa-play-circle rotation-3" aria-hidden="true"></i></a></td>';
+              }else{
+                  channelList=channelList+'<td class="mapped_class"><i class="fa fa-check active" aria-hidden="true"></i></td>';
+                  channelList=channelList+'<td class="database-icon">';
+                  channelList=channelList+'<a ';
+                  channelList=channelList+'data-placement="right" data-toggle="tooltip" data-html="true" ';
+                  channelList=channelList+'title="<div onClick=\'javascript:call(1)\'><a class=\'restart_tool\'>Restart</a></div>';
+                  channelList=channelList+'<div onClick=\'javascript:call(2)\'><a class=\'stop_tool\' >Stop</a></div>">';
+                  channelList=channelList+'<i class="fa fa-database"></i><i class="fa fa-refresh rotation-1" aria-hidden="true"></i><i class="fa fa-stop-circle-o rotation-2" aria-hidden="true"></i></a></td>';
+                  }
+              channelList=channelList+'<td><i class="fa fa-pencil-square-o edit-confi" aria-hidden="true"></i></td>';
+              channelList=channelList+'</tr>';
+            }
+            $("#channelList").html(channelList);
+            $('[data-toggle="tooltip"]').tooltip();
+            setTimeout(function(){ toastr.success("New devices found.."); }, 1000);
+            $(".loading-icon").addClass("hide");
+            $(".button-scan").attr("disabled", false);
+            $(".btn-txt").text("Scan for devices...");
+          },
+          error:function(err){
+              setTimeout(function(){ toastr.success("New devices found.."); }, 1000);          }
+        });
+      }
+    </script>
+    </div>
+</div>
+</body>
+</html>

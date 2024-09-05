@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/layout}">
+<head>
+	<title>[[${session.APP_NAME}]] - Settings</title>
+</head>c
+<body>
+<div layout:fragment="content" class="contant">
+	<div class="pre-loading">
+    	<img class="loader" src="/web/images/loader.png" />
+  	</div>
+    <div class="main-table">  
+        <div class="data_api">
+            <div>
+                <ul class="nav nav-tabs separator-tabs ml-0" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link fs-16 active"  id="fourth-tab" data-toggle="tab" href="#fourth" role="tab"
+                           aria-controls="second" aria-selected="false">Data API</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-16" id="first-tab" data-toggle="tab" href="#first" role="tab"
+                           aria-controls="first" aria-selected="true">Entry Exit</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link fs-16"  id="second-tab" data-toggle="tab" href="#second" role="tab"
+                           aria-controls="second" aria-selected="false">Data Retains </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-16"  id="third-tab" data-toggle="tab" href="#third" role="tab"
+                           aria-controls="second" aria-selected="false">Report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-16"  id="fifth-tab" data-toggle="tab" href="#fifth" role="tab"
+                           aria-controls="second" aria-selected="false">SMTP</a>
+                    </li>
+
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane show" id="first" role="tabpanel" aria-labelledby="first-tab">
+                        <div class="row">
+                            <div class="col-12 col-lg-12 apisty">
+                                <div class="row g-0">
+                                    <div class="entryDiv border-right">
+                                        <div class="col-md-12 dFlex pt-3">
+                                            <div class="cfLable">
+                                                <label class="config_labels">Expected Entry Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Depending on this time, display the on-time entry data." ></i></label>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input type="text" id="timeSelector" class="expectedEntry" name="timeSelector"/>
+                                            </div>
+                                        </div>      
+                                        <div class="col-md-12 dFlex pt-3">
+                                            <div class="cfLable">
+                                                <label class="config_labels"> Entry Grace Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="This time is used to determine grace entry." ></i></label>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <select class="retains_sec" id="graceTime" name="graceTime">                  
+                                                    <option value=10>10 Mins</option>
+                                                    <option value=20>20 Mins</option>
+                                                    <option value=30>30 Mins</option>
+                                                </select>
+                                            </div>    
+                                        </div>
+                                    </div>
+                                    <div class="hrLine"></div>	
+                                    <div class="entryDiv">
+                                        <div class="col-md-12 dFlex pt-3">
+                                            <div class="cfLable">
+                                                <label class="config_labels">Expected Exit Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Depending on this time, display the on-time exit data." ></i></label>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input type="text" id="exitTimeSelector" class="expectedEntry" name="exitTimeSelector"/>
+                                            </div>
+                                        </div>      
+                                        <div class="col-md-12 dFlex pt-3">
+                                            <div class="cfLable">
+                                                <label class="config_labels"> Exit Grace Time <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="This time is used to determine grace exit." ></i></label>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <select class="retains_sec" id="exitgraceTime" name="exitgraceTime">                  
+                                                    <option value=10>10 Mins</option>
+                                                    <option value=20>20 Mins</option>
+                                                    <option value=30>30 Mins</option>
+                                                </select>
+                                            </div>    
+                                        </div>
+                                    </div>  
+
+                                </div>
+                            </div>
+            
+                        </div>
+
+                    </div>
+                    <div class="tab-pane show" id="second" role="tabpanel" aria-labelledby="second-tab">
+                        <div class="row">
+                            <div class="col-12 col-lg-12 apisty">
+                                <div class="row g-0">	
+                                    <div class="col-md-12 dFlex">
+                                        <div class="col-md-2">
+                                            <label class="config_labels">Data retains period <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Data Retains Period keeps the data for the required number of days." ></i></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <select class="retains_sec" id="dayRetains" name="dayRetains">                  
+                                                <option value="30">30 Days</option>
+                                                <option value="35">35 Days</option>
+                                                <option value="40">40 Days</option>
+                                            </select>
+                                        </div>
+                                    </div>       
+                                    <div class="col-md-12 dFlex pt-3">
+                                        <div class="col-md-2">
+                                            <label class="config_labels">Video save option <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="If video save option checked, your video will save; otherwise, it won't." ></i></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="checkbox" class="save_check" id="saveCheck" name="savecheck">
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane show" id="third" role="tabpanel" aria-labelledby="third-tab">
+                        <div class="row">
+                            <div class="col-12 col-lg-12 apisty">
+                                <div class="row g-0">	
+                                    <div class="col-md-12 row">
+                                        <div class="col-md-2">
+                                        <label class="config_labels">Report Generation Interval <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Ilens will send an attendance report for the chosen period to the specified report receipt email address." ></i></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <select class="retains_sec" id="interval" name="interval">                  
+                                                <option value="1">1 Day</option>
+                                                <option value="2">2 Days</option>
+                                                <option value="7">1 Week</option>
+                                                <option value="14">2 Weeks</option>
+                                                <option value="30">1 Month</option>
+                                            </select>
+                                        </div>
+                                    </div>    
+                                    <div class="col-md-12 row pt-3">
+                                        <div class="col-md-2">
+                                            <label class="config_labels">Report Recipient Email <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The attendance report will be sent to this email address." ></i></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="text" id="receipt" data-role="tagsinput" value="" class="Report_receipt" name="receipt"/>
+                                            <div id="mailSendBtn">
+                                                <div class="text-warning ml-3 errorDiv"><i class="fas fa-exclamation-triangle"><span id="errorMsg" class="text-white"></span></i></div>
+                                            </div>
+                                        </div>
+                                    </div>   
+                                    <div class="col-md-12 row pt-3">
+                                        <div class="col-md-2">
+                                            <label class="config_labels">Week Days <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="Choose working days to customise the outcome." ></i></label>
+                                        </div>
+                                        <div class="col-md-8 reportCheck">
+                                            <input type="checkbox" name="checkbox" id="sunday" class="save_check" value="sunday"><span>Sun</span>
+                                            <input type="checkbox" name="checkbox" id="monday" class="save_check" value="monday"><span>Mon</span>
+                                            <input type="checkbox" name="checkbox" id="tuesday" class="save_check" value="tuesday"><span>Tues</span>
+                                            <input type="checkbox" name="checkbox" id="wednesday" class="save_check" value="wednesday"><span>Wed</span>
+                                            <input type="checkbox" name="checkbox" id="thursday" class="save_check" value="thursday"><span>Thu</span>
+                                            <input type="checkbox" name="checkbox" id="friday" class="save_check" value="friday"><span>Fri</span>
+                                            <input type="checkbox" name="checkbox" id="saturday" class="save_check" value="saturday"><span>Sat</span>
+                                            <div class="pt-2"><button class="emailButton" onclick="reportGenerate()">Generate Now</button></div>
+                                        </div>
+                                    </div>     
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane show active" id="fourth" role="tabpanel" aria-labelledby="fourth-tab">
+                        <div class="row">
+                            <div class="col-12 col-lg-12 apisty">
+                                <div class="col-md-12 p-0">
+                                    <label class="dinput-labels">Data API <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The API that accepts data to process and present on cloud" ></i></label>
+                                    <input type="text"  class="dlens_input"  id="apiValue" />
+                                </div>
+                                <div class="col-md-12 p-0">
+                                    <label class="dinput-labels">Report API <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The API URL is receive process data" ></i></label>
+                                    <input type="text"  class="Report_input"  id="reportValue" />
+                                </div>
+                                <div class="col-md-12 p-0">
+                                    <label class="dinput-labels">API Token <i class="fa fa-question-circle " data-toggle1="tooltip" data-placement="right" title="The token to authentication remote API server" ></i></label>
+                                    <input type="text"   class="alens_input" id="tokenValue"  />
+                                </div>                                      
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane show" id="fifth" role="tabpanel" aria-labelledby="fifth-tab">
+                        <div class="row">
+                            <div class="col-12 col-lg-12 apisty">
+                                <form class="smtpForm">
+                                    <div class="row mb-3">
+                                      <div class="col-md-6">
+                                        <label class="config_labels">SMTP Host</label>
+                                        <input type="text" class="form-control smtpInput" id="smtpHost" required>
+                                        <div class="error-feedback" id="error1">This field cannot be empty <i class='fas fa-exclamation-circle'></i></div>
+                                      </div>
+                                      <div class="col-md-6">
+                                        <label class="config_labels">Port Number</label>
+                                        <input type="text" class="form-control smtpInput" id="smtpPort" required>
+                                        <div class="error-feedback" id="error2">This field cannot be empty <i class='fas fa-exclamation-circle'></i></div>
+                                      </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                          <label class="config_labels">Email ID</label>
+                                          <input type="text" class="form-control smtpInput" id="smtpEmail" required>
+                                          <div class="error-feedback" id="error3">This field cannot be empty <i class='fas fa-exclamation-circle'></i></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                          <label class="config_labels">Password</label>
+                                          <input type="password" class="form-control smtpInput" id="smtpPassword" required>
+                                          <div class="error-feedback" id="error4">This field cannot be empty <i class='fas fa-exclamation-circle'></i></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="config_labels">Secure</label>
+                                            <div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="smtpSSL">
+                                                    <label class="form-check-label config_labels" for="inlineRadio1">SSL</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="smtpTLS">
+                                                    <label class="form-check-label config_labels" for="inlineRadio2">TLS</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <buttonn type="button" class="emailButton" data-toggle="modal" data-target="#testModel">Test Email</button>
+                                        </div>
+                                    </div>
+                                </form>                                    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <div>
+            <button type="button"  class="api-button" id="update" >Update</button>
+        </div>
+
+    </div>
+    <div class="modal" id="testModel">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content smtpModel">
+            <div class="pre-loading" id="smtploader">
+                <img class="smptloader" src="/web/images/loader.png" />
+              </div>
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Test Email</h4>
+              <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                      <label class="config_labels">Email ID</label>
+                      <input type="text" class="form-control smtpInput" id="smtpTestEmail">
+                      <div class="text-warning ml-3 errorDiv1"><i class="fas fa-exclamation-triangle"><span id="errorMsg" class="errorMsg text-white"></span></i></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="smtpBtn" data-dismiss="modal">Close</button>
+                <button type="button" class="smtpBtn" id="testMail">Test Email</button>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+<script>
+    $("#heading").html("Settings");
+  	$(document).ready(function(){
+        configurationsList();
+        reportlist();
+        getDataApi();
+        getSMTP();
+      $('#timeSelector').datetimepicker({
+        format: 'LT',
+        showClear:true,
+        toolbarPlacement: 'bottom',
+        showClose:true,
+        icons: {
+            close: 'fa fa-check'
+        }
+      });
+      $('#exitTimeSelector').datetimepicker({
+        format: 'LT',
+        showClear:true,
+        toolbarPlacement: 'bottom',
+        showClose:true,
+        icons: {
+            close: 'fa fa-check'
+        }
+      });
+    //   var dates= moment().format("MM/DD/YYYY");
+    //   var datetime = moment(dates+" "+$('#timeSelector').val()).add(30, 'minutes');
+    //   console.log(moment(datetime).add(30, 'minutes').format("DD/MM/YYYY HH:mm a"));
+      $("#navadms").addClass('active');
+      $("#Adms").addClass('show');
+      $("#data_configuration").addClass('active');
+      toastr.options = {
+          debug: false,
+          newestOnTop: false,
+          positionClass: "toast-bottom-right",
+          closeButton: true,
+          progressBar: false,
+        }
+      $('[data-toggle1="tooltip"]').tooltip({trigger:'click'});
+      $(".fa-question-circle").mouseleave(function(){
+           $('[data-toggle1="tooltip"]').tooltip('hide');
+         })
+    })
+
+    $("#update").click(function(){
+      if(checkReport()==false){
+        return false;
+      }else if(dataApiSave()==false){
+        return false;
+      }else if(smtp()==false){
+        return false;
+      }
+    var retainsPeriod=$("#dayRetains").val();
+    var videoStatus=$("#saveCheck").is(':checked') ? true : false;
+    var graceTime=$("#graceTime").val();
+    var onTime=$("#timeSelector").val();
+    var exitGracePeriod=$("#exitgraceTime").val();
+    var exitOnTime=$("#exitTimeSelector").val();
+    var exitOnTimeMIn=($("#exitTimeSelector").val()).split(":");
+    var onTimeMin=($("#timeSelector").val()).split(":");
+    var graceTime1=parseInt((onTimeMin[1]).split(" ")[0])+parseInt(graceTime);
+    if(graceTime1 > 59){
+        var graceTime=(parseInt(onTimeMin[0])+1)+":"+((parseInt((onTimeMin[1]).split(" ")[0])+parseInt(graceTime))%60)+" "+(onTimeMin[1]).split(" ")[1]; 
+    }else{
+        var graceTime=onTimeMin[0]+":"+(parseInt((onTimeMin[1]).split(" ")[0])+parseInt(graceTime))+" "+(onTimeMin[1]).split(" ")[1]; 
+    }
+    // var graceTime=onTimeMin[0]+":"+(parseInt((onTimeMin[1]).split(" ")[0])+parseInt(graceTime))+" "+(onTimeMin[1]).split(" ")[1];
+    if(onTimeMin[1].charAt(0) == '0'){
+        onTime = onTimeMin[0]+":"+onTimeMin[1].replace('0','');
+    }
+    if(exitOnTimeMIn[1].charAt(0)=="0"){
+        exitOnTime = exitOnTimeMIn[0]+":"+exitOnTimeMIn[1].replace('0',''); 
+    }
+    var gracePeriod=$("#graceTime").val();
+    var exitGraceTime=(moment().format("YYYY-MM-DD")) +" "+ ($("#exitTimeSelector").val());
+    var exitGraceTiMin = moment(exitGraceTime).subtract(exitGracePeriod, 'minutes').format('hh:mm A');
+    exitGraceTiMin=exitGraceTiMin.split(":")
+    if(exitGraceTiMin[0].charAt(0) == '0'){
+         exitGraceTiMin[0]=exitGraceTiMin[0].replace('0',"");
+    }
+    if(exitGraceTiMin[1].charAt(0) == '0'){
+        exitGraceTiMin[1]=exitGraceTiMin[1].replace('0',"");
+    }
+    var exitGraceTime= exitGraceTiMin[0]+":"+exitGraceTiMin[1];
+
+    var id=0;
+      var data={
+        retainsPeriod:retainsPeriod,
+        exitGracePeriod:exitGracePeriod,
+        exitOnTime:exitOnTime,
+        exitGraceTime,exitGraceTime,
+        onTime:onTime,
+        videoStatus:videoStatus,
+        graceTime:graceTime,
+        gracePeriod:gracePeriod,
+        id:id
+      }
+    var sessionToken = "[[${session.API_TOKEN}]]";
+    var apiUrl = "api/v1/configurations/save";
+     $.ajax({
+          contentType: "application/json;charset=UTF-8",
+          url:apiUrl,
+          headers:{'CLIENT_KEY':sessionToken},
+          type: 'POST',
+          data: JSON.stringify(data),
+          async: false,
+          success: function(data){
+            setTimeout(function(){ toastr.success("Configuration updated"); }, 1000);
+          },
+          error: function(err){
+            setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+          }
+        });
+    })
+    
+    function configurationsList(){
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/configurations/list";  
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url: apiUrl,
+            dataType:'json',      
+            headers:{'CLIENT_KEY': sessionToken},
+            type: 'GET',
+            async: false,
+            success: function(data){ 
+                    $("#dayRetains").val(data.retainsPeriod);
+                    $("#timeSelector").val(data.onTime);
+                    $("#exitTimeSelector").val(data.exitOnTime);
+                    // var graceTime=((data.graceTime+"").split(":")[1]).split(" ")[0];
+                    $("#graceTime").val(data.gracePeriod);
+                    $("#exitgraceTime").val(data.exitGracePeriod);
+                    if(data.videoStatus == true){
+                        $("#saveCheck").prop( "checked", true )
+                    }
+
+            },
+            error: function(err){
+                setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+            }
+        });
+    }
+    function reportlist(){
+        var days = [];
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/report/list";  
+        $.ajax({
+                contentType: "application/json;charset=UTF-8",
+                url: apiUrl,
+                dataType:'json',      
+                headers:{'CLIENT_KEY': sessionToken},
+                type: 'GET',
+                async: false,
+                success: function(data){ 
+                    $("#interval").val(data.reportPeriod);
+                    $("#receipt").val(data.mail);
+                    $('#receipt').tagsinput('add', data.mail);
+                    days = data.weekDays.split(",");
+                    for(var i=0; i<days.length; i++){
+                        $("#"+days[i]).prop("checked", true);
+                    }
+                },
+                error: function(err){
+                    setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+                }
+            });
+    }
+    function reportGenerate(){
+        var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        var emailaddressVal = ($("#receipt").val()).split(",");
+        for(i=0;i<emailaddressVal.length;i++){
+            if(emailaddressVal[i] == '') {
+                $("#errorMsg").html('Please enter your email address.');
+                $(".errorDiv").css("opacity", "1");
+                return false;
+            }else if(!emailReg.test(emailaddressVal[i])) {
+                $("#errorMsg").html('Enter a valid email address.');
+                $(".errorDiv").css("opacity", "1");
+                return false;
+            }
+        };
+        $(".errorDiv").css("opacity", "0");
+        $(".pre-loading").show();
+        var mail= $("#receipt").val();
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/report/generate/"+mail;  
+        $.ajax({
+                contentType: "application/json;charset=UTF-8",
+                url: apiUrl,
+                headers:{'CLIENT_KEY': sessionToken},
+                type: 'GET',
+                async: true,
+                success: function(data){ 
+                    setTimeout(function(){ $(".pre-loading").hide();}, 2000);
+                    setTimeout(function(){ toastr.success("Report sent successfully"); }, 1000);
+                },
+                error: function(err){
+                    setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+                }
+            });
+    }
+
+    function checkReport(){
+        var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        var emailaddressVal = ($("#receipt").val()).split(",");
+        for(i=0;i<emailaddressVal.length;i++){
+            if(emailaddressVal[i] == '') {
+                $("#errorMsg").html('Please enter your email address.');
+                $(".errorDiv").css("opacity", "1");
+                return false;
+            }else if(!emailReg.test(emailaddressVal[i])) {
+                $("#errorMsg").html('Enter a valid email address.');
+                $(".errorDiv").css("opacity", "1");
+                return false;
+            }
+        };
+        $(".errorDiv").css("opacity", "0");
+        saveReport();
+    }
+
+    function saveReport(){
+        var reportPeriod= $("#interval").val();
+        var mail= $("#receipt").val();
+        var weekDays = [];
+        $(':checkbox:checked').each(function(i){
+            weekDays[i] = $(this).val();
+        });
+        weekDays=weekDays.join()
+       var data={
+            reportPeriod:reportPeriod,
+            mail:mail,
+            weekDays:weekDays,
+            id:1
+        }
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/report/save";  
+        $.ajax({
+                contentType: "application/json;charset=UTF-8",
+                url: apiUrl,   
+                headers:{'CLIENT_KEY': sessionToken},
+                type: 'POST',
+                data: JSON.stringify(data),
+                async: false,
+                success: function(data){ 
+                    // setTimeout(function(){ toastr.success("Configuration updated"); }, 1000);
+                },
+                error: function(err){
+                    setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+                }
+            });
+    }
+    function getDataApi() {
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "api/v1/dataApi/details";  
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url: apiUrl,
+            dataType:'json',      
+            headers:{'CLIENT_KEY': sessionToken},
+            type: 'GET',
+            async: false,
+            success: function(data){ 
+                $("#tokenValue").val(data.apiToken);
+                $("#apiValue").val(data.dataApi);
+                $("#reportValue").val(data.reportApi);
+            },
+            error: function(err){
+                setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+            }
+        });
+    }
+
+    function apiHealthCheck(reportApi, apiToken) {
+        var returnVal = "false";
+        var url = reportApi.toString().endsWith("/")?reportApi:reportApi+"/"; 
+        var finalUrl = url + "api/v1/dataApi/details"; 
+        var ilensApiClientVO  = {
+                                    api: finalUrl,
+                                    clientKey: apiToken.toString(),
+                                    inputVo: {},
+                                    method: "GET"
+                                }
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url: "/api/v1/iLensApiClient",
+            dataType:'json',      
+            headers:{'CLIENT_KEY':"[[${session.USER.sessionToken}]]"},
+            type: 'POST',
+            data: JSON.stringify(ilensApiClientVO),
+            crossDomain: true,       
+            async: false,
+            complete: function(xhr, data){      
+                if(xhr.status == 200){
+                returnVal = "true";
+                }     
+            }
+        });
+
+        return returnVal;
+    }
+
+
+    function dataApiSave(){
+        var rtnVl = apiHealthCheck($("#reportValue").val(), $("#tokenValue").val());
+        var update = {
+            apiToken: $("#tokenValue").val(),
+            reportApi:$("#reportValue").val(),
+            dataApi: $("#apiValue").val(),
+            id: ("0")
+            };
+        var sessionToken = "[[${session.USER.sessionToken}]]";
+        var apiUrl ="api/v1/dataApi/update";
+        if(rtnVl == "true"){
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url:apiUrl,
+            headers:{'CLIENT_KEY':sessionToken},
+            type: 'POST',
+            data: JSON.stringify(update),
+            async: false,
+            success: function(data){
+                // setTimeout(function(){ toastr.success("Success.."); }, 1000);
+            },
+            error: function(err){
+                setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+            }
+            });
+        }else{
+            setTimeout(function(){ toastr.error("Invalid Data API or API Token "); }, 1000);
+            return false;
+        }
+    }
+
+    function getSMTP() {
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "/api/v1/smtp/configs/list";  
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url: apiUrl,
+            dataType:'json',      
+            headers:{'CLIENT_KEY': sessionToken},
+            type: 'GET',
+            async: false,
+            success: function(data){ 
+               $("#smtpHost").val(data.host);
+               $("#smtpPort").val(data.port);
+               $("#smtpEmail").val(data.userMail);
+               $("#smtpPassword").val(data.secret);
+               if(data.ssl==true){
+                $("#smtpSSL").attr('checked', true);
+               }else{
+                $("#smtpTLS").attr('checked', true);
+               }
+            },
+            error: function(err){
+                setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+            }
+        });
+    }
+
+    function smtp(){
+        var host= $("#smtpHost").val();
+        var port= $("#smtpPort").val();
+        var userMail= $("#smtpEmail").val();
+        var secret= $("#smtpPassword").val();
+        var ssl=$("#smtpSSL").is(':checked') ? true : false;
+        var tls=$("#smtpTLS").is(':checked') ? true : false;
+        var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        $("#error-feedback").css("opacity", "0");
+        if(host==""){
+            $("#error1").css("opacity", "1");
+            return false;
+        }else if(port==""){
+            $("#error2").css("opacity", "1");
+            return false;  
+        }else if(userMail==""){
+            $("#error3").html('This field cannot be empty <i class="fas fa-exclamation-circle">');
+            $("#error3").css("opacity", "1");
+            return false;
+        }else if(!emailReg.test(userMail)) {
+            $("#error3").html('Enter a valid email address <i class="fas fa-exclamation-circle">');
+            $("#error3").css("opacity", "1");
+            return false;
+        }else if(secret==""){
+            $("#error4").css("opacity", "1");
+            return false; 
+        }
+        var data={
+            host:host,
+            port:port,
+            userMail:userMail,
+            secret:secret,
+            ssl:ssl,
+            tls:tls,
+            id:1
+        }
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "/api/v1/smtp/configs/save";  
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url: apiUrl,   
+            headers:{'CLIENT_KEY': sessionToken},
+            type: 'POST',
+            data: JSON.stringify(data),
+            async: false,
+            success: function(data){ 
+                // setTimeout(function(){ toastr.success("Configuration updated"); }, 1000);
+            },
+            error: function(err){
+                setTimeout(function(){ toastr.error("Error found.."); }, 1000);
+            }
+        });
+    }
+
+    $("#testMail").click(function(){
+    var email=$("#smtpTestEmail").val();
+    var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+    if(email== '') {
+        $(".errorMsg").html('Please enter your email address.');
+        $(".errorDiv1").css("opacity", "1");
+        return false;
+    }else if(!emailReg.test(email)) {
+        $(".errorMsg").html('Enter a valid email address.');
+        $(".errorDiv1").css("opacity", "1");
+        return false;
+    }
+    $(".errorDiv1").css("opacity", "0");
+   testEmail();
+    })
+
+    function testEmail(){
+        $("#smtploader").show();
+        var toMail=$("#smtpTestEmail").val();
+        var host= $("#smtpHost").val();
+        var port= $("#smtpPort").val();
+        var userMail= $("#smtpEmail").val();
+        var secret= $("#smtpPassword").val();
+        var ssl=$("#smtpSSL").is(':checked') ? true : false;
+        var tls=$("#smtpTLS").is(':checked') ? true : false;
+        var data={
+            host:host,
+            port:port,
+            userMail:userMail,
+            secret:secret,
+            ssl:ssl,
+            tls:tls,
+            toMail:toMail,
+            id:1
+        }
+        var sessionToken = "[[${session.API_TOKEN}]]";
+        var apiUrl = "/api/v1/smtp/mail/test";  
+        $.ajax({
+            contentType: "application/json;charset=UTF-8",
+            url: apiUrl,   
+            headers:{'CLIENT_KEY': sessionToken},
+            type: 'POST',
+            data: JSON.stringify(data),
+            async: true,
+            success: function(data){ 
+                setTimeout(function(){ toastr.success("Test email sent"); }, 1000);
+                modalHide();
+            },
+            error: function(xhr,err,errorThrown){
+                setTimeout(function(){ toastr.error(xhr.responseJSON.message); }, 1000);
+                modalHide();
+            }
+        });
+    }
+
+function modalHide(){
+    $("#testModel").modal('hide');
+    $("#smtploader").hide();
+    $("#smtpTestEmail").val("");
+}
+</script>
+
+</div>
+</body>
+</html>

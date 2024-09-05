@@ -5,6 +5,7 @@ import com.pbs.tech.model.User;
 import com.pbs.tech.vo.UserTokenVO;
 import com.pbs.tech.vo.UserVo;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public interface UserRepo extends PagingAndSortingRepository<User,Long> {
+public interface UserRepo extends JpaRepository<User,Long>,PagingAndSortingRepository<User,Long> {
 
     User findByUsername(String userName);
 

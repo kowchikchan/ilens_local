@@ -1,8 +1,7 @@
 import org.apache.tools.ant.filters.ReplaceTokens
-
 buildscript {
     repositories {
-        maven {url "https://plugins.gradle.org/m2/"}
+        maven { url "https://plugins.gradle.org/m2/" }
         google()
     }
     dependencies {
@@ -10,81 +9,72 @@ buildscript {
         classpath 'com.google.gms:google-services:4.3.13'
     }
 }
-
 plugins {
     id 'org.springframework.boot' version '2.3.9.RELEASE'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'java'
 }
-
 apply plugin: "org.sonarqube"
-
 group = 'com.pbs.tech'
 version = '1.0'
 sourceCompatibility = '11'
-
 repositories {
     mavenCentral()
     maven { url 'https://repo.spring.io/milestone' }
     google()
 }
-
 sonarqube {
     properties {
         property 'sonar.sources', 'src/main/java,src/main/resources'
-        //property 'sonar.tests', 'src/test/java'
+        // property 'sonar.tests', 'src/test/java'
     }
 }
-
 dependencies {
-
-    //Spring core
+    // Spring core
     implementation("org.springframework.boot:spring-boot-starter-web")
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
-
     // Template layout
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
-
     implementation('org.springframework.boot:spring-boot-starter-data-cassandra')
-
-    //Thanks for using https://jar-download.com
-    //spring security
+    // Spring security
     implementation('org.springframework.boot:spring-boot-starter-security')
-
-    //DATA
-    implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
-    //compile 'mysql:mysql-connector-java:6.0.5'
-    // https://mvnrepository.com/artifact/com.h2database/h2
+    // Data
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation group: 'com.h2database', name: 'h2', version: '1.4.200'
-
-    //Apache Utils
+    // Apache Utils
     implementation 'org.apache.commons:commons-dbcp2:2.1.1'
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-
+    // Test dependencies
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
-
-    //swagger API DOC.
+    // Swagger API documentation
     implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
     implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'
+    // Additional dependencies
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.5'
     implementation group: 'com.itextpdf', name: 'itextpdf', version: '5.0.6'
     implementation group: 'javax.mail', name: 'mail', version: '1.4.7'
-
+    // Firebase Admin
     implementation 'com.google.firebase:firebase-admin:8.1.0'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 }
-
 test {
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    reports {
+        junitXml.enabled = true   // Enable XML report generation
+        html.enabled = true       // Enable HTML report generation
+    }
+    ignoreFailures = false       // Fail the build if any tests fail
+    failFast = true              // Stop at the first failing test
 }
-
 sourceSets {
     main {
         resources {
@@ -94,7 +84,6 @@ sourceSets {
         }
     }
 }
-
 def packageDistribution = copySpec {
     def distroName = "$name-$version"
     into(distroName) {
@@ -103,12 +92,10 @@ def packageDistribution = copySpec {
         new File(buildDir, "$distroName/lib").mkdirs()
         new File(buildDir, "$distroName/data").mkdirs()
         new File(buildDir, "$distroName/scripts").mkdirs()
-
         into('lib') {
             from 'build/libs'
             include '*.jar' // copy the fat jar created by bootRepackage
         }
-
         into('bin') {
             from 'src/templates'
             include 'start*.template'
@@ -122,36 +109,51 @@ def packageDistribution = copySpec {
             ])
             fileMode = 0755
         }
-
         into('conf') {
             from "src/main/resources/" // custom start script based on startScripts task output
             include '*.yml'
             include 'ilens-ssl.pkcs12'
         }
-
         into('scripts') {
             from "build/resources/main/scripts/"
             exclude '**/*.jpg'
             include '**/*.py'
             include '**/*.xml'
         }
-
         into('scripts/report') {
             from "build/resources/main/static/web/images/"
             include 'logo.png'
         }
-
         into('scripts/rtspServer') {
             from "build/resources/main/scripts/rtspServer/"
             include 'ilensCert.crt'
             include 'ilensKey.key'
         }
-
         rename("^start-ilens.sh.template\$", "start-ilens.sh")
         rename("^stop-ilens.sh.template\$", "stop-ilens.sh")
     }
 }
-
 task releaseTar(type: Tar, dependsOn: ['build']) {
     with packageDistribution
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

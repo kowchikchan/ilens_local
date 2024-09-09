@@ -11,6 +11,7 @@ buildscript {
 }
 plugins {
     id 'org.springframework.boot' version '2.3.9.RELEASE'
+    id "org.sonarqube" version "4.3.0.3225"
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'java'
 }
@@ -25,6 +26,9 @@ repositories {
 }
 sonarqube {
     properties {
+        property "sonar.projectKey", "ilens"
+        property "sonar.host.url", "http://192.168.1.12:9000"
+        property "sonar.login", "b3e150b4b7f1a1c39df5ceb538b4254bea99c08e"
         property 'sonar.sources', 'src/main/java,src/main/resources'
         // property 'sonar.tests', 'src/test/java'
     }
